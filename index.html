@@ -434,10 +434,10 @@ img { display: block; max-width: 100%; }
       <!-- TAB CONFIG -->
       <div class="tab-panel" data-panel="config">
         <div style="background:rgba(212,181,139,0.08);border:1px dashed rgba(212,181,139,0.4);padding:16px;border-radius:10px;font-size:13px;line-height:1.7;color:#d2c3ae">
-          <strong>Mode local :</strong> les produits sont sauvegardés dans le navigateur (localStorage). Ils restent visibles sur cet appareil.
+          <strong>Synchronisation active :</strong> catalogue, photos et commandes sont partagés via Supabase. Les nouvelles commandes arrivent dans l'onglet Commandes en temps réel.
         </div>
         <div style="margin-top:20px">
-          <button class="btn-danger" id="btnReset" style="padding:12px 20px;font-size:14px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M12 3 22 20H2L12 3Z"/><path d="M12 9v5"/><path d="M12 17.5h.01"/></svg>Tout réinitialiser</button>
+          <button class="btn" id="btnSync" style="padding:12px 20px;font-size:14px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M20 7v5h-5"/><path d="M4 17v-5h5"/><path d="M5.6 9A7 7 0 0 1 18 6l2 6M4 12l2 6a7 7 0 0 0 12.4-3"/></svg>Synchroniser maintenant</button>
         </div>
       </div>
     </div>
@@ -557,6 +557,7 @@ let orders = [];
 let editingId = null;
 let supabaseClient = null;
 let ordersChannel = null;
+let productsChannel = null;
 let currentAdmin = null;
 
 function loadState() {
@@ -783,6 +784,29 @@ function initSupabase() {
   supabaseClient=window.supabase.createClient(cfg.supabaseUrl,cfg.supabasePublishableKey);
 }
 
+async function loadRemoteProducts(showError=false) {
+  if(!supabaseClient) return;
+  const {data,error}=await supabaseClient.from("products").select("id,name,category,price,description,image,tag,published,created_at,updated_at").order("id",{ascending:true});
+  if(error) { console.error("Chargement catalogue Supabase:",error); if(showError) notify("Impossible de synchroniser le catalogue."); return; }
+  products=(data||[]).map(p=>({id:Number(p.id),name:p.name,category:p.category,price:Number(p.price)||0,description:p.description||"",image:p.image||"",tag:p.tag||"",published:p.published}));
+  renderShop(); renderAdminProducts(); renderAdminStats();
+}
+function subscribeToProducts() {
+  if(!supabaseClient) return;
+  if(productsChannel) supabaseClient.removeChannel(productsChannel);
+  productsChannel=supabaseClient.channel("atelier-products-realtime")
+    .on("postgres_changes",{event:"*",schema:"public",table:"products"},()=>loadRemoteProducts(false))
+    .subscribe(status=>{if(status==="CHANNEL_ERROR") console.error("Canal catalogue Realtime indisponible");});
+}
+async function saveProductImage(image) {
+  if(!image || !image.startsWith("data:")) return image || "";
+  const blob=await fetch(image).then(r=>r.blob());
+  const path="products/"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,10)+".jpg";
+  const {error}=await supabaseClient.storage.from("atelier-products").upload(path,blob,{contentType:"image/jpeg",upsert:false});
+  if(error) throw error;
+  return supabaseClient.storage.from("atelier-products").getPublicUrl(path).data.publicUrl;
+}
+
 /* ================================================================
    ADMIN
 ================================================================ */
@@ -816,6 +840,7 @@ async function adminLogin(e) {
     }
     currentAdmin=data.user;
     $("adminLogin").hidden=true; $("adminDash").hidden=false;
+    await loadRemoteProducts(true);
     await loadRemoteOrders(false);
     subscribeToOrders();
     renderAdminProducts(); renderAdminStats();
@@ -944,44 +969,38 @@ function cancelForm() {
   editingId = null;
 }
 
-function saveProduct(e) {
+async function saveProduct(e) {
   e.preventDefault();
-  const name = $("fieldName").value.trim();
-  const category = $("fieldCategory").value.trim();
-  const price = Number($("fieldPrice").value) || 0;
-  const tag = $("fieldTag").value.trim();
-  const image = $("fieldImagePreview").dataset.dataUrl || $("fieldImage").value.trim();
-  const description = $("fieldDescription").value.trim();
-
-  if (!name || !category || price <= 0) {
-    notify("Remplissez nom, catégorie et prix.");
-    return;
-  }
-
-  if (editingId) {
-    const idx = products.findIndex(x => x.id === editingId);
-    if (idx > -1) {
-      products[idx] = Object.assign({}, products[idx], { name, category, price, tag, image, description });
-    }
-    notify("Produit modifié ✓");
-  } else {
-    products.push({ id: Date.now(), name, category, price, tag, image, description });
-    notify("Produit ajouté ✓");
-  }
-
-  saveProducts();
-  renderShop();
-  renderAdminProducts();
-  cancelForm();
+  if(!supabaseClient || !currentAdmin) return notify("Connectez-vous à l'administration.");
+  const name=$("fieldName").value.trim(), category=$("fieldCategory").value.trim();
+  const price=Number($("fieldPrice").value)||0, tag=$("fieldTag").value.trim();
+  let image=$("fieldImagePreview").dataset.dataUrl || $("fieldImage").value.trim();
+  const description=$("fieldDescription").value.trim();
+  if(!name || !category || price<=0) return notify("Remplissez nom, catégorie et prix.");
+  const button=$("productForm").querySelector('button[type="submit"]');
+  if(button){button.disabled=true;button.textContent="Enregistrement…";}
+  const wasEditing=Boolean(editingId);
+  try {
+    image=await saveProductImage(image);
+    const record={name,category,price,tag,image,description,published:true,updated_at:new Date().toISOString()};
+    const result=wasEditing ? await supabaseClient.from("products").update(record).eq("id",editingId) : await supabaseClient.from("products").insert(record);
+    if(result.error) throw result.error;
+    await loadRemoteProducts(false); cancelForm();
+    notify(wasEditing ? "Produit modifié et synchronisé." : "Produit ajouté et synchronisé.");
+  } catch(error) {
+    console.error("Enregistrement produit Supabase:",error);
+    notify("Échec de l'enregistrement. Vérifiez la connexion et les droits Supabase.");
+  } finally { if(button){button.disabled=false;button.textContent="Enregistrer";} }
 }
 
-function deleteProduct(id) {
-  if (!confirm("Supprimer définitivement ce produit ?")) return;
-  products = products.filter(x => x.id !== id);
-  saveProducts();
-  renderShop();
-  renderAdminProducts();
-  notify("Produit supprimé");
+async function deleteProduct(id) {
+  if(!currentAdmin || !supabaseClient) return notify("Connectez-vous à l'administration.");
+  if(!confirm("Supprimer définitivement ce produit pour tous les visiteurs ?")) return;
+  try {
+    const {error}=await supabaseClient.from("products").delete().eq("id",id);
+    if(error) throw error;
+    await loadRemoteProducts(false); notify("Produit supprimé de la boutique.");
+  } catch(error) { console.error("Suppression produit:",error); notify("Impossible de supprimer ce produit."); }
 }
 
 function resetAll() {
@@ -1023,6 +1042,7 @@ function sendChat(e){e.preventDefault();const input=$("chatInput");const value=i
 function init() {
   initSupabase();
   loadState();
+  if(supabaseClient) { loadRemoteProducts(false); subscribeToProducts(); }
   renderShop();
   renderCart();
   chatBubble("bot","Bonjour et bienvenue chez Atelier N°. Je suis Sora, votre assistante locale. Je peux vous présenter les produits et vous aider à commander.");
@@ -1089,7 +1109,7 @@ function init() {
   $("btnCheckout").addEventListener("click", checkout);
 
   /* Reset */
-  $("btnReset").addEventListener("click", resetAll);
+  $("btnSync").addEventListener("click", async () => { await loadRemoteProducts(true); await loadRemoteOrders(false); notify("Synchronisation terminée."); });
 
   /* Ouverture auto si #admin */
   if (location.hash === "#admin") openAdmin();
