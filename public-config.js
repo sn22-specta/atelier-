@@ -4,6 +4,9 @@
  * Remplace les chaînes vides par les liens publics officiels de la boutique.
  */
 window.ATELIER_PUBLIC_CONFIG = Object.freeze({
+  // Clé publishable publique : ne jamais y placer une clé secret/service_role.
+  supabaseUrl: "https://mdafofdfznufdwscvroq.supabase.co",
+  supabasePublishableKey: "sb_publishable_11bcDyC21WlB9kz1OaXsNw_qMoi_ykZ",
   social: Object.freeze({
     whatsapp: "",
     instagram: "",
