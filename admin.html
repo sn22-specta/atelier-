@@ -125,7 +125,7 @@ function resetProductForm(){
 $("loginForm").addEventListener("submit",async e=>{
  e.preventDefault();const btn=$("loginBtn");btn.disabled=true;message("loginMsg","Vérification…");
  code=$("accessCode").value;
- try{await api("products");sessionStorage.setItem("atelier_owner_code",code);$("loginPanel").hidden=true;$("dashboard").hidden=false;await loadAll();}
+ try{await api("products");sessionStorage.setItem("atelier_owner_code",code);$("loginPanel").hidden=true;$("dashboard").hidden=false;await loadAll();if(location.hash==="#configuration")showTab("config");}
  catch(err){code="";message("loginMsg",err.message,true);}
  finally{btn.disabled=false;}
 });
@@ -161,7 +161,7 @@ document.getElementById("dashboard").addEventListener("change",async e=>{
 $("refreshBtn").addEventListener("click",loadAll);
 $("logoutBtn").addEventListener("click",()=>{sessionStorage.removeItem("atelier_owner_code");code="";products=[];orders=[];tickets=[];$("dashboard").hidden=true;$("loginPanel").hidden=false;$("accessCode").value="";});
 code=sessionStorage.getItem("atelier_owner_code")||"";
-if(code){$("accessCode").value="";api("products").then(()=>{$("loginPanel").hidden=true;$("dashboard").hidden=false;loadAll();}).catch(()=>{sessionStorage.removeItem("atelier_owner_code");code="";});}
+if(code){$("accessCode").value="";api("products").then(()=>{$("loginPanel").hidden=true;$("dashboard").hidden=false;loadAll();if(location.hash==="#configuration")showTab("config");}).catch(()=>{sessionStorage.removeItem("atelier_owner_code");code="";});}
 })();
 </script>
 </body>
