@@ -16,6 +16,8 @@ create table if not exists public.orders (
     check (status in ('pending_confirmation','confirmed','preparing','shipped','delivered','cancelled')),
   payment_status text not null default 'unpaid'
     check (payment_status in ('unpaid','pending','paid','refunded')),
+  payment_method text not null default 'delivery'
+    check (payment_method in ('delivery','now')),
   created_at timestamptz not null default now()
 );
 
