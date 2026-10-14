@@ -73,6 +73,8 @@ img { display: block; max-width: 100%; }
 .stat-card { background:#0a0a0a;border:1px solid #252525;border-radius:12px;padding:18px }
 .stat-card span { display:block;color:#999;font-size:12px }
 .stat-card strong { display:block;color:#d4b58b;font-size:clamp(22px,4vw,30px);font-weight:500;margin-top:8px }
+.whatsapp-float { position:fixed;left:22px;bottom:22px;z-index:1500;width:58px;height:58px;border-radius:50%;background:#20c76a;color:#fff;display:grid;place-items:center;border:1px solid #57e08d;box-shadow:0 8px 35px #0008;transition:transform .2s,box-shadow .2s;text-decoration:none }
+.whatsapp-float:hover { transform:translateY(-3px);box-shadow:0 12px 38px #000a }
 .chat-launch { position:fixed;right:22px;bottom:22px;z-index:1500;width:60px;height:60px;border-radius:50%;border:1px solid #d4b58b;background:#d4b58b;display:grid;place-items:center;box-shadow:0 8px 35px #0008 }
 .chat-launch::after { content:"";position:absolute;inset:-4px;border:1px solid #d4b58b80;border-radius:50%;animation:halo 3s ease-out infinite }
 .orb { width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff1d5,#c08d50 40%,#6f4523 75%,#2a1b12);box-shadow:0 0 18px #ffe7c080;animation:breathe 3s ease-in-out infinite }
@@ -322,8 +324,8 @@ img { display: block; max-width: 100%; }
 <header class="header">
   <div class="logo">ATELIER <span>N°</span></div>
   <div class="header-spacer"></div>
-  <button class="btn" id="btnCart">🛒 Panier (<span id="cartCount">0</span>)</button>
-  <button class="btn admin" id="btnAdmin">🔑 Espace admin</button>
+  <button class="btn" id="btnCart"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-4px;margin-right:5px"><path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 1.9-1.4L21 8H6"/><circle cx="10" cy="20" r="1.2"/><circle cx="18" cy="20" r="1.2"/></svg>Panier (<span id="cartCount">0</span>)</button>
+  <button class="btn admin" id="btnAdmin"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:5px"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14v3"/></svg>Espace admin</button>
 </header>
 
 <main>
@@ -348,11 +350,10 @@ img { display: block; max-width: 100%; }
       <h2>Espace propriétaire</h2>
       <p>Gérez vos produits directement.</p>
       <form id="loginForm">
-        <div class="field">
-          <label for="adminCode">Code d'accès</label>
-          <input type="password" id="adminCode" value="" autocomplete="current-password" placeholder="Saisir le code d’accès">
-        </div>
-        <button type="submit" class="btn-primary" style="width:100%">Ouvrir mon espace</button>
+        <div class="field"><label for="adminEmail">E-mail administrateur</label><input type="email" id="adminEmail" required autocomplete="username" placeholder="admin@votreboutique.com"></div>
+        <div class="field"><label for="adminPassword">Mot de passe</label><input type="password" id="adminPassword" required autocomplete="current-password" placeholder="Mot de passe Supabase"></div>
+        <p style="color:#888;font-size:12px;line-height:1.6;margin:0 0 14px">Accès réservé au compte administrateur autorisé dans Supabase.</p>
+        <button type="submit" class="btn-primary" style="width:100%">Se connecter</button>
       </form>
     </div>
 
@@ -436,7 +437,7 @@ img { display: block; max-width: 100%; }
           <strong>Mode local :</strong> les produits sont sauvegardés dans le navigateur (localStorage). Ils restent visibles sur cet appareil.
         </div>
         <div style="margin-top:20px">
-          <button class="btn-danger" id="btnReset" style="padding:12px 20px;font-size:14px">⚠️ Tout réinitialiser</button>
+          <button class="btn-danger" id="btnReset" style="padding:12px 20px;font-size:14px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M12 3 22 20H2L12 3Z"/><path d="M12 9v5"/><path d="M12 17.5h.01"/></svg>Tout réinitialiser</button>
         </div>
       </div>
     </div>
@@ -479,6 +480,7 @@ img { display: block; max-width: 100%; }
   <div><div class="eyebrow">Notre signature</div><h2>Des pièces choisies. Une présence durable.</h2><p>Atelier N° rassemble des objets au design soigné, des matières expressives et des lignes intemporelles. Chaque pièce est sélectionnée pour trouver naturellement sa place dans votre quotidien.</p></div>
 </div>
 <section class="cinematic-banner"><div class="eyebrow">Atelier N°</div><h2>Le détail fait toute la différence.</h2><p>Découvrez une collection pensée pour durer.</p></section>
+<a class="whatsapp-float" href="https://wa.me/221771234567?text=Bonjour%20Atelier%20N%C2%B0%2C%20je%20souhaite%20des%20informations." target="_blank" rel="noopener noreferrer" aria-label="Contacter Atelier N° sur WhatsApp" title="Contacter sur WhatsApp"><svg aria-hidden="true" viewBox="0 0 32 32" width="29" height="29" fill="none"><path d="M16 3.3A12.1 12.1 0 0 0 5.6 21.6L4 28l6.6-1.7A12.1 12.1 0 1 0 16 3.3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M11 9.5c-.4-.8-.8-.8-1.2-.8h-.9c-.4 0-1 .2-1.5.7-.5.5-1.9 1.8-1.9 4.3s1.9 5 2.2 5.3c.3.3 3.7 5.9 9.1 7.1 4.5 1 5.4-.7 6.4-1.5 1-.9 1.3-1.8 1.2-2.1-.1-.4-.4-.5-.9-.8l-3-1.4c-.4-.2-.8-.3-1.1.3-.3.5-1.2 1.5-1.5 1.8-.3.3-.6.4-1.1.1-.5-.2-2.1-.8-4-2.5-1.5-1.3-2.5-3-2.8-3.5-.3-.5 0-.8.2-1 .2-.2.5-.6.8-.9.3-.3.4-.5.5-.8.2-.3.1-.6 0-.9L11 9.5Z" fill="currentColor" transform="translate(4 1) scale(.8)"/></svg></a>
 <button class="chat-launch" id="chatLaunch" aria-label="Ouvrir l’assistant Atelier N°" aria-expanded="false"><span class="orb"></span></button>
 <div class="chat-window" id="chatWindow" role="dialog" aria-label="Assistant Atelier N°">
   <div class="chat-head"><span class="orb"></span><div class="chat-id"><b>Sora · Atelier N°</b><small><i class="chat-status-dot"></i><span id="chatStatus">Assistant local</span></small></div><button class="modal-close" id="chatClose" type="button" style="position:static">✕</button></div>
@@ -487,13 +489,14 @@ img { display: block; max-width: 100%; }
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0"></script>
+<script src="./public-config.js"></script>
 <script>
 "use strict";
 
 /* ================================================================
    CONFIGURATION
 ================================================================ */
-const ADMIN_CODE = "LNYGM";
 const LS_PRODUCTS = "atelier_n_products_v1";
 const LS_ORDERS   = "atelier_n_orders_v1";
 const LS_CART     = "atelier_n_cart_v1";
@@ -552,6 +555,9 @@ let products = [];
 let cart = [];
 let orders = [];
 let editingId = null;
+let supabaseClient = null;
+let ordersChannel = null;
+let currentAdmin = null;
 
 function loadState() {
   let p = readLS(LS_PRODUCTS, null);
@@ -701,15 +707,80 @@ function checkout() {
   $("checkoutModal").classList.add("open");
 }
 function closeCheckout() { $("checkoutModal").classList.remove("open"); }
-function submitCheckout(e) {
+async function submitCheckout(e) {
   e.preventDefault();
   if (!cart.length) return notify("Votre panier est vide.");
+  if (!supabaseClient) return notify("La connexion aux commandes est indisponible. Réessayez plus tard.");
   const customer = { name:$("customerName").value.trim(), phone:$("customerPhone").value.trim(), address:$("customerAddress").value.trim(), payment:$("customerPayment").value };
-  const total = cart.reduce((sum,item)=>{ const p=products.find(x=>x.id===item.id); return sum+(p?Number(p.price)*Number(item.qty):0); },0);
-  const order = { ref:"CMD-"+Date.now().toString().slice(-6), date:new Date().toISOString(), customer,
-    items:cart.map(i=>{const p=products.find(x=>x.id===i.id);return p?{name:p.name,qty:i.qty,price:p.price}:null;}).filter(Boolean), total, status:"À confirmer" };
-  orders.unshift(order); saveOrders(); cart=[]; saveCart(); renderCart(); renderAdminOrders(); renderAdminStats(); closeCheckout(); closeCart(); $("checkoutForm").reset();
-  notify("Commande "+order.ref+" enregistrée sur cet appareil.");
+  const items = cart.map(i=>{const p=products.find(x=>x.id===i.id);return p?{name:p.name,qty:i.qty,price:Number(p.price)}:null;}).filter(Boolean);
+  const total = items.reduce((sum,i)=>sum+(i.price*i.qty),0);
+  const ref = "CMD-" + Date.now().toString(36).toUpperCase();
+  const payload = {
+    reference: ref,
+    customer_name: customer.name,
+    customer_phone: customer.phone,
+    delivery_city: "À confirmer",
+    delivery_address: customer.address,
+    customer_note: "Mode de paiement souhaité : " + customer.payment,
+    items,
+    estimated_total: total,
+    status: "pending_confirmation",
+    payment_status: "unpaid",
+    payment_method: /Wave|Orange Money/i.test(customer.payment) ? "now" : "delivery"
+  };
+  const submitButton = $("checkoutForm").querySelector('button[type="submit"]');
+  if (submitButton) { submitButton.disabled = true; submitButton.textContent = "Enregistrement…"; }
+  try {
+    const { error } = await supabaseClient.from("orders").insert(payload);
+    if (error) throw error;
+    const order = { ref, date:new Date().toISOString(), customer, items, total, status:"À confirmer" };
+    orders.unshift(order);
+    cart=[]; saveCart(); renderCart(); renderAdminOrders(); renderAdminStats();
+    closeCheckout(); closeCart(); $("checkoutForm").reset();
+    notify("Commande enregistrée. La boutique la reçoit en temps réel.");
+  } catch (error) {
+    console.error("Supabase order insert:", error);
+    notify("Commande non enregistrée : vérifiez votre connexion puis réessayez.");
+  } finally {
+    if (submitButton) { submitButton.disabled = false; submitButton.textContent = "Confirmer la commande"; }
+  }
+}
+
+function mapSupabaseOrder(row) {
+  const note = String(row.customer_note || "");
+  const paymentMatch = note.match(/Mode de paiement souhaité\s*:\s*(.+)/i);
+  const statusMap = {pending_confirmation:"À confirmer",confirmed:"Confirmée",preparing:"En préparation",shipped:"Expédiée",delivered:"Livrée",cancelled:"Annulée"};
+  return {
+    id:row.id, ref:row.reference, date:row.created_at,
+    customer:{name:row.customer_name,phone:row.customer_phone,address:row.delivery_address,payment:paymentMatch ? paymentMatch[1] : (row.payment_method==="now" ? "Paiement en ligne à confirmer" : "Espèces à la livraison")},
+    items:Array.isArray(row.items)?row.items:[], total:Number(row.estimated_total)||0,
+    status:statusMap[row.status] || row.status
+  };
+}
+async function loadRemoteOrders(silent=true) {
+  if (!supabaseClient || !currentAdmin) return;
+  const {data,error}=await supabaseClient.from("orders").select("id,reference,customer_name,customer_phone,delivery_city,delivery_address,customer_note,items,estimated_total,status,payment_method,created_at").order("created_at",{ascending:false}).limit(500);
+  if(error) { console.error("Chargement commandes:",error); if(!silent) notify("Impossible de charger les commandes Supabase."); return; }
+  orders=(data||[]).map(mapSupabaseOrder);
+  renderAdminOrders(); renderAdminStats();
+}
+function subscribeToOrders() {
+  if (!supabaseClient || !currentAdmin) return;
+  if (ordersChannel) supabaseClient.removeChannel(ordersChannel);
+  ordersChannel=supabaseClient.channel("atelier-orders-realtime")
+    .on("postgres_changes",{event:"*",schema:"public",table:"orders"},async payload=>{
+      await loadRemoteOrders(true);
+      if(payload.eventType==="INSERT") notify("Nouvelle commande reçue en direct.");
+    })
+    .subscribe(status=>{ if(status==="CHANNEL_ERROR") console.error("Canal commandes Realtime indisponible"); });
+}
+function initSupabase() {
+  const cfg=window.ATELIER_PUBLIC_CONFIG||{};
+  if(!window.supabase || typeof window.supabase.createClient!=="function" || !cfg.supabaseUrl || !cfg.supabasePublishableKey) {
+    console.error("Configuration Supabase manquante.");
+    return;
+  }
+  supabaseClient=window.supabase.createClient(cfg.supabaseUrl,cfg.supabasePublishableKey);
 }
 
 /* ================================================================
@@ -719,7 +790,7 @@ function openAdmin() {
   $("adminModal").classList.add("open");
   document.body.style.overflow = "hidden";
   if ($("adminDash").hidden) {
-    setTimeout(() => { const i = $("adminCode"); if (i) i.focus(); }, 120);
+    setTimeout(() => { const i = $("adminEmail"); if (i) i.focus(); }, 120);
   }
 }
 
@@ -728,23 +799,40 @@ function closeAdmin() {
   document.body.style.overflow = "";
 }
 
-function adminLogin(e) {
-  if (e) e.preventDefault();
-  const code = (($("adminCode") || {}).value || "").trim();
-  if (code !== ADMIN_CODE) {
-    notify("Code incorrect.");
-    return;
+async function adminLogin(e) {
+  if(e) e.preventDefault();
+  if(!supabaseClient) return notify("Supabase n'est pas configuré.");
+  const email=$("adminEmail").value.trim();
+  const password=$("adminPassword").value;
+  const button=$("loginForm").querySelector('button[type="submit"]');
+  if(button){button.disabled=true;button.textContent="Connexion…";}
+  try {
+    const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+    if(error) throw error;
+    const {data:membership,error:membershipError}=await supabaseClient.from("store_admins").select("user_id").eq("user_id",data.user.id).maybeSingle();
+    if(membershipError || !membership) {
+      await supabaseClient.auth.signOut();
+      throw new Error("Ce compte n'est pas autorisé à administrer la boutique.");
+    }
+    currentAdmin=data.user;
+    $("adminLogin").hidden=true; $("adminDash").hidden=false;
+    await loadRemoteOrders(false);
+    subscribeToOrders();
+    renderAdminProducts(); renderAdminStats();
+    notify("Connexion sécurisée établie.");
+  } catch(error) {
+    console.error("Connexion admin:",error);
+    notify(error.message || "Connexion impossible. Vérifiez l'e-mail et le mot de passe.");
+  } finally {
+    if(button){button.disabled=false;button.textContent="Se connecter";}
   }
-  $("adminLogin").hidden = true;
-  $("adminDash").hidden = false;
-  renderAdmin();
-  notify("Bienvenue !");
 }
-
-function adminLogout() {
-  $("adminLogin").hidden = false;
-  $("adminDash").hidden = true;
-  $("adminCode").value = "";
+async function adminLogout() {
+  if(ordersChannel && supabaseClient) { await supabaseClient.removeChannel(ordersChannel); ordersChannel=null; }
+  if(supabaseClient) await supabaseClient.auth.signOut();
+  currentAdmin=null;
+  $("adminLogin").hidden=false; $("adminDash").hidden=true;
+  $("adminPassword").value="";
   notify("Déconnecté");
 }
 
@@ -808,6 +896,7 @@ function renderAdminOrders() {
       '<div style="margin-top:8px;color:#d4b58b">Client : ' + esc(o.customer?.name || "Non renseigné") + ' · ' + esc(o.customer?.phone || "") + '</div>' +
       '<div style="color:#999;margin-top:4px">Adresse : ' + esc(o.customer?.address || "Non renseignée") + ' · Paiement souhaité : ' + esc(o.customer?.payment || "À confirmer") + '</div>' +
       '<div style="margin-top:8px;font-weight:600">' + fmtPrice(o.total) + '</div>' +
+      '<div style="margin-top:6px;color:#d4b58b">État : ' + esc(o.status || "À confirmer") + '</div>' +
     '</div>'
   ).join("");
 }
@@ -932,6 +1021,7 @@ function sendChat(e){e.preventDefault();const input=$("chatInput");const value=i
    INITIALISATION
 ================================================================ */
 function init() {
+  initSupabase();
   loadState();
   renderShop();
   renderCart();
