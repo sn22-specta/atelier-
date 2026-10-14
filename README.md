@@ -5,7 +5,7 @@ Site vitrine e-commerce statique avec fonctions serveur Vercel.
 ## Changements de cette branche
 
 - Chat Sora relié à Claude via `/api/chat`; la clé API reste côté serveur.
-- Demandes de commande via le panier et `/api/orders`, avec référence et statut initial « en attente de confirmation ».
+- Commande simplifiée dans un formulaire unique, avec ticket/référence, choix de paiement à la livraison/sur place ou paiement à finaliser par WhatsApp, et enregistrement via `/api/orders` dans Supabase.
 - Formulaire de contact relié à `/api/tickets`, qui renvoie une référence de ticket.
 - Configuration des liens sociaux dans `public-config.js`.
 - Espace propriétaire dans `admin.html` : gestion des produits, commandes, statuts de paiement déclarés et tickets support, protégé côté serveur par `ADMIN_ACCESS_CODE`.
@@ -45,7 +45,7 @@ Ces paramètres sont publics par conception. Ne mets aucun mot de passe, jeton n
 - Claude répond en flux via `/api/chat`.
 - Le panier soumet une demande à `/api/orders`, puis peut ouvrir WhatsApp si le numéro est configuré.
 - Le formulaire de contact crée un ticket via `/api/tickets`.
-- Le paiement Wave/Orange Money, la livraison réelle, les notifications et le suivi client automatisé ne sont pas encore connectés.
+- Le paiement Wave/Orange Money automatique, la livraison réelle, les notifications et le suivi client automatisé ne sont pas encore connectés. Le choix « payer maintenant » ouvre WhatsApp au 77 123 45 67, sans marquer le paiement comme réussi.
 - L'espace propriétaire se trouve dans `admin.html` et utilise le code côté serveur. Le code n'est jamais intégré au JavaScript public. Change-le dans les variables Vercel, puis redéploie.
 
 ## Déploiement
