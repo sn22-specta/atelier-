@@ -1176,9 +1176,14 @@ body.chat-open .chat-launch::after { display: none; }
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/public-config.js"></script>
 <script>
 "use strict";
+
+const ATELIER_SUPABASE_URL = "https://mdafofdfznufdwscvroq.supabase.co";
+const ATELIER_SUPABASE_KEY = "sb_publishable_11bcDyC21WlB9kz1OaXsNw_qMoi_ykZ";
+const atelierSupabase = window.supabase.createClient(ATELIER_SUPABASE_URL, ATELIER_SUPABASE_KEY);
 
 /* -------------------------------------------
    CONFIGURATION DE LA BOUTIQUE
@@ -1494,6 +1499,9 @@ function renderCart() {
 const checkoutModal = document.getElementById("checkoutModal");
 const checkoutForm = document.getElementById("checkoutForm");
 let latestOrderWhatsAppMessage = "";
+function cryptoRandomReference() {
+  return Array.from(crypto.getRandomValues(new Uint8Array(5)), b => b.toString(16).padStart(2, "0")).join("").toUpperCase();
+}
 
 function openCheckout() {
   if (!cart.length) return notify("Votre panier est vide.");
@@ -1536,15 +1544,29 @@ checkoutForm.addEventListener("submit", async event => {
   button.disabled = true;
   button.textContent = "Enregistrement…";
   try {
-    const response = await fetch("/api/orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ customer, items, paymentMethod })
-    });
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok || !result.ok) throw new Error(result.error || "La commande n'a pas pu être enregistrée.");
-
     const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const reference = "AT-" + cryptoRandomReference();
+    const normalizedItems = items.map(item => ({
+      product_id: Number(item.id),
+      name: String(item.name).slice(0, 100),
+      unit_price_claimed: Number(item.price),
+      quantity: Number(item.quantity)
+    }));
+    const { error: orderError } = await atelierSupabase.from("orders").insert({
+      reference,
+      customer_name: customer.name,
+      customer_phone: customer.phone,
+      delivery_city: customer.city,
+      delivery_address: customer.address,
+      customer_note: customer.note,
+      items: normalizedItems,
+      estimated_total: total,
+      status: "pending_confirmation",
+      payment_method: paymentMethod,
+      payment_status: paymentMethod === "now" ? "pending" : "unpaid"
+    });
+    if (orderError) throw new Error("Enregistrement impossible : " + orderError.message);
+    const result = { reference };
     const methodLabel = paymentMethod === "now" ? "Paiement à finaliser avec la boutique" : "Paiement à la livraison / sur place";
     latestOrderWhatsAppMessage = [
       "Bonjour Atelier N°, ma commande est enregistrée.",
