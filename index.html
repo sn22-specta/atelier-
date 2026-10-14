@@ -4,1261 +4,910 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#090909">
-<title>Atelier N° — L'art de choisir</title>
+<title>Atelier N° — Boutique</title>
 <style>
-:root{--bg:#090909;--surface:#141414;--text:#f5f1e9;--muted:#99958d;--accent:#d4b58b;--line:rgba(255,255,255,.12)}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:85px}
-body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-x:hidden}
-button,a{-webkit-tap-highlight-color:transparent}
-button{color:inherit;cursor:pointer;font-family:inherit}
-a{color:inherit;text-decoration:none}
-img{display:block;width:100%;object-fit:cover}
-input,textarea,select{font-family:inherit}
-::selection{background:var(--accent);color:#111}
-
-header{height:76px;padding:0 5%;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30;background:rgba(9,9,9,.88);backdrop-filter:blur(18px)}
-.logo{font-size:21px;font-weight:750;letter-spacing:-.9px}
-.logo span{color:var(--accent)}
-nav{display:flex;align-items:center;gap:28px;color:#c9c5bd;font-size:12px}
-nav a:hover{color:var(--accent)}
-.header-actions{display:flex;gap:10px;align-items:center;position:relative}
-.admin-menu-wrap{position:relative}
-.admin-menu{position:absolute;top:calc(100% + 10px);right:0;min-width:220px;padding:7px;background:#141414;border:1px solid var(--line);border-radius:12px;box-shadow:0 16px 45px #0009;z-index:80}
-.admin-menu a{display:block;padding:11px 12px;border-radius:7px;color:#d6d0c6;font-size:12px}
-.admin-menu a:hover{background:#24211c;color:var(--accent)}
-.admin-menu[hidden]{display:none}
-.icon-btn{border:1px solid var(--line);background:transparent;border-radius:50px;padding:10px 14px;font-size:12px}
-.icon-btn:hover{border-color:var(--accent)}
-
-.hero{min-height:690px;height:calc(100svh - 76px);max-height:950px;position:relative;display:flex;align-items:center;overflow:hidden;padding:6%}
-.hero-image{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.85),rgba(0,0,0,.25) 70%),linear-gradient(0deg,rgba(0,0,0,.55),transparent 50%),url("https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2200&q=85") center/cover;animation:heroZoom 16s ease-in-out infinite alternate}
-.hero-content{position:relative;z-index:1;max-width:780px}
-.eyebrow{text-transform:uppercase;letter-spacing:3px;font-size:10px;color:var(--accent)}
-.hero h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(55px,9vw,115px);line-height:.94;letter-spacing:-5px;margin:28px 0}
-.hero h1 em{color:var(--accent);font-weight:400}
-.hero p{max-width:410px;color:#d0ccc4;font-size:14px;line-height:1.9}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;border:1px solid var(--accent);background:var(--accent);color:#111;border-radius:40px;padding:15px 23px;font-size:12px;font-weight:650;cursor:pointer}
-.btn:hover{background:#e5caa5}
-.btn.secondary{color:var(--text);background:transparent;border-color:var(--line)}
-.hero .btn{margin-top:22px}
-.hero-bottom{position:absolute;bottom:30px;left:6%;right:6%;display:flex;justify-content:space-between;color:#c8c4bd;font-size:10px;letter-spacing:1px;text-transform:uppercase}
-
-section{padding:100px 6%}
-.section-head{display:flex;justify-content:space-between;align-items:end;gap:25px;margin-bottom:40px;flex-wrap:wrap}
-.section-head h2{font:400 clamp(36px,5vw,58px)/1.08 Georgia,serif;letter-spacing:-1.8px;margin:14px 0 0}
-.section-head p{color:var(--muted);font-size:13px;line-height:1.8;max-width:340px}
-.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:25px}
-.filter{background:transparent;border:1px solid var(--line);border-radius:40px;padding:10px 16px;font-size:11px;color:#b8b4ad}
-.filter.active,.filter:hover{background:var(--text);color:#111;border-color:var(--text)}
-.products{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px 18px}
-.product-card{min-width:0}
-.product-image{position:relative;aspect-ratio:4/4.8;overflow:hidden;background:var(--surface);border-radius:3px}
-.product-image img{height:100%;transition:transform .7s}
-.product-card:hover .product-image img{transform:scale(1.055)}
-.tag{position:absolute;top:14px;left:14px;background:rgba(9,9,9,.8);border:1px solid var(--line);padding:7px 10px;font-size:9px;letter-spacing:1px;text-transform:uppercase}
-.add-btn{position:absolute;right:12px;bottom:12px;border:0;border-radius:50%;width:43px;height:43px;background:var(--text);color:#111;font-size:23px}
-.product-info{padding:15px 1px;display:flex;justify-content:space-between;gap:10px}
-.product-info h3{font-size:14px;font-weight:500;margin:0 0 7px}
-.product-info p{font-size:11px;color:var(--muted);margin:0}
-.price{font-size:13px;white-space:nowrap}
-.empty{grid-column:1/-1;color:var(--muted);padding:40px 0;text-align:center}
-
-.story{background:#e8e0d4;color:#171512;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:7%}
-.story img{height:510px}
-.story h2{font:400 clamp(40px,5vw,66px)/1.04 Georgia,serif;letter-spacing:-2px}
-.story p{font-size:13px;line-height:2;color:#5e574e;max-width:450px}
-.story .eyebrow{color:#826849}
-.values{display:grid;grid-template-columns:repeat(3,1fr);gap:25px;margin-top:35px}
-.value{border-top:1px solid rgba(0,0,0,.2);padding-top:15px}
-.value b{font:400 23px Georgia,serif}
-.value p{font-size:11px}
-
-.banner{padding:110px 6%;text-align:center;background:linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.8)),url("https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1800&q=80") center/cover fixed}
-.banner h2{font:400 clamp(38px,6vw,72px)/1.05 Georgia,serif;max-width:760px;margin:25px auto}
-.banner p{color:#c1bdb5;font-size:13px;line-height:1.8}
-
-.contact{display:grid;grid-template-columns:1fr 1fr;gap:60px}
-.contact h2{font:400 52px Georgia,serif}
-.contact p{color:var(--muted);font-size:13px;line-height:2}
-.contact-form{display:grid;gap:13px}
-input,textarea{width:100%;background:#141414;color:var(--text);border:1px solid var(--line);padding:15px;border-radius:8px;font-size:13px}
-textarea{min-height:120px;resize:vertical}
-.contact-form .btn{justify-self:start}
-.small-note{color:var(--muted);font-size:10px;line-height:1.7}
-
-footer{border-top:1px solid var(--line);padding:35px 6%;display:flex;justify-content:space-between;gap:20px;color:var(--muted);font-size:11px;flex-wrap:wrap}
-footer a:hover{color:var(--accent)}
-
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:60;opacity:0;visibility:hidden;transition:.3s}
-.overlay.open{opacity:1;visibility:visible}
-.drawer{position:fixed;z-index:61;top:0;right:0;bottom:0;width:min(440px,100%);background:#101010;border-left:1px solid var(--line);padding:25px;transform:translateX(100%);transition:transform .35s;display:flex;flex-direction:column}
-.drawer.open{transform:translateX(0)}
-.drawer-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:20px}
-.drawer-head h2{font:400 30px Georgia,serif}
-.close-btn{background:none;border:1px solid var(--line);width:38px;height:38px;border-radius:50%;font-size:20px}
-.cart-items{overflow:auto;flex:1}
-.cart-item{display:grid;grid-template-columns:75px 1fr auto;gap:13px;padding:17px 0;border-bottom:1px solid var(--line);align-items:center}
-.cart-item img{height:85px;border-radius:4px;background:#222}
-.cart-item h4{margin:0 0 8px;font-size:12px}
-.cart-item p{margin:0;color:var(--muted);font-size:11px}
-.qty{display:flex;align-items:center;gap:12px;margin-top:10px}
-.qty button{border:1px solid var(--line);background:none;width:25px;height:25px;border-radius:50%}
-.remove{background:none;border:0;color:var(--muted);font-size:11px}
-.cart-footer{padding-top:20px;border-top:1px solid var(--line)}
-.total{display:flex;justify-content:space-between;margin-bottom:18px}
-.cart-footer .btn{width:100%}
-
-.checkout-modal{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.78)}
-.checkout-modal.open{display:flex}
-.checkout-panel{width:min(620px,100%);max-height:min(90svh,900px);overflow:auto;background:#111;border:1px solid rgba(212,181,139,.3);border-radius:18px;padding:24px}
-.checkout-panel h2{font:400 34px Georgia,serif;margin:0 0 8px}
-.checkout-panel .lead{color:var(--muted);font-size:12px;line-height:1.7;margin:0 0 22px}
-.checkout-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-.checkout-grid .wide{grid-column:1/-1}
-.checkout-grid label{display:block;color:#bcb6ab;font-size:11px;margin:0 0 6px}
-.checkout-grid input,.checkout-grid textarea{background:#191919;padding:13px;border-radius:8px}
-.checkout-total{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:15px;margin:18px 0}
-.checkout-actions{display:flex;gap:10px;justify-content:flex-end}
-.ticket-view{display:none;border:1px dashed rgba(212,181,139,.6);padding:18px;margin-top:18px;border-radius:10px;background:#171510}
-.ticket-view.open{display:block}
-.ticket-view h3{margin:0 0 8px;font:400 24px Georgia,serif}
-.ticket-view p{color:#d6d0c6;font-size:12px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}
-
-.chat-launch{position:fixed;right:25px;bottom:25px;z-index:40;width:62px;height:62px;border-radius:50%;border:1px solid rgba(212,181,139,.6);background:#d4b58b;color:#14110d;display:grid;place-items:center;box-shadow:0 8px 40px rgba(0,0,0,.4)}
-.orb{width:33px;height:33px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff1d5,#c08d50 40%,#6f4523 75%,#2a1b12);box-shadow:0 0 18px rgba(255,231,192,.7)}
-.chat-window{position:fixed;right:25px;bottom:100px;z-index:41;width:min(410px,calc(100vw - 30px));height:min(620px,calc(100svh - 135px));background:#101010;border:1px solid var(--line);border-radius:18px;overflow:hidden;display:none;flex-direction:column}
-.chat-window.open{display:flex}
-.chat-head{padding:15px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line)}
-.chat-head b{font-size:13px;display:block}
-.chat-head small{display:flex;align-items:center;gap:6px;margin-top:4px;color:#a5a198;font-size:10px}
-.chat-status-dot{width:6px;height:6px;border-radius:50%;background:#6ecf8f;flex-shrink:0}
-.chat-head .close-btn{margin-left:auto;width:34px;height:34px;font-size:17px}
-.chat-messages{padding:18px 16px 6px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:14px}
-.message{max-width:90%;border-radius:14px;padding:12px 14px;font-size:12.5px;line-height:1.75;overflow-wrap:anywhere}
-.message.bot{align-self:flex-start;background:#1b1b1b;color:#e8e4dc;border-bottom-left-radius:5px}
-.message.user{align-self:flex-end;background:linear-gradient(180deg,#ddc09a,#cba97e);color:#18130d;border-bottom-right-radius:5px}
-.message p{margin:0 0 8px}.message p:last-child{margin-bottom:0}
-.message strong{color:#fff}
-.chat-suggestions{display:flex;gap:6px;padding:4px 16px 10px;overflow-x:auto;flex-shrink:0}
-.chat-suggestions button{flex-shrink:0;background:transparent;border:1px solid var(--line);padding:7px 12px;border-radius:20px;font-size:10.5px;color:#b8b4ad;white-space:nowrap}
-.chat-form{padding:10px 12px 12px;display:flex;gap:8px;align-items:flex-end;border-top:1px solid var(--line);flex-shrink:0}
-.chat-form textarea{flex:1;background:#161616;border-radius:20px;padding:11px 14px;font-size:12.5px;resize:none;max-height:110px;min-height:42px}
-.chat-form .send-btn{background:var(--accent);color:#111;border:0;border-radius:50%;width:42px;height:42px;flex-shrink:0;font-size:16px;display:grid;place-items:center}
-
-.toast{position:fixed;z-index:100;left:50%;bottom:25px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#f1e8da;color:#111;padding:13px 18px;border-radius:30px;font-size:12px;transition:.25s;max-width:90vw;text-align:center}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-
-/* ============================================================
-   ADMIN — plein écran, intégré à la page
-   ============================================================ */
-#ownerOverlay{position:fixed;inset:0;z-index:9999;background:#090909;overflow-y:auto;display:none;padding:24px 20px 60px}
-#ownerOverlay.open{display:block}
-.owner-close{position:fixed;right:16px;top:14px;z-index:10001;border:1px solid #777;border-radius:24px;background:#111;color:#fff;padding:10px 16px;cursor:pointer;font-size:12px}
-.owner-shell{width:min(1180px,100%);margin:0 auto;color:#f5f1e9}
-.owner-top{border-bottom:1px solid rgba(255,255,255,.12);padding:0 0 20px;display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}
-.owner-logo{font-weight:750;letter-spacing:-.8px;font-size:16px}
-.owner-logo span{color:#d4b58b}
-.owner-logo small{font-weight:400;color:#a39d92;font-size:11px}
-.owner-back{color:#a39d92;font-size:13px;background:none;border:0;cursor:pointer}
-.owner-back:hover{color:#d4b58b}
-.owner-eyebrow{text-transform:uppercase;letter-spacing:2px;color:#d4b58b;font-size:10px;margin-top:30px}
-.owner-shell h1{font:400 clamp(32px,5vw,52px)/1.05 Georgia,serif;letter-spacing:-1px;margin:12px 0}
-.owner-shell h2{font-size:22px;font-weight:500;margin:0 0 18px;letter-spacing:-.5px}
-.owner-intro{color:#a39d92;line-height:1.7;max-width:650px;font-size:13px}
-.owner-panel{background:#141414;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:24px;margin-top:22px}
-.owner-login{max-width:460px;margin:35px auto}
-.owner-field{display:grid;gap:8px;margin-bottom:15px}
-.owner-field label{font-size:12px;color:#d5d0c7}
-.owner-field input,.owner-field textarea,.owner-field select{width:100%;border:1px solid rgba(255,255,255,.12);border-radius:9px;background:#0c0c0c;color:#f5f1e9;padding:12px;font-size:13px}
-.owner-field textarea{min-height:80px;resize:vertical}
-.owner-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.owner-btn{border:1px solid #d4b58b;border-radius:30px;padding:11px 18px;background:#d4b58b;color:#15110c;font-size:12px;font-weight:650;cursor:pointer}
-.owner-btn:hover{background:#e5caa5}
-.owner-btn.ghost{background:transparent;color:#f5f1e9;border-color:rgba(255,255,255,.2)}
-.owner-btn.danger{background:transparent;color:#f0a59a;border-color:#6c3c36}
-.owner-msg{font-size:12px;color:#a39d92;margin-top:12px;line-height:1.6;min-height:18px}
-.owner-msg.error{color:#f0a59a}
-.owner-msg.ok{color:#87c9a0}
-.owner-hint{background:rgba(212,181,139,.08);border:1px dashed rgba(212,181,139,.4);padding:12px 14px;border-radius:10px;color:#d2c3ae;font-size:12px;line-height:1.7;margin-top:16px}
-.owner-hint code{background:#221c14;padding:2px 7px;border-radius:4px;color:#d4b58b;font-weight:600}
-.owner-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:25px 0}
-.owner-tab{border:1px solid rgba(255,255,255,.12);background:transparent;color:#a39d92;padding:10px 14px;border-radius:25px;font-size:12px;cursor:pointer}
-.owner-tab.active{background:#d4b58b;border-color:#d4b58b;color:#15110c}
-.owner-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.owner-stat{background:#1c1c1c;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,.12)}
-.owner-stat span{font-size:11px;color:#a39d92}
-.owner-stat strong{display:block;font-size:22px;font-weight:500;margin-top:8px;color:#f5f1e9}
-.owner-list{display:grid;gap:10px;margin-top:18px}
-.owner-item{border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:15px;display:grid;grid-template-columns:70px minmax(0,1fr) auto;gap:14px;align-items:start}
-.owner-item img{width:70px;height:85px;object-fit:cover;border-radius:7px;background:#1c1c1c}
-.owner-item h3{font-size:14px;font-weight:550;margin:0 0 6px}
-.owner-item p{font-size:12px;color:#a39d92;line-height:1.6;margin:0 0 6px;overflow-wrap:anywhere}
-.owner-item .owner-actions{display:flex;gap:8px;flex-wrap:wrap}
-.owner-pill{display:inline-block;border:1px solid rgba(255,255,255,.12);border-radius:30px;padding:5px 8px;font-size:10px;color:#d4b58b}
-.owner-section-title{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:18px;flex-wrap:wrap}
-.owner-empty{color:#a39d92;padding:30px 0;text-align:center;font-size:13px}
-.owner-order{border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:15px;font-size:12px;line-height:1.7}
-.owner-order header{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px;font-weight:600}
-.owner-order .meta{color:#a39d92}
-[hidden]{display:none !important}
-
-@keyframes heroZoom{from{transform:scale(1)}to{transform:scale(1.07)}}
-
-@media(max-width:800px){
-  header{height:66px}
-  nav{display:none}
-  .hero{min-height:650px;height:83svh}
-  section{padding:75px 5%}
-  .products{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 12px}
-  .story,.contact{grid-template-columns:1fr;gap:30px}
-  .story img{height:360px}
-  .banner{background-attachment:scroll}
-  .chat-window{right:0;bottom:0;width:100vw;height:100svh;border-radius:0;border:0}
-  .owner-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .checkout-grid{grid-template-columns:1fr}
-  .owner-item{grid-template-columns:55px minmax(0,1fr)}
-  .owner-item img{width:55px;height:70px}
-  .owner-item .owner-actions{grid-column:2}
-  .owner-row{grid-template-columns:1fr}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #090909; color: #f5f1e9;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh; line-height: 1.5;
 }
-@media(max-width:420px){
-  .hero h1{font-size:55px}
-  .values{grid-template-columns:1fr}
-  footer{flex-direction:column}
-  .owner-stat-grid{grid-template-columns:1fr}
+button { font-family: inherit; cursor: pointer; }
+input, textarea { font-family: inherit; }
+img { display: block; max-width: 100%; }
+
+/* HEADER */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 20px;
+  background: rgba(9,9,9,0.95);
+  border-bottom: 1px solid #1a1a1a;
+  backdrop-filter: blur(10px);
+  flex-wrap: wrap;
+}
+.logo { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+.logo span { color: #d4b58b; }
+.header-spacer { flex: 1; min-width: 8px; }
+.btn {
+  background: transparent; border: 1px solid #333; color: #f5f1e9;
+  padding: 9px 14px; border-radius: 22px; font-size: 13px;
+  transition: 0.2s;
+}
+.btn:hover { border-color: #d4b58b; color: #d4b58b; }
+.btn.admin {
+  background: #d4b58b; border-color: #d4b58b; color: #111;
+  font-weight: 700; font-size: 13px;
+}
+.btn.admin:hover { background: #e5caa5; color: #111; transform: translateY(-1px); }
+.btn-primary {
+  background: #d4b58b; border: 1px solid #d4b58b; color: #111;
+  padding: 11px 18px; border-radius: 8px; font-weight: 600;
+}
+.btn-primary:hover { background: #e5caa5; }
+.btn-danger {
+  background: transparent; border: 1px solid #6c3c36; color: #f0a59a;
+  padding: 8px 14px; border-radius: 20px; font-size: 12px;
+}
+.btn-danger:hover { background: rgba(255,120,90,0.1); }
+
+/* MAIN */
+.hero {
+  padding: 80px 20px; text-align: center;
+  border-bottom: 1px solid #1a1a1a;
+}
+.hero h1 {
+  font-family: Georgia, serif; font-weight: 400;
+  font-size: clamp(40px, 8vw, 80px); letter-spacing: -2px;
+  margin-bottom: 16px;
+}
+.hero h1 em { color: #d4b58b; font-style: normal; }
+.hero p { color: #999; max-width: 500px; margin: 0 auto; }
+
+.section { padding: 60px 20px; max-width: 1200px; margin: 0 auto; }
+.section h2 {
+  font-family: Georgia, serif; font-weight: 400;
+  font-size: 32px; margin-bottom: 30px; letter-spacing: -0.5px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+.card {
+  background: #101010; border: 1px solid #1a1a1a;
+  border-radius: 12px; overflow: hidden;
+  display: flex; flex-direction: column;
+  transition: 0.2s;
+}
+.card:hover { border-color: #333; transform: translateY(-2px); }
+.card-img {
+  aspect-ratio: 4/5; background: #1a1a1a; overflow: hidden;
+}
+.card-img img { width: 100%; height: 100%; object-fit: cover; }
+.card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; }
+.card-body h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.card-body p { font-size: 12px; color: #888; margin-bottom: 12px; flex: 1; }
+.card-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding-top: 12px; border-top: 1px solid #1a1a1a;
+}
+.card-price { font-size: 14px; font-weight: 600; }
+.btn-add {
+  background: #f5f1e9; border: 0; color: #111;
+  padding: 8px 14px; border-radius: 20px; font-size: 12px;
+  font-weight: 600;
+}
+.btn-add:hover { background: #d4b58b; }
+
+.empty-state {
+  padding: 60px 20px; text-align: center; color: #666;
+  border: 1px dashed #222; border-radius: 12px;
+}
+
+/* MODAL */
+.modal {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.9); backdrop-filter: blur(8px);
+  display: none; align-items: flex-start; justify-content: center;
+  padding: 20px; overflow-y: auto;
+}
+.modal.open { display: flex; }
+.modal-box {
+  background: #101010; border: 1px solid #222;
+  border-radius: 16px; width: 100%; max-width: 900px;
+  padding: 24px; margin: auto;
+  position: relative;
+}
+.modal-close {
+  position: absolute; top: 16px; right: 16px;
+  background: transparent; border: 1px solid #333;
+  width: 36px; height: 36px; border-radius: 50%;
+  color: #f5f1e9; font-size: 18px;
+}
+.modal-close:hover { border-color: #d4b58b; color: #d4b58b; }
+
+/* LOGIN */
+.login-view { max-width: 420px; margin: 40px auto; text-align: center; }
+.login-view h2 {
+  font-family: Georgia, serif; font-weight: 400;
+  font-size: 32px; margin-bottom: 8px;
+}
+.login-view p { color: #999; margin-bottom: 24px; font-size: 14px; }
+.field { margin-bottom: 16px; text-align: left; }
+.field label {
+  display: block; font-size: 12px; color: #bbb;
+  margin-bottom: 6px; font-weight: 500;
+}
+.field input, .field textarea, .field select {
+  width: 100%; background: #0a0a0a; border: 1px solid #222;
+  color: #f5f1e9; padding: 12px; border-radius: 8px;
+  font-size: 14px;
+}
+.field input:focus, .field textarea:focus {
+  outline: none; border-color: #d4b58b;
+}
+.field textarea { min-height: 80px; resize: vertical; }
+.field-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.login-hint {
+  background: rgba(212,181,139,0.1);
+  border: 1px dashed rgba(212,181,139,0.4);
+  padding: 12px; border-radius: 8px;
+  font-size: 13px; color: #d4b58b; margin-top: 20px;
+}
+.login-hint code {
+  background: #221c14; padding: 2px 8px; border-radius: 4px;
+  color: #d4b58b; font-weight: 600;
+}
+
+/* ADMIN DASHBOARD */
+.admin-head {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 16px; flex-wrap: wrap; margin-bottom: 20px;
+}
+.admin-head h2 {
+  font-family: Georgia, serif; font-weight: 400;
+  font-size: 26px;
+}
+.tabs {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  border-bottom: 1px solid #1a1a1a; margin-bottom: 20px;
+}
+.tab {
+  background: transparent; border: 0; color: #888;
+  padding: 10px 16px; font-size: 13px; font-weight: 500;
+  border-bottom: 2px solid transparent;
+}
+.tab.active { color: #d4b58b; border-bottom-color: #d4b58b; }
+.tab:hover { color: #f5f1e9; }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* PRODUCT FORM */
+.product-form {
+  background: #0a0a0a; border: 1px solid #1a1a1a;
+  border-radius: 12px; padding: 20px; margin-bottom: 24px;
+}
+.product-form h3 {
+  font-size: 16px; margin-bottom: 16px; color: #d4b58b;
+}
+
+/* ADMIN PRODUCTS LIST */
+.admin-products {
+  display: flex; flex-direction: column; gap: 10px;
+}
+.admin-product {
+  display: grid;
+  grid-template-columns: 60px 1fr auto;
+  gap: 14px; align-items: center;
+  padding: 12px; background: #0a0a0a;
+  border: 1px solid #1a1a1a; border-radius: 10px;
+}
+.admin-product img {
+  width: 60px; height: 75px; object-fit: cover;
+  border-radius: 6px; background: #1a1a1a;
+}
+.admin-product h4 { font-size: 14px; margin-bottom: 4px; }
+.admin-product p { font-size: 12px; color: #888; }
+.admin-product .actions { display: flex; gap: 8px; }
+.btn-edit {
+  background: transparent; border: 1px solid #333; color: #f5f1e9;
+  padding: 7px 12px; border-radius: 18px; font-size: 12px;
+}
+.btn-edit:hover { border-color: #d4b58b; color: #d4b58b; }
+
+/* CART */
+.cart-drawer {
+  position: fixed; top: 0; right: 0; bottom: 0;
+  width: min(400px, 100%);
+  background: #0a0a0a; border-left: 1px solid #1a1a1a;
+  z-index: 500; transform: translateX(100%);
+  transition: transform 0.3s;
+  display: flex; flex-direction: column;
+}
+.cart-drawer.open { transform: translateX(0); }
+.cart-head {
+  padding: 20px; border-bottom: 1px solid #1a1a1a;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.cart-head h2 { font-size: 20px; font-weight: 600; }
+.cart-items { padding: 16px 20px; overflow-y: auto; flex: 1; }
+.cart-empty { color: #666; text-align: center; padding: 40px 0; }
+.cart-item {
+  display: grid; grid-template-columns: 60px 1fr;
+  gap: 12px; align-items: center; padding: 12px 0;
+  border-bottom: 1px solid #1a1a1a;
+}
+.cart-item img {
+  width: 60px; height: 75px; object-fit: cover;
+  border-radius: 6px; background: #1a1a1a;
+}
+.cart-item h4 { font-size: 13px; margin-bottom: 4px; }
+.cart-item p { font-size: 12px; color: #888; }
+.cart-foot { padding: 20px; border-top: 1px solid #1a1a1a; }
+.cart-total {
+  display: flex; justify-content: space-between;
+  font-size: 15px; font-weight: 600; margin-bottom: 16px;
+}
+
+.backdrop {
+  position: fixed; inset: 0; z-index: 400;
+  background: rgba(0,0,0,0.6); opacity: 0; visibility: hidden;
+  transition: 0.3s;
+}
+.backdrop.open { opacity: 1; visibility: visible; }
+
+.toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translate(-50%, 100px);
+  background: #d4b58b; color: #111;
+  padding: 12px 20px; border-radius: 24px;
+  font-size: 13px; font-weight: 600; z-index: 2000;
+  transition: transform 0.3s; max-width: 90vw;
+}
+.toast.show { transform: translate(-50%, 0); }
+
+@media (max-width: 640px) {
+  .hero { padding: 60px 20px; }
+  .section { padding: 40px 16px; }
+  .modal { padding: 0; }
+  .modal-box { border-radius: 0; min-height: 100vh; max-width: 100%; }
+  .field-row { grid-template-columns: 1fr; }
+  .admin-product { grid-template-columns: 50px 1fr; }
+  .admin-product img { width: 50px; height: 62px; }
+  .admin-product .actions { grid-column: 2; justify-content: flex-start; }
+  .header { padding: 12px 14px; }
+  .btn { padding: 8px 12px; font-size: 12px; }
 }
 </style>
 </head>
 <body>
 
-<header>
-  <a class="logo" href="#accueil">ATELIER <span>N°</span></a>
-  <nav>
-    <a href="#collection">Collection</a>
-    <a href="#histoire">Notre vision</a>
-    <a href="#contact">Contact</a>
-  </nav>
-  <div class="header-actions">
-    <div class="admin-menu-wrap">
-      <button class="icon-btn" id="adminToggle" type="button" aria-expanded="false">Espace admin ▾</button>
-      <div class="admin-menu" id="adminMenu" hidden>
-        <a href="#" id="menuOpenOwner">🔑 Accès propriétaire</a>
-        <a href="#" id="menuOpenConfig">⚙️ Configuration propriétaire</a>
-      </div>
-    </div>
-    <button class="icon-btn" id="cartOpen" type="button">Panier (<span id="cartCount">0</span>)</button>
-  </div>
+<header class="header">
+  <div class="logo">ATELIER <span>N°</span></div>
+  <div class="header-spacer"></div>
+  <button class="btn" id="btnCart">🛒 Panier (<span id="cartCount">0</span>)</button>
+  <button class="btn admin" id="btnAdmin">🔑 Espace admin</button>
 </header>
 
 <main>
-  <section class="hero" id="accueil">
-    <div class="hero-image"></div>
-    <div class="hero-content">
-      <div class="eyebrow">Objets choisis. Esprit singulier.</div>
-      <h1>L'art de<br><em>choisir.</em></h1>
-      <p>Une collection pensée pour celles et ceux qui accordent de l'importance aux détails, aux matières et aux objets qui traversent le temps.</p>
-      <a class="btn" href="#collection">Explorer la collection ↗</a>
-    </div>
-    <div class="hero-bottom"><span>Édition sélectionnée · 2026</span><span>Design · Matière · Caractère</span></div>
+  <section class="hero">
+    <h1>L'art de<br><em>choisir.</em></h1>
+    <p>Une sélection d'objets choisis pour leur caractère, leur matière et leur design intemporel.</p>
   </section>
 
-  <section id="collection">
-    <div class="section-head">
-      <div><div class="eyebrow">La sélection Atelier</div><h2>Des pièces<br>qui ont une présence.</h2></div>
-      <p>Découvrez notre sélection d'objets et d'accessoires. Chaque pièce est choisie pour son caractère et sa qualité.</p>
-    </div>
-    <div class="filters" id="filters">
-      <button class="filter active" data-category="Tout">Tout voir</button>
-      <button class="filter" data-category="Maison">Maison</button>
-      <button class="filter" data-category="Accessoires">Accessoires</button>
-      <button class="filter" data-category="Technologie">Technologie</button>
-    </div>
-    <div class="products" id="products"></div>
-  </section>
-
-  <section class="story" id="histoire">
-    <img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=85" alt="Intérieur" loading="lazy">
-    <div>
-      <div class="eyebrow">Notre philosophie</div>
-      <h2>Moins, mais<br>mieux choisi.</h2>
-      <p>Atelier N° est une invitation à porter un autre regard sur les objets qui nous entourent. Nous privilégions une présentation claire, une sélection réfléchie et une expérience d'achat simple.</p>
-      <p>Notre ambition : faire de chaque découverte un moment agréable, sans superflu et sans compromis sur le soin apporté aux détails.</p>
-      <div class="values">
-        <div class="value"><b>01.</b><p>Sélection réfléchie</p></div>
-        <div class="value"><b>02.</b><p>Design intemporel</p></div>
-        <div class="value"><b>03.</b><p>Service attentif</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="banner">
-    <div class="eyebrow">Votre prochain coup de cœur</div>
-    <h2>Le beau n'a pas besoin d'en faire trop.</h2>
-    <p>Découvrez les pièces qui correspondent à votre univers.</p>
-    <a class="btn" href="#collection">Voir la sélection ↗</a>
-  </section>
-
-  <section id="contact">
-    <div class="contact">
-      <div>
-        <div class="eyebrow">Restons en contact</div>
-        <h2>Une question ?<br>Parlons-en.</h2>
-        <p>Vous souhaitez en savoir plus sur un produit ou préparer une commande ? Envoyez-nous votre demande.</p>
-        <p>Pour un contact immédiat, vous pouvez aussi utiliser l'assistant Atelier N° en bas à droite.</p>
-      </div>
-      <form class="contact-form" id="contactForm">
-        <input id="contactName" placeholder="Votre nom" required maxlength="100">
-        <input id="contactEmail" type="email" placeholder="Votre e-mail" required>
-        <textarea id="contactMessage" placeholder="Comment pouvons-nous vous aider ?" required maxlength="2000"></textarea>
-        <button class="btn" type="submit">Envoyer ma demande ↗</button>
-        <p class="small-note">Votre message est enregistré et visible par le propriétaire dans son espace admin.</p>
-      </form>
-    </div>
+  <section class="section">
+    <h2>Notre collection</h2>
+    <div class="grid" id="shopGrid"></div>
   </section>
 </main>
 
-<footer>
-  <a class="logo" href="#accueil">ATELIER <span>N°</span></a>
-  <span>© <span id="year"></span> Atelier N° · Tous droits réservés.</span>
-  <a href="#contact">Nous contacter ↗</a>
-</footer>
+<!-- ================= ADMIN MODAL ================= -->
+<div class="modal" id="adminModal">
+  <div class="modal-box">
+    <button class="modal-close" id="adminClose" title="Fermer">✕</button>
 
-<!-- Panier -->
-<div class="overlay" id="overlay"></div>
-<aside class="drawer" id="cartDrawer" role="dialog" aria-label="Panier">
-  <div class="drawer-head"><h2>Votre panier</h2><button class="close-btn" id="cartClose" aria-label="Fermer">×</button></div>
-  <div class="cart-items" id="cartItems"></div>
-  <div class="cart-footer">
-    <div class="total"><span>Total estimé</span><strong id="cartTotal">0 FCFA</strong></div>
-    <button class="btn" id="checkout" type="button">Préparer ma commande ↗</button>
-    <p class="small-note">Aucun paiement n'est effectué sur cette démonstration.</p>
-  </div>
-</aside>
-
-<!-- Commande -->
-<div class="checkout-modal" id="checkoutModal" role="dialog">
-  <div class="checkout-panel">
-    <div id="checkoutFormView">
-      <h2>Finaliser ma commande</h2>
-      <p class="lead">Remplissez vos informations. Votre commande est enregistrée puis visible par le propriétaire.</p>
-      <form id="checkoutForm">
-        <div class="checkout-grid">
-          <div><label for="orderName">Nom complet *</label><input id="orderName" name="name" required maxlength="100"></div>
-          <div><label for="orderPhone">Téléphone *</label><input id="orderPhone" name="phone" type="tel" required maxlength="40"></div>
-          <div><label for="orderCity">Ville *</label><input id="orderCity" name="city" required maxlength="100"></div>
-          <div><label for="orderAddress">Adresse *</label><input id="orderAddress" name="address" required maxlength="300"></div>
-          <div class="wide"><label for="orderNote">Note (facultatif)</label><textarea id="orderNote" name="note" maxlength="1000"></textarea></div>
+    <!-- LOGIN -->
+    <div id="adminLogin" class="login-view">
+      <h2>Espace propriétaire</h2>
+      <p>Gérez vos produits directement.</p>
+      <form id="loginForm">
+        <div class="field">
+          <label for="adminCode">Code d'accès</label>
+          <input type="password" id="adminCode" value="atelier2026" autocomplete="current-password">
         </div>
-        <div class="checkout-total"><span>Total estimé</span><strong id="checkoutTotal">0 FCFA</strong></div>
-        <div class="checkout-actions">
-          <button class="btn secondary" id="cancelCheckout" type="button">Retour</button>
-          <button class="btn" id="submitOrder" type="submit">Enregistrer ↗</button>
-        </div>
+        <button type="submit" class="btn-primary" style="width:100%">Ouvrir mon espace</button>
       </form>
+      <div class="login-hint">
+        💡 <strong>Code :</strong> <code>atelier2026</code><br>
+        <small style="opacity:.8">Le champ est déjà pré-rempli, cliquez simplement sur « Ouvrir mon espace ».</small>
+      </div>
     </div>
-    <div class="ticket-view" id="orderTicket">
-      <h3>Commande enregistrée</h3>
-      <p id="ticketDetails"></p>
-      <div class="checkout-actions" style="margin-top:16px">
-        <button class="btn secondary" id="closeTicket" type="button">Fermer</button>
+
+    <!-- DASHBOARD -->
+    <div id="adminDash" hidden>
+      <div class="admin-head">
+        <h2>Tableau de bord</h2>
+        <button class="btn" id="btnLogout">Déconnexion</button>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="products">Produits</button>
+        <button class="tab" data-tab="orders">Commandes</button>
+        <button class="tab" data-tab="config">Configuration</button>
+      </div>
+
+      <!-- TAB PRODUITS -->
+      <div class="tab-panel active" data-panel="products">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:12px;flex-wrap:wrap">
+          <div style="color:#888;font-size:13px"><span id="adminProductCount">0</span> produit(s) en boutique</div>
+          <button class="btn-primary" id="btnNewProduct">+ Nouveau produit</button>
+        </div>
+
+        <form class="product-form" id="productForm" hidden>
+          <h3 id="formTitle">Nouveau produit</h3>
+          <input type="hidden" id="fieldId">
+          <div class="field-row">
+            <div class="field">
+              <label for="fieldName">Nom *</label>
+              <input type="text" id="fieldName" required maxlength="120">
+            </div>
+            <div class="field">
+              <label for="fieldCategory">Catégorie *</label>
+              <input type="text" id="fieldCategory" required maxlength="60" placeholder="Maison, Accessoires…">
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="fieldPrice">Prix (FCFA) *</label>
+              <input type="number" id="fieldPrice" required min="0" step="100">
+            </div>
+            <div class="field">
+              <label for="fieldTag">Étiquette</label>
+              <input type="text" id="fieldTag" maxlength="50" placeholder="Nouveauté, Sélection…">
+            </div>
+          </div>
+          <div class="field">
+            <label for="fieldImage">URL de l'image (HTTPS)</label>
+            <input type="url" id="fieldImage" maxlength="2000" placeholder="https://…">
+          </div>
+          <div class="field">
+            <label for="fieldDescription">Description</label>
+            <textarea id="fieldDescription" maxlength="500"></textarea>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:flex-end">
+            <button type="button" class="btn" id="btnCancelForm">Annuler</button>
+            <button type="submit" class="btn-primary">Enregistrer</button>
+          </div>
+        </form>
+
+        <div class="admin-products" id="adminProductList"></div>
+      </div>
+
+      <!-- TAB COMMANDES -->
+      <div class="tab-panel" data-panel="orders">
+        <div id="adminOrdersList"></div>
+      </div>
+
+      <!-- TAB CONFIG -->
+      <div class="tab-panel" data-panel="config">
+        <div style="background:rgba(212,181,139,0.08);border:1px dashed rgba(212,181,139,0.4);padding:16px;border-radius:10px;font-size:13px;line-height:1.7;color:#d2c3ae">
+          <strong>Mode local :</strong> les produits sont sauvegardés dans le navigateur (localStorage). Ils restent visibles sur cet appareil.
+        </div>
+        <div style="margin-top:20px">
+          <button class="btn-danger" id="btnReset" style="padding:12px 20px;font-size:14px">⚠️ Tout réinitialiser</button>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Sora -->
-<button class="chat-launch" id="chatLaunch" aria-label="Assistant"><span class="orb"></span></button>
-<div class="chat-window" id="chatWindow" role="dialog">
-  <div class="chat-head">
-    <span class="orb"></span>
-    <div><b>Sora · Atelier N°</b><small><i class="chat-status-dot"></i>En ligne</small></div>
-    <button class="close-btn" id="chatClose" aria-label="Fermer">×</button>
+<!-- ================= CART ================= -->
+<div class="backdrop" id="backdrop"></div>
+<aside class="cart-drawer" id="cartDrawer">
+  <div class="cart-head">
+    <h2>Panier</h2>
+    <button class="modal-close" id="cartClose" style="position:static">✕</button>
   </div>
-  <div class="chat-messages" id="chatMessages"></div>
-  <div class="chat-suggestions" id="chatSuggestions"></div>
-  <form class="chat-form" id="chatForm">
-    <textarea id="chatInput" rows="1" placeholder="Écrivez votre message…" autocomplete="off" maxlength="1000" required></textarea>
-    <button class="send-btn" type="submit">↑</button>
-  </form>
-</div>
-
-<div class="toast" id="toast" role="status"></div>
-
-<!-- ============================================================
-     ESPACE PROPRIÉTAIRE — plein écran, 100% fonctionnel
-     ============================================================ -->
-<div id="ownerOverlay">
-  <button type="button" class="owner-close" id="ownerCloseBtn">✕ Fermer</button>
-  <div class="owner-shell">
-    <div class="owner-top">
-      <div class="owner-logo">ATELIER <span>N°</span> <small>/ PROPRIÉTAIRE</small></div>
-      <button class="owner-back" type="button" id="ownerBackBtn">← Retour à la boutique</button>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-foot">
+    <div class="cart-total">
+      <span>Total</span>
+      <span id="cartTotal">0 FCFA</span>
     </div>
-
-    <!-- VUE CONNEXION -->
-    <div id="ownerLoginView">
-      <div class="owner-eyebrow">Administration privée</div>
-      <h1>Votre boutique,<br>en toute maîtrise.</h1>
-      <p class="owner-intro">Gérez le catalogue, les commandes et les demandes clients. Toutes vos modifications sont visibles immédiatement sur la boutique.</p>
-
-      <section class="owner-panel owner-login">
-        <h2>Accès propriétaire</h2>
-        <p class="owner-intro">Saisissez votre code d'accès pour ouvrir le tableau de bord.</p>
-        <form id="ownerLoginForm">
-          <div class="owner-field">
-            <label for="ownerCode">Code d'accès</label>
-            <input id="ownerCode" type="password" autocomplete="current-password" required placeholder="Votre code privé">
-          </div>
-          <button class="owner-btn" type="submit" id="ownerLoginBtn">Ouvrir mon espace</button>
-          <div class="owner-msg" id="ownerLoginMsg"></div>
-        </form>
-        <div class="owner-hint">💡 <strong>Code d'accès :</strong> <code>atelier2026</code></div>
-      </section>
-    </div>
-
-    <!-- VUE TABLEAU DE BORD -->
-    <div id="ownerDashView" hidden>
-      <div class="owner-eyebrow">Tableau de bord</div>
-      <h1>Bonjour, propriétaire.</h1>
-
-      <div class="owner-stat-grid" id="ownerStats"></div>
-
-      <nav class="owner-tabs">
-        <button class="owner-tab active" data-owner-tab="products">Produits</button>
-        <button class="owner-tab" data-owner-tab="orders">Commandes</button>
-        <button class="owner-tab" data-owner-tab="tickets">Support</button>
-        <button class="owner-tab" data-owner-tab="config">Configuration</button>
-        <button class="owner-tab" id="ownerLogoutBtn" style="margin-left:auto">Déconnexion</button>
-      </nav>
-
-      <!-- ONGLET PRODUITS -->
-      <section class="owner-panel" id="ownerProductsPanel">
-        <div class="owner-section-title">
-          <h2>Mon catalogue</h2>
-          <button class="owner-btn" id="ownerNewProductBtn">+ Ajouter un produit</button>
-        </div>
-
-        <form id="ownerProductForm" hidden>
-          <input type="hidden" id="ownerProductId">
-          <div class="owner-row">
-            <div class="owner-field">
-              <label for="ownerProductName">Nom du produit *</label>
-              <input id="ownerProductName" required maxlength="120">
-            </div>
-            <div class="owner-field">
-              <label for="ownerProductCategory">Catégorie *</label>
-              <input id="ownerProductCategory" required maxlength="60" placeholder="Maison, Accessoires…">
-            </div>
-          </div>
-          <div class="owner-row">
-            <div class="owner-field">
-              <label for="ownerProductPrice">Prix (FCFA) *</label>
-              <input id="ownerProductPrice" type="number" min="0" step="1" required>
-            </div>
-            <div class="owner-field">
-              <label for="ownerProductTag">Étiquette</label>
-              <input id="ownerProductTag" maxlength="50" placeholder="Nouveauté, Sélection…">
-            </div>
-          </div>
-          <div class="owner-field">
-            <label for="ownerProductImage">URL de la photo (HTTPS)</label>
-            <input id="ownerProductImage" type="url" placeholder="https://…" maxlength="1500">
-          </div>
-          <div class="owner-field">
-            <label for="ownerProductDescription">Description</label>
-            <textarea id="ownerProductDescription" maxlength="500"></textarea>
-          </div>
-          <div class="owner-section-title">
-            <div></div>
-            <div class="owner-actions">
-              <button type="button" class="owner-btn ghost" id="ownerProductCancel">Annuler</button>
-              <button type="submit" class="owner-btn" id="ownerProductSave">Enregistrer</button>
-            </div>
-          </div>
-          <div class="owner-msg" id="ownerProductMsg"></div>
-        </form>
-
-        <div class="owner-list" id="ownerProductList"></div>
-      </section>
-
-      <!-- ONGLET COMMANDES -->
-      <section class="owner-panel" id="ownerOrdersPanel" hidden>
-        <h2>Commandes clients</h2>
-        <p class="owner-intro">Les commandes passées par les clients sur la boutique s'affichent ici automatiquement.</p>
-        <div class="owner-list" id="ownerOrdersList"></div>
-      </section>
-
-      <!-- ONGLET SUPPORT -->
-      <section class="owner-panel" id="ownerTicketsPanel" hidden>
-        <h2>Demandes de support</h2>
-        <p class="owner-intro">Messages envoyés depuis le formulaire de contact.</p>
-        <div class="owner-list" id="ownerTicketsList"></div>
-      </section>
-
-      <!-- ONGLET CONFIG -->
-      <section class="owner-panel" id="ownerConfigPanel" hidden>
-        <h2>Configuration du propriétaire</h2>
-        <div class="owner-hint">
-          En production, remplacez le code dans le code source par une variable d'environnement serveur. En local, le code actuel est <code>atelier2026</code>.
-        </div>
-        <div class="owner-field" style="margin-top:18px">
-          <label>Variable privée (production)</label>
-          <input readonly value="ADMIN_ACCESS_CODE">
-        </div>
-        <div class="owner-section-title" style="margin-top:20px">
-          <div></div>
-          <button type="button" class="owner-btn danger" id="ownerResetAll">Tout réinitialiser (produits + commandes + tickets)</button>
-        </div>
-      </section>
-    </div>
+    <button class="btn-primary" id="btnCheckout" style="width:100%">Commander</button>
   </div>
-</div>
+</aside>
+
+<div class="toast" id="toast"></div>
 
 <script>
 "use strict";
 
-/* ============================================================
-   1. MENU ADMIN
-   ============================================================ */
-(function () {
-  const toggle = document.getElementById("adminToggle");
-  const menu = document.getElementById("adminMenu");
-  if (!toggle || !menu) return;
-  toggle.addEventListener("click", e => {
-    e.stopPropagation();
-    const willOpen = menu.hidden;
-    menu.hidden = !willOpen;
-    toggle.setAttribute("aria-expanded", String(willOpen));
-  });
-  document.addEventListener("click", e => {
-    if (!e.target.closest(".admin-menu-wrap")) {
-      menu.hidden = true;
-      toggle.setAttribute("aria-expanded", "false");
-    }
-  });
-})();
-
-/* ============================================================
-   2. OUTILS PARTAGÉS
-   ============================================================ */
-const LS_PRODUCTS = "atelier_products";
-const LS_ORDERS   = "atelier_orders";
-const LS_TICKETS  = "atelier_tickets";
-const LS_CART     = "atelier_cart";
-const DEMO_CODE   = "atelier2026";
+/* ================================================================
+   CONFIGURATION
+================================================================ */
+const ADMIN_CODE = "atelier2026";
+const LS_PRODUCTS = "atelier_n_products_v1";
+const LS_ORDERS   = "atelier_n_orders_v1";
+const LS_CART     = "atelier_n_cart_v1";
 
 const DEFAULT_PRODUCTS = [
   { id: 1, name: "Lampe Sculpturale", category: "Maison", price: 45000, description: "Une lumière douce et architecturale.", image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80", tag: "Sélection" },
   { id: 2, name: "Fauteuil Horizon", category: "Maison", price: 185000, description: "Lignes pures et confort généreux.", image: "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=900&q=80", tag: "Design" },
   { id: 3, name: "Sac Signature", category: "Accessoires", price: 38000, description: "Une silhouette sobre au quotidien.", image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=900&q=80", tag: "Essentiel" },
-  { id: 4, name: "Casque Studio", category: "Technologie", price: 65000, description: "Une expérience d'écoute immersive.", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80", tag: "Audio" },
+  { id: 4, name: "Casque Studio", category: "Technologie", price: 65000, description: "Une écoute immersive.", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80", tag: "Audio" },
   { id: 5, name: "Vase Minéral", category: "Maison", price: 22000, description: "Une présence discrète et naturelle.", image: "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&w=900&q=80", tag: "Matière" },
   { id: 6, name: "Montre Contemporaine", category: "Accessoires", price: 52000, description: "Une élégance pensée pour durer.", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80", tag: "Signature" }
 ];
 
+/* ================================================================
+   HELPERS
+================================================================ */
+const $ = id => document.getElementById(id);
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[c]);
+}
+
+function fmtPrice(n) {
+  return new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(Number(n) || 0) + " FCFA";
+}
+
 function readLS(key, fallback) {
   try {
-    const v = localStorage.getItem(key);
-    return v ? JSON.parse(v) : fallback;
-  } catch { return fallback; }
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw);
+  } catch (e) { console.warn("readLS:", key, e); return fallback; }
 }
+
 function writeLS(key, value) {
   try { localStorage.setItem(key, JSON.stringify(value)); return true; }
-  catch { return false; }
-}
-function money(a) {
-  return new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(Number(a) || 0) + " FCFA";
+  catch (e) { console.warn("writeLS:", key, e); return false; }
 }
 
-let products = readLS(LS_PRODUCTS, null);
-if (!Array.isArray(products) || !products.length) {
-  products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
-  writeLS(LS_PRODUCTS, products);
+let toastTimer;
+function notify(msg) {
+  const t = $("toast");
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2500);
 }
-let cart = readLS(LS_CART, []);
-if (!Array.isArray(cart)) cart = [];
-let activeCategory = "Tout";
 
-function saveCart() { writeLS(LS_CART, cart); }
+/* ================================================================
+   STATE
+================================================================ */
+let products = [];
+let cart = [];
+let orders = [];
+let editingId = null;
+
+function loadState() {
+  let p = readLS(LS_PRODUCTS, null);
+  if (!Array.isArray(p) || !p.length) {
+    p = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+    writeLS(LS_PRODUCTS, p);
+  }
+  products = p;
+
+  let c = readLS(LS_CART, []);
+  cart = Array.isArray(c) ? c : [];
+
+  let o = readLS(LS_ORDERS, []);
+  orders = Array.isArray(o) ? o : [];
+}
+
 function saveProducts() { writeLS(LS_PRODUCTS, products); }
+function saveCart()     { writeLS(LS_CART, cart); }
+function saveOrders()   { writeLS(LS_ORDERS, orders); }
 
-/* ============================================================
-   3. AFFICHAGE CATALOGUE
-   ============================================================ */
-const productGrid = document.getElementById("products");
+/* ================================================================
+   SHOP PUBLIC
+================================================================ */
+function renderShop() {
+  const grid = $("shopGrid");
+  if (!grid) return;
+  grid.innerHTML = "";
 
-function renderProducts() {
-  const filtered = products.filter(p =>
-    activeCategory === "Tout" ||
-    String(p.category || "").toLowerCase() === activeCategory.toLowerCase()
-  );
-  productGrid.replaceChildren();
-
-  if (!filtered.length) {
-    const e = document.createElement("p");
-    e.className = "empty";
-    e.textContent = "Aucun produit dans cette catégorie pour le moment.";
-    productGrid.append(e);
+  if (!products.length) {
+    const div = document.createElement("div");
+    div.className = "empty-state";
+    div.style.gridColumn = "1 / -1";
+    div.innerHTML = "Aucun produit.<br><small>Ouvrez l'espace admin pour en ajouter.</small>";
+    grid.appendChild(div);
     return;
   }
 
-  filtered.forEach(product => {
-    const card = document.createElement("article");
-    card.className = "product-card";
+  products.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML =
+      '<div class="card-img">' +
+        '<img src="' + esc(p.image || "") + '" alt="' + esc(p.name) + '" onerror="this.style.display=\'none\'">' +
+      '</div>' +
+      '<div class="card-body">' +
+        '<h3>' + esc(p.name) + '</h3>' +
+        '<p>' + esc(p.description || p.category || "") + '</p>' +
+        '<div class="card-foot">' +
+          '<span class="card-price">' + fmtPrice(p.price) + '</span>' +
+          '<button class="btn-add" data-add="' + p.id + '">+ Panier</button>' +
+        '</div>' +
+      '</div>';
+    grid.appendChild(card);
+  });
 
-    const imageBox = document.createElement("div");
-    imageBox.className = "product-image";
-
-    const image = document.createElement("img");
-    image.src = product.image || "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=600&q=70";
-    image.alt = product.name;
-    image.loading = "lazy";
-    image.onerror = () => { image.removeAttribute("src"); imageBox.style.background = "#25211b"; };
-
-    const tag = document.createElement("span");
-    tag.className = "tag";
-    tag.textContent = product.tag || product.category || "Pièce";
-
-    const add = document.createElement("button");
-    add.className = "add-btn";
-    add.type = "button";
-    add.textContent = "+";
-    add.setAttribute("aria-label", "Ajouter " + product.name + " au panier");
-    add.addEventListener("click", () => addToCart(product.id));
-
-    imageBox.append(image, tag, add);
-
-    const info = document.createElement("div");
-    info.className = "product-info";
-
-    const details = document.createElement("div");
-    const title = document.createElement("h3");
-    title.textContent = product.name;
-    const desc = document.createElement("p");
-    desc.textContent = product.description || "";
-    details.append(title, desc);
-
-    const price = document.createElement("span");
-    price.className = "price";
-    price.textContent = money(product.price);
-
-    info.append(details, price);
-    card.append(imageBox, info);
-    productGrid.append(card);
+  grid.querySelectorAll("[data-add]").forEach(btn => {
+    btn.addEventListener("click", () => addToCart(Number(btn.dataset.add)));
   });
 }
 
-document.getElementById("filters").addEventListener("click", e => {
-  const btn = e.target.closest("[data-category]");
-  if (!btn) return;
-  activeCategory = btn.dataset.category;
-  document.querySelectorAll(".filter").forEach(i => i.classList.toggle("active", i === btn));
-  renderProducts();
-});
-
-/* ============================================================
-   4. PANIER
-   ============================================================ */
-const overlay = document.getElementById("overlay");
-const drawer = document.getElementById("cartDrawer");
-
-function openCart() { overlay.classList.add("open"); drawer.classList.add("open"); }
-function closeCart() { overlay.classList.remove("open"); drawer.classList.remove("open"); }
-
-document.getElementById("cartOpen").addEventListener("click", openCart);
-document.getElementById("cartClose").addEventListener("click", closeCart);
-overlay.addEventListener("click", closeCart);
-
-function addToCart(id, quantity = 1) {
-  const product = products.find(p => p.id === id);
-  if (!product) return false;
-  const qty = Math.max(1, Math.min(99, Number(quantity) || 1));
-  const item = cart.find(i => i.id === id);
-  if (item) item.quantity += qty;
-  else cart.push({ id, quantity: qty });
+/* ================================================================
+   PANIER
+================================================================ */
+function addToCart(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  const item = cart.find(x => x.id === id);
+  if (item) item.qty = (item.qty || 1) + 1;
+  else cart.push({ id, qty: 1 });
   saveCart();
   renderCart();
-  notify((product.name || "Article") + " ajouté au panier.");
-  return true;
+  notify(p.name + " ajouté au panier");
 }
 
-function changeQuantity(id, delta) {
-  const item = cart.find(i => i.id === id);
+function changeQty(id, delta) {
+  const item = cart.find(x => x.id === id);
   if (!item) return;
-  item.quantity += delta;
-  if (item.quantity <= 0) cart = cart.filter(i => i.id !== id);
+  item.qty = (item.qty || 1) + delta;
+  if (item.qty <= 0) cart = cart.filter(x => x.id !== id);
+  saveCart();
+  renderCart();
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(x => x.id !== id);
   saveCart();
   renderCart();
 }
 
 function renderCart() {
-  const container = document.getElementById("cartItems");
-  container.replaceChildren();
+  const container = $("cartItems");
+  const countEl = $("cartCount");
+  const totalEl = $("cartTotal");
+  if (!container) return;
+
+  container.innerHTML = "";
   let count = 0, total = 0;
 
-  cart.forEach(item => {
-    const product = products.find(p => p.id === item.id);
-    if (!product) return;
-    const quantity = Math.max(1, Number(item.quantity) || 1);
-    count += quantity;
-    total += Number(product.price) * quantity;
+  if (!cart.length) {
+    container.innerHTML = '<div class="cart-empty">Votre panier est vide.</div>';
+  } else {
+    cart.forEach(item => {
+      const p = products.find(x => x.id === item.id);
+      if (!p) return;
+      const qty = Math.max(1, Number(item.qty) || 1);
+      count += qty;
+      total += Number(p.price) * qty;
 
-    const row = document.createElement("div");
-    row.className = "cart-item";
-
-    const img = document.createElement("img");
-    img.src = product.image || "";
-    img.alt = product.name;
-
-    const detail = document.createElement("div");
-    const title = document.createElement("h4");
-    title.textContent = product.name;
-    const price = document.createElement("p");
-    price.textContent = money(product.price);
-
-    const qty = document.createElement("div");
-    qty.className = "qty";
-    const minus = document.createElement("button");
-    minus.type = "button"; minus.textContent = "−";
-    minus.addEventListener("click", () => changeQuantity(item.id, -1));
-    const number = document.createElement("span");
-    number.textContent = quantity;
-    const plus = document.createElement("button");
-    plus.type = "button"; plus.textContent = "+";
-    plus.addEventListener("click", () => changeQuantity(item.id, 1));
-    qty.append(minus, number, plus);
-    detail.append(title, price, qty);
-
-    const remove = document.createElement("button");
-    remove.className = "remove";
-    remove.type = "button";
-    remove.textContent = "Retirer";
-    remove.addEventListener("click", () => {
-      cart = cart.filter(e => e.id !== item.id);
-      saveCart();
-      renderCart();
+      const row = document.createElement("div");
+      row.className = "cart-item";
+      row.innerHTML =
+        '<img src="' + esc(p.image || "") + '" alt="' + esc(p.name) + '" onerror="this.style.display=\'none\'">' +
+        '<div>' +
+          '<h4>' + esc(p.name) + '</h4>' +
+          '<p>' + fmtPrice(p.price) + ' × ' + qty + '</p>' +
+          '<div style="display:flex;gap:6px;align-items:center;margin-top:8px">' +
+            '<button class="btn-edit" data-minus="' + p.id + '" style="padding:4px 10px">−</button>' +
+            '<span style="font-size:12px">' + qty + '</span>' +
+            '<button class="btn-edit" data-plus="' + p.id + '" style="padding:4px 10px">+</button>' +
+            '<button class="btn-danger" data-remove="' + p.id + '" style="padding:4px 10px;font-size:11px;margin-left:auto">✕</button>' +
+          '</div>' +
+        '</div>';
+      container.appendChild(row);
     });
 
-    row.append(img, detail, remove);
-    container.append(row);
-  });
-
-  if (!count) {
-    const empty = document.createElement("p");
-    empty.className = "small-note";
-    empty.textContent = "Votre panier est vide. Explorez la collection.";
-    container.append(empty);
+    container.querySelectorAll("[data-minus]").forEach(b => b.addEventListener("click", () => changeQty(Number(b.dataset.minus), -1)));
+    container.querySelectorAll("[data-plus]").forEach(b => b.addEventListener("click", () => changeQty(Number(b.dataset.plus), 1)));
+    container.querySelectorAll("[data-remove]").forEach(b => b.addEventListener("click", () => removeFromCart(Number(b.dataset.remove))));
   }
 
-  document.getElementById("cartCount").textContent = count;
-  document.getElementById("cartTotal").textContent = money(total);
+  if (countEl) countEl.textContent = count;
+  if (totalEl) totalEl.textContent = fmtPrice(total);
 }
 
-/* ============================================================
-   5. COMMANDE
-   ============================================================ */
-const checkoutModal = document.getElementById("checkoutModal");
-const checkoutForm = document.getElementById("checkoutForm");
+function openCart() {
+  $("cartDrawer").classList.add("open");
+  $("backdrop").classList.add("open");
+}
+function closeCart() {
+  $("cartDrawer").classList.remove("open");
+  $("backdrop").classList.remove("open");
+}
 
-function openCheckout() {
+function checkout() {
   if (!cart.length) return notify("Votre panier est vide.");
-  const total = cart.reduce((sum, item) => {
+  const total = cart.reduce((s, item) => {
     const p = products.find(x => x.id === item.id);
-    return sum + (p ? Number(p.price) * Number(item.quantity) : 0);
+    return s + (p ? Number(p.price) * Number(item.qty) : 0);
   }, 0);
-  document.getElementById("checkoutTotal").textContent = money(total);
-  document.getElementById("checkoutFormView").style.display = "block";
-  document.getElementById("orderTicket").classList.remove("open");
-  checkoutModal.classList.add("open");
-  document.getElementById("orderName").focus();
-}
-function closeCheckout() { checkoutModal.classList.remove("open"); }
-
-document.getElementById("checkout").addEventListener("click", openCheckout);
-document.getElementById("cancelCheckout").addEventListener("click", closeCheckout);
-document.getElementById("closeTicket").addEventListener("click", closeCheckout);
-checkoutModal.addEventListener("click", e => { if (e.target === checkoutModal) closeCheckout(); });
-
-checkoutForm.addEventListener("submit", e => {
-  e.preventDefault();
-  if (!cart.length) return notify("Votre panier est vide.");
-  const form = new FormData(checkoutForm);
-  const customer = {
-    name: String(form.get("name") || "").trim(),
-    phone: String(form.get("phone") || "").trim(),
-    city: String(form.get("city") || "").trim(),
-    address: String(form.get("address") || "").trim(),
-    note: String(form.get("note") || "").trim()
+  const order = {
+    ref: "CMD-" + Date.now().toString().slice(-6),
+    date: new Date().toISOString(),
+    items: cart.map(i => {
+      const p = products.find(x => x.id === i.id);
+      return p ? { name: p.name, qty: i.qty, price: p.price } : null;
+    }).filter(Boolean),
+    total
   };
-  const items = cart.map(item => {
-    const p = products.find(x => x.id === item.id);
-    return p ? { id: p.id, name: p.name, price: Number(p.price), quantity: Number(item.quantity) } : null;
-  }).filter(Boolean);
-  if (!items.length) return notify("Panier invalide.");
-
-  const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
-  const reference = "CMD-" + Date.now().toString().slice(-8);
-
-  /* Enregistrement dans le localStorage, visible par le propriétaire */
-  const orders = readLS(LS_ORDERS, []) || [];
-  orders.unshift({
-    reference,
-    created_at: new Date().toISOString(),
-    customer,
-    items,
-    total,
-    status: "pending_confirmation"
-  });
-  writeLS(LS_ORDERS, orders);
-
-  document.getElementById("checkoutFormView").style.display = "none";
-  document.getElementById("orderTicket").classList.add("open");
-  document.getElementById("ticketDetails").textContent =
-    "Référence : " + reference + "\n" +
-    "Client : " + customer.name + "\n" +
-    "Téléphone : " + customer.phone + "\n" +
-    "Livraison : " + customer.address + ", " + customer.city + "\n" +
-    "Total estimé : " + money(total);
-
-  notify("Commande enregistrée : " + reference);
-
+  orders.unshift(order);
+  saveOrders();
   cart = [];
   saveCart();
   renderCart();
-});
-
-/* ============================================================
-   6. FORMULAIRE DE CONTACT (enregistre en local)
-   ============================================================ */
-document.getElementById("contactForm").addEventListener("submit", e => {
-  e.preventDefault();
-  const name = document.getElementById("contactName").value.trim();
-  const email = document.getElementById("contactEmail").value.trim();
-  const message = document.getElementById("contactMessage").value.trim();
-  const reference = "SUP-" + Date.now().toString().slice(-6);
-
-  const tickets = readLS(LS_TICKETS, []) || [];
-  tickets.unshift({
-    reference,
-    created_at: new Date().toISOString(),
-    name, email, message
-  });
-  writeLS(LS_TICKETS, tickets);
-
-  notify("Message enregistré : " + reference);
-  e.currentTarget.reset();
-});
-
-/* ============================================================
-   7. SORA (assistant)
-   ============================================================ */
-(function Sora() {
-  const el = {
-    launch: document.getElementById("chatLaunch"),
-    window: document.getElementById("chatWindow"),
-    close: document.getElementById("chatClose"),
-    messages: document.getElementById("chatMessages"),
-    suggestions: document.getElementById("chatSuggestions"),
-    form: document.getElementById("chatForm"),
-    input: document.getElementById("chatInput")
-  };
-
-  const GREETING = "Bonjour et bienvenue chez Atelier N°. Je suis **Sora**.\n\nJe peux vous conseiller une pièce, afficher les prix ou ouvrir votre panier.";
-  const SUGGESTIONS = ["Montre-moi la collection", "Quels sont vos prix ?", "Je cherche un cadeau"];
-
-  let opened = false;
-
-  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  function fmt(t) {
-    return esc(t).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-  }
-  function md(t) {
-    return String(t).split("\n").map(l => l.trim() ? "<p>" + fmt(l) + "</p>" : "").join("");
-  }
-
-  function addMsg(role, text) {
-    const node = document.createElement("div");
-    node.className = "message " + role;
-    node.innerHTML = md(text);
-    el.messages.append(node);
-    el.messages.scrollTop = el.messages.scrollHeight;
-  }
-
-  function setSuggestions(list) {
-    el.suggestions.replaceChildren();
-    (list || []).forEach(t => {
-      const b = document.createElement("button");
-      b.type = "button"; b.textContent = t;
-      b.addEventListener("click", () => send(t));
-      el.suggestions.append(b);
-    });
-  }
-
-  function localReply(text) {
-    const m = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    if (/bonjour|salut|bonsoir|hello/.test(m))
-      return "Bonjour ! Comment puis-je vous aider ?";
-    if (/collection|catalogue|produit|piece/.test(m)) {
-      setTimeout(() => document.getElementById("collection")?.scrollIntoView({ behavior: "smooth" }), 200);
-      return "Voici notre collection :";
-    }
-    if (/prix|tarif|combien/.test(m)) {
-      const list = products.slice(0, 5).map(p => "• " + p.name + " — " + money(p.price)).join("\n");
-      return "Voici quelques prix :\n" + list;
-    }
-    if (/panier/.test(m)) { openCart(); return "J'ouvre votre panier."; }
-    if (/commander|acheter/.test(m)) {
-      if (cart.length) { openCheckout(); return "J'ouvre le formulaire de commande."; }
-      openCart(); return "Votre panier est vide.";
-    }
-    if (/merci/.test(m)) return "Avec plaisir !";
-    return "Je peux vous montrer la collection, les prix, ou ouvrir votre panier.";
-  }
-
-  function send(text) {
-    const content = String(text || "").trim();
-    if (!content) return;
-    if (!opened) open();
-    addMsg("user", content);
-    el.input.value = "";
-    setTimeout(() => {
-      addMsg("bot", localReply(content));
-      setSuggestions(SUGGESTIONS);
-    }, 500);
-  }
-
-  function open() { opened = true; el.window.classList.add("open"); }
-  function close() { opened = false; el.window.classList.remove("open"); }
-
-  addMsg("bot", GREETING);
-  setSuggestions(SUGGESTIONS);
-  el.launch.addEventListener("click", () => opened ? close() : open());
-  el.close.addEventListener("click", close);
-  el.form.addEventListener("submit", e => { e.preventDefault(); send(el.input.value); });
-})();
-
-/* ============================================================
-   8. ESPACE PROPRIÉTAIRE — CRUD fonctionnel
-   ============================================================ */
-(function Owner() {
-  const overlay = document.getElementById("ownerOverlay");
-  const loginView = document.getElementById("ownerLoginView");
-  const dashView = document.getElementById("ownerDashView");
-  const loginForm = document.getElementById("ownerLoginForm");
-  const loginBtn = document.getElementById("ownerLoginBtn");
-  const codeInput = document.getElementById("ownerCode");
-  const loginMsg = document.getElementById("ownerLoginMsg");
-  const statsEl = document.getElementById("ownerStats");
-  const productListEl = document.getElementById("ownerProductList");
-  const ordersListEl = document.getElementById("ownerOrdersList");
-  const ticketsListEl = document.getElementById("ownerTicketsList");
-  const productForm = document.getElementById("ownerProductForm");
-  const productMsg = document.getElementById("ownerProductMsg");
-  const globalMsg = document.getElementById("ownerProductMsg");
-
-  let currentCode = "";
-
-  function esc(s) {
-    return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-    })[c]);
-  }
-  function setMsg(el, text, type) {
-    if (!el) return;
-    el.textContent = text;
-    el.className = "owner-msg" + (type ? " " + type : "");
-  }
-
-  function openOwner(showConfig) {
-    overlay.classList.add("open");
-    document.body.style.overflow = "hidden";
-    if (dashView.hidden === false && showConfig) showTab("config");
-    if (!loginView.hidden) setTimeout(() => codeInput.focus(), 120);
-  }
-  function closeOwner() {
-    overlay.classList.remove("open");
-    document.body.style.overflow = "";
-  }
-
-  document.getElementById("ownerCloseBtn").addEventListener("click", closeOwner);
-  document.getElementById("ownerBackBtn").addEventListener("click", closeOwner);
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape" && overlay.classList.contains("open")) closeOwner();
-  });
-
-  document.getElementById("menuOpenOwner").addEventListener("click", e => {
-    e.preventDefault();
-    document.getElementById("adminMenu").hidden = true;
-    document.getElementById("adminToggle").setAttribute("aria-expanded", "false");
-    openOwner(false);
-  });
-  document.getElementById("menuOpenConfig").addEventListener("click", e => {
-    e.preventDefault();
-    document.getElementById("adminMenu").hidden = true;
-    document.getElementById("adminToggle").setAttribute("aria-expanded", "false");
-    openOwner(true);
-  });
-
-  /* ---- TABS ---- */
-  function showTab(tab) {
-    document.querySelectorAll("[data-owner-tab]").forEach(b => {
-      b.classList.toggle("active", b.dataset.ownerTab === tab);
-    });
-    const map = {
-      products: document.getElementById("ownerProductsPanel"),
-      orders: document.getElementById("ownerOrdersPanel"),
-      tickets: document.getElementById("ownerTicketsPanel"),
-      config: document.getElementById("ownerConfigPanel")
-    };
-    Object.keys(map).forEach(k => { map[k].hidden = k !== tab; });
-  }
-  document.querySelectorAll("[data-owner-tab]").forEach(btn => {
-    btn.addEventListener("click", () => showTab(btn.dataset.ownerTab));
-  });
-
-  /* ---- RENDU ---- */
-  function renderStats() {
-    const orders = readLS(LS_ORDERS, []) || [];
-    const tickets = readLS(LS_TICKETS, []) || [];
-    const revenue = orders.reduce((s, o) => s + Number(o.total || 0), 0);
-    statsEl.innerHTML = [
-      ["Produits", products.length],
-      ["Commandes", orders.length],
-      ["Support", tickets.length],
-      ["Chiffre d'affaires estimé", money(revenue)]
-    ].map(([label, val]) => `
-      <div class="owner-stat">
-        <span>${esc(label)}</span>
-        <strong>${esc(val)}</strong>
-      </div>
-    `).join("");
-  }
-
-  function renderProductList() {
-    if (!products.length) {
-      productListEl.innerHTML = '<div class="owner-empty">Aucun produit. Cliquez sur « Ajouter un produit ».</div>';
-      return;
-    }
-    productListEl.innerHTML = products.map(p => `
-      <article class="owner-item">
-        <img src="${esc(p.image || "")}" alt="" onerror="this.style.visibility='hidden'">
-        <div>
-          <h3>${esc(p.name)}</h3>
-          <p>${esc(p.category)} · ${esc(money(p.price))}</p>
-          <p>${esc(p.description || "")}</p>
-          <span class="owner-pill">${p.tag ? esc(p.tag) : "—"}</span>
-        </div>
-        <div class="owner-actions">
-          <button type="button" class="owner-btn ghost" data-edit="${p.id}">Modifier</button>
-          <button type="button" class="owner-btn danger" data-delete="${p.id}">Supprimer</button>
-        </div>
-      </article>
-    `).join("");
-  }
-
-  function renderOrdersList() {
-    const orders = readLS(LS_ORDERS, []) || [];
-    if (!orders.length) {
-      ordersListEl.innerHTML = '<div class="owner-empty">Aucune commande pour le moment.</div>';
-      return;
-    }
-    ordersListEl.innerHTML = orders.map(o => `
-      <div class="owner-order">
-        <header>
-          <span>${esc(o.reference)}</span>
-          <span class="meta">${new Date(o.created_at).toLocaleString("fr-FR")}</span>
-        </header>
-        <div><strong>Client :</strong> ${esc(o.customer.name)} — ${esc(o.customer.phone)}</div>
-        <div><strong>Livraison :</strong> ${esc(o.customer.address)}, ${esc(o.customer.city)}</div>
-        <div><strong>Articles :</strong> ${esc(o.items.map(i => i.name + " × " + i.quantity).join(", "))}</div>
-        <div><strong>Total :</strong> ${esc(money(o.total))}</div>
-      </div>
-    `).join("");
-  }
-
-  function renderTicketsList() {
-    const tickets = readLS(LS_TICKETS, []) || [];
-    if (!tickets.length) {
-      ticketsListEl.innerHTML = '<div class="owner-empty">Aucune demande de support.</div>';
-      return;
-    }
-    ticketsListEl.innerHTML = tickets.map(t => `
-      <div class="owner-order">
-        <header>
-          <span>${esc(t.reference)}</span>
-          <span class="meta">${new Date(t.created_at).toLocaleString("fr-FR")}</span>
-        </header>
-        <div><strong>De :</strong> ${esc(t.name)} — ${esc(t.email)}</div>
-        <div>${esc(t.message)}</div>
-      </div>
-    `).join("");
-  }
-
-  function refreshAll() {
-    renderStats();
-    renderProductList();
-    renderOrdersList();
-    renderTicketsList();
-    /* Rafraîchir la boutique */
-    renderProducts();
-    renderCart();
-  }
-
-  /* ---- LOGIN ---- */
-  loginForm.addEventListener("submit", e => {
-    e.preventDefault();
-    const entered = codeInput.value.trim();
-    if (!entered) return setMsg(loginMsg, "Saisissez un code.", "error");
-
-    loginBtn.disabled = true;
-    setMsg(loginMsg, "Vérification…");
-
-    setTimeout(() => {
-      if (entered === DEMO_CODE) {
-        currentCode = entered;
-        loginView.hidden = true;
-        dashView.hidden = false;
-        setMsg(loginMsg, "");
-        refreshAll();
-        showTab("products");
-      } else {
-        setMsg(loginMsg, "Code incorrect. Utilisez : " + DEMO_CODE, "error");
-      }
-      loginBtn.disabled = false;
-    }, 200);
-  });
-
-  document.getElementById("ownerLogoutBtn").addEventListener("click", () => {
-    currentCode = "";
-    codeInput.value = "";
-    setMsg(loginMsg, "");
-    dashView.hidden = true;
-    loginView.hidden = false;
-    codeInput.focus();
-  });
-
-  /* ---- FORMULAIRE PRODUIT ---- */
-  function resetProductForm() {
-    productForm.reset();
-    productForm.hidden = true;
-    document.getElementById("ownerProductId").value = "";
-    setMsg(productMsg, "");
-  }
-
-  document.getElementById("ownerNewProductBtn").addEventListener("click", () => {
-    resetProductForm();
-    productForm.hidden = false;
-    document.getElementById("ownerProductName").focus();
-  });
-  document.getElementById("ownerProductCancel").addEventListener("click", resetProductForm);
-
-  productForm.addEventListener("submit", e => {
-    e.preventDefault();
-    const id = document.getElementById("ownerProductId").value;
-    const data = {
-      name: document.getElementById("ownerProductName").value.trim(),
-      category: document.getElementById("ownerProductCategory").value.trim(),
-      price: Number(document.getElementById("ownerProductPrice").value) || 0,
-      tag: document.getElementById("ownerProductTag").value.trim(),
-      image: document.getElementById("ownerProductImage").value.trim(),
-      description: document.getElementById("ownerProductDescription").value.trim()
-    };
-
-    if (!data.name || !data.category || data.price <= 0) {
-      return setMsg(productMsg, "Remplissez nom, catégorie et prix.", "error");
-    }
-
-    if (id) {
-      /* Modification */
-      const idx = products.findIndex(p => String(p.id) === String(id));
-      if (idx === -1) return setMsg(productMsg, "Produit introuvable.", "error");
-      products[idx] = Object.assign({}, products[idx], data);
-      setMsg(productMsg, "Produit modifié.", "ok");
-    } else {
-      /* Ajout */
-      const newId = Date.now();
-      products.push(Object.assign({ id: newId }, data));
-      setMsg(productMsg, "Produit ajouté.", "ok");
-    }
-
-    saveProducts();
-    refreshAll();
-    setTimeout(resetProductForm, 800);
-  });
-
-  /* ---- ÉDITER / SUPPRIMER ---- */
-  productListEl.addEventListener("click", e => {
-    const editBtn = e.target.closest("[data-edit]");
-    const delBtn = e.target.closest("[data-delete]");
-
-    if (editBtn) {
-      const id = editBtn.dataset.edit;
-      const p = products.find(x => String(x.id) === String(id));
-      if (!p) return;
-      document.getElementById("ownerProductId").value = p.id;
-      document.getElementById("ownerProductName").value = p.name;
-      document.getElementById("ownerProductCategory").value = p.category;
-      document.getElementById("ownerProductPrice").value = p.price;
-      document.getElementById("ownerProductTag").value = p.tag || "";
-      document.getElementById("ownerProductImage").value = p.image || "";
-      document.getElementById("ownerProductDescription").value = p.description || "";
-      productForm.hidden = false;
-      productForm.scrollIntoView({ behavior: "smooth", block: "center" });
-      document.getElementById("ownerProductName").focus();
-    }
-
-    if (delBtn) {
-      if (!confirm("Supprimer définitivement ce produit ?")) return;
-      const id = delBtn.dataset.delete;
-      products = products.filter(x => String(x.id) !== String(id));
-      saveProducts();
-      refreshAll();
-      setMsg(globalMsg, "Produit supprimé.", "ok");
-    }
-  });
-
-  /* ---- RESET ---- */
-  document.getElementById("ownerResetAll").addEventListener("click", () => {
-    if (!confirm("Réinitialiser le catalogue (produits par défaut), les commandes et les tickets ?")) return;
-    products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
-    saveProducts();
-    writeLS(LS_ORDERS, []);
-    writeLS(LS_TICKETS, []);
-    cart = [];
-    saveCart();
-    refreshAll();
-    setMsg(globalMsg, "Tout a été réinitialisé.", "ok");
-  });
-
-  /* Écoute les changements localStorage depuis d'autres onglets */
-  window.addEventListener("storage", () => {
-    products = readLS(LS_PRODUCTS, DEFAULT_PRODUCTS);
-    cart = readLS(LS_CART, []);
-    if (!overlay.classList.contains("open")) return;
-    refreshAll();
-  });
-
-  /* Exposer pour les autres scripts */
-  window.__ownerRefresh = refreshAll;
-})();
-
-/* ============================================================
-   9. INITIALISATION
-   ============================================================ */
-let toastTimer;
-function notify(message) {
-  const toast = document.getElementById("toast");
-  toast.textContent = message;
-  toast.classList.add("show");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
+  closeCart();
+  notify("Commande " + order.ref + " enregistrée !");
 }
 
-document.getElementById("year").textContent = new Date().getFullYear();
+/* ================================================================
+   ADMIN
+================================================================ */
+function openAdmin() {
+  $("adminModal").classList.add("open");
+  document.body.style.overflow = "hidden";
+  if ($("adminDash").hidden) {
+    setTimeout(() => { const i = $("adminCode"); if (i) i.focus(); }, 120);
+  }
+}
 
-renderProducts();
-renderCart();
+function closeAdmin() {
+  $("adminModal").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function adminLogin(e) {
+  if (e) e.preventDefault();
+  const code = (($("adminCode") || {}).value || "").trim();
+  if (code !== ADMIN_CODE) {
+    notify("Code incorrect. Utilisez : " + ADMIN_CODE);
+    return;
+  }
+  $("adminLogin").hidden = true;
+  $("adminDash").hidden = false;
+  renderAdmin();
+  notify("Bienvenue !");
+}
+
+function adminLogout() {
+  $("adminLogin").hidden = false;
+  $("adminDash").hidden = true;
+  $("adminCode").value = ADMIN_CODE;
+  notify("Déconnecté");
+}
+
+function switchTab(name) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.dataset.panel === name));
+}
+
+function renderAdmin() {
+  renderAdminProducts();
+  renderAdminOrders();
+}
+
+function renderAdminProducts() {
+  const list = $("adminProductList");
+  const count = $("adminProductCount");
+  if (!list) return;
+  if (count) count.textContent = products.length;
+
+  if (!products.length) {
+    list.innerHTML = '<div class="empty-state">Aucun produit. Cliquez sur "Nouveau produit".</div>';
+    return;
+  }
+
+  list.innerHTML = products.map(p =>
+    '<div class="admin-product">' +
+      '<img src="' + esc(p.image || "") + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
+      '<div>' +
+        '<h4>' + esc(p.name) + '</h4>' +
+        '<p>' + esc(p.category) + ' · ' + fmtPrice(p.price) + '</p>' +
+      '</div>' +
+      '<div class="actions">' +
+        '<button class="btn-edit" data-edit="' + p.id + '">Modifier</button>' +
+        '<button class="btn-danger" data-del="' + p.id + '">Supprimer</button>' +
+      '</div>' +
+    '</div>'
+  ).join("");
+
+  list.querySelectorAll("[data-edit]").forEach(b => b.addEventListener("click", () => startEdit(Number(b.dataset.edit))));
+  list.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", () => deleteProduct(Number(b.dataset.del))));
+}
+
+function renderAdminOrders() {
+  const list = $("adminOrdersList");
+  if (!list) return;
+  if (!orders.length) {
+    list.innerHTML = '<div class="empty-state">Aucune commande pour le moment.</div>';
+    return;
+  }
+  list.innerHTML = orders.map(o =>
+    '<div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:10px;padding:14px;margin-bottom:10px;font-size:13px">' +
+      '<div style="display:flex;justify-content:space-between;margin-bottom:8px">' +
+        '<strong>' + esc(o.ref) + '</strong>' +
+        '<span style="color:#888">' + new Date(o.date).toLocaleString("fr-FR") + '</span>' +
+      '</div>' +
+      '<div style="color:#aaa">' + o.items.map(i => esc(i.name) + " × " + i.qty).join(", ") + '</div>' +
+      '<div style="margin-top:8px;font-weight:600">' + fmtPrice(o.total) + '</div>' +
+    '</div>'
+  ).join("");
+}
+
+function startNew() {
+  editingId = null;
+  $("formTitle").textContent = "Nouveau produit";
+  $("fieldId").value = "";
+  $("fieldName").value = "";
+  $("fieldCategory").value = "";
+  $("fieldPrice").value = "";
+  $("fieldTag").value = "";
+  $("fieldImage").value = "";
+  $("fieldDescription").value = "";
+  $("productForm").hidden = false;
+  $("fieldName").focus();
+}
+
+function startEdit(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  editingId = id;
+  $("formTitle").textContent = "Modifier : " + p.name;
+  $("fieldId").value = p.id;
+  $("fieldName").value = p.name || "";
+  $("fieldCategory").value = p.category || "";
+  $("fieldPrice").value = p.price || 0;
+  $("fieldTag").value = p.tag || "";
+  $("fieldImage").value = p.image || "";
+  $("fieldDescription").value = p.description || "";
+  $("productForm").hidden = false;
+  $("productForm").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function cancelForm() {
+  $("productForm").hidden = true;
+  editingId = null;
+}
+
+function saveProduct(e) {
+  e.preventDefault();
+  const name = $("fieldName").value.trim();
+  const category = $("fieldCategory").value.trim();
+  const price = Number($("fieldPrice").value) || 0;
+  const tag = $("fieldTag").value.trim();
+  const image = $("fieldImage").value.trim();
+  const description = $("fieldDescription").value.trim();
+
+  if (!name || !category || price <= 0) {
+    notify("Remplissez nom, catégorie et prix.");
+    return;
+  }
+
+  if (editingId) {
+    const idx = products.findIndex(x => x.id === editingId);
+    if (idx > -1) {
+      products[idx] = Object.assign({}, products[idx], { name, category, price, tag, image, description });
+    }
+    notify("Produit modifié ✓");
+  } else {
+    products.push({ id: Date.now(), name, category, price, tag, image, description });
+    notify("Produit ajouté ✓");
+  }
+
+  saveProducts();
+  renderShop();
+  renderAdminProducts();
+  cancelForm();
+}
+
+function deleteProduct(id) {
+  if (!confirm("Supprimer définitivement ce produit ?")) return;
+  products = products.filter(x => x.id !== id);
+  saveProducts();
+  renderShop();
+  renderAdminProducts();
+  notify("Produit supprimé");
+}
+
+function resetAll() {
+  if (!confirm("Réinitialiser TOUT ?")) return;
+  products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+  cart = [];
+  orders = [];
+  saveProducts();
+  saveCart();
+  saveOrders();
+  renderShop();
+  renderCart();
+  renderAdmin();
+  notify("Tout a été réinitialisé");
+}
+
+/* ================================================================
+   INITIALISATION
+================================================================ */
+function init() {
+  loadState();
+  renderShop();
+  renderCart();
+
+  /* Boutons principaux */
+  $("btnAdmin").addEventListener("click", openAdmin);
+  $("btnCart").addEventListener("click", openCart);
+  $("adminClose").addEventListener("click", closeAdmin);
+  $("cartClose").addEventListener("click", closeCart);
+  $("backdrop").addEventListener("click", closeCart);
+
+  /* Escape ferme */
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") {
+      if ($("adminModal").classList.contains("open")) closeAdmin();
+      if ($("cartDrawer").classList.contains("open")) closeCart();
+    }
+  });
+
+  /* Clic extérieur ferme */
+  $("adminModal").addEventListener("click", e => {
+    if (e.target === $("adminModal")) closeAdmin();
+  });
+
+  /* Login */
+  $("loginForm").addEventListener("submit", adminLogin);
+  $("btnLogout").addEventListener("click", adminLogout);
+
+  /* Tabs */
+  document.querySelectorAll(".tab").forEach(t => {
+    t.addEventListener("click", () => switchTab(t.dataset.tab));
+  });
+
+  /* Form produit */
+  $("btnNewProduct").addEventListener("click", startNew);
+  $("btnCancelForm").addEventListener("click", cancelForm);
+  $("productForm").addEventListener("submit", saveProduct);
+
+  /* Checkout */
+  $("btnCheckout").addEventListener("click", checkout);
+
+  /* Reset */
+  $("btnReset").addEventListener("click", resetAll);
+
+  /* Ouverture auto si #admin */
+  if (location.hash === "#admin") openAdmin();
+
+  console.log("%c🔑 Atelier N° — Code admin : " + ADMIN_CODE, "color:#d4b58b;font-weight:bold;font-size:14px");
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
+
+/* Debug console */
+window.ATELIER = {
+  openAdmin, closeAdmin,
+  getProducts: () => products,
+  getCart: () => cart,
+  code: ADMIN_CODE
+};
 </script>
 
 </body>
