@@ -8,12 +8,23 @@ function reply(res, status, data) {
 }
 
 module.exports = async function handler(req, res) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
-    return reply(res, 405, { error: "Méthode non autorisée." });
-  }
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  // Vérification non destructive pour diagnostiquer le déploiement sans exposer de secrets.
+  if (req.method === "GET") {
+    return reply(res, 200, {
+      ok: true,
+      endpoint: "orders",
+      method: "POST",
+      databaseConfigured: Boolean(url && key),
+      message: url && key ? "Le point de commande est disponible." : "Les variables Supabase du serveur sont manquantes."
+    });
+  }
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "GET, POST");
+    return reply(res, 405, { error: "Méthode non autorisée." });
+  }
   if (!url || !key) return reply(res, 503, { error: "La réception des commandes n'est pas encore configurée." });
 
   const body = req.body || {};
