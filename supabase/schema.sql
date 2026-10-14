@@ -66,3 +66,96 @@ create policy "Published products are publicly readable"
   using (published = true);
 
 -- Les fonctions serveur avec la clé service role administrent le catalogue.
+
+
+-- Atelier N° : commandes publiques en écriture, consultation réservée aux admins.
+-- Les commandes sont reçues par le client Supabase puis diffusées via Realtime.
+drop policy if exists "Public can create order tickets" on public.orders;
+create policy "Public can create order tickets"
+  on public.orders for insert to anon, authenticated
+  with check (
+    length(trim(customer_name)) between 1 and 100
+    and length(trim(customer_phone)) between 3 and 40
+    and length(trim(delivery_city)) between 1 and 100
+    and length(trim(delivery_address)) between 1 and 300
+    and jsonb_typeof(items) = 'array'
+    and jsonb_array_length(items) between 1 and 40
+    and estimated_total >= 0
+    and status = 'pending_confirmation'
+    and payment_method in ('delivery','now')
+    and payment_status in ('unpaid','pending')
+  );
+
+create table if not exists public.store_admins (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+alter table public.store_admins enable row level security;
+revoke all on public.store_admins from anon, authenticated;
+grant select on public.store_admins to authenticated;
+drop policy if exists "Store admins can read their own membership" on public.store_admins;
+create policy "Store admins can read their own membership"
+  on public.store_admins for select to authenticated
+  using (user_id = (select auth.uid()));
+
+create or replace function public.is_store_admin()
+returns boolean language sql stable set search_path = ''
+as $$
+  select exists (select 1 from public.store_admins where user_id = (select auth.uid()));
+$$;
+revoke all on function public.is_store_admin() from public;
+grant execute on function public.is_store_admin() to authenticated;
+
+grant insert on public.orders to anon, authenticated;
+grant select, update on public.orders to authenticated;
+revoke select on public.orders from anon;
+
+drop policy if exists "Store admins can view orders" on public.orders;
+create policy "Store admins can view orders" on public.orders for select to authenticated
+  using (public.is_store_admin());
+drop policy if exists "Store admins can update orders" on public.orders;
+create policy "Store admins can update orders" on public.orders for update to authenticated
+  using (public.is_store_admin()) with check (public.is_store_admin());
+
+grant select on public.products to anon, authenticated;
+grant insert, update, delete on public.products to authenticated;
+drop policy if exists "Published products are publicly readable" on public.products;
+create policy "Published products are publicly readable" on public.products for select to anon, authenticated
+  using (published = true);
+drop policy if exists "Admins can read all products" on public.products;
+create policy "Admins can read all products" on public.products for select to authenticated
+  using (public.is_store_admin());
+drop policy if exists "Admins can insert products" on public.products;
+create policy "Admins can insert products" on public.products for insert to authenticated
+  with check (public.is_store_admin());
+drop policy if exists "Admins can update products" on public.products;
+create policy "Admins can update products" on public.products for update to authenticated
+  using (public.is_store_admin()) with check (public.is_store_admin());
+drop policy if exists "Admins can delete products" on public.products;
+create policy "Admins can delete products" on public.products for delete to authenticated
+  using (public.is_store_admin());
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('atelier-products', 'atelier-products', true, 8388608, array['image/jpeg','image/png','image/webp','image/avif'])
+on conflict (id) do update set public=true, file_size_limit=8388608,
+  allowed_mime_types=array['image/jpeg','image/png','image/webp','image/avif'];
+drop policy if exists "Atelier product images admin upload" on storage.objects;
+create policy "Atelier product images admin upload" on storage.objects for insert to authenticated
+  with check (bucket_id='atelier-products' and public.is_store_admin());
+drop policy if exists "Atelier product images admin update" on storage.objects;
+create policy "Atelier product images admin update" on storage.objects for update to authenticated
+  using (bucket_id='atelier-products' and public.is_store_admin())
+  with check (bucket_id='atelier-products' and public.is_store_admin());
+drop policy if exists "Atelier product images admin delete" on storage.objects;
+create policy "Atelier product images admin delete" on storage.objects for delete to authenticated
+  using (bucket_id='atelier-products' and public.is_store_admin());
+
+do $$
+begin
+  if not exists (select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename='orders') then
+    alter publication supabase_realtime add table public.orders;
+  end if;
+  if not exists (select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename='products') then
+    alter publication supabase_realtime add table public.products;
+  end if;
+end $$;
