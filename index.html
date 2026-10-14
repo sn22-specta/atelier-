@@ -1545,28 +1545,17 @@ checkoutForm.addEventListener("submit", async event => {
   button.textContent = "Enregistrement…";
   try {
     const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const reference = "AT-" + cryptoRandomReference();
-    const normalizedItems = items.map(item => ({
-      product_id: Number(item.id),
-      name: String(item.name).slice(0, 100),
-      unit_price_claimed: Number(item.price),
-      quantity: Number(item.quantity)
-    }));
-    const { error: orderError } = await atelierSupabase.from("orders").insert({
-      reference,
-      customer_name: customer.name,
-      customer_phone: customer.phone,
-      delivery_city: customer.city,
-      delivery_address: customer.address,
-      customer_note: customer.note,
-      items: normalizedItems,
-      estimated_total: total,
-      status: "pending_confirmation",
-      payment_method: paymentMethod,
-      payment_status: paymentMethod === "now" ? "pending" : "unpaid"
+    // Les commandes passent par la fonction serveur pour être enregistrées
+    // avec les droits privés Supabase, puis apparaître dans l'espace propriétaire.
+    const response = await fetch("/api/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ customer, items, paymentMethod })
     });
-    if (orderError) throw new Error("Enregistrement impossible : " + orderError.message);
-    const result = { reference };
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || !result.ok || !result.reference) {
+      throw new Error(result.error || "Impossible d'enregistrer la commande. Réessayez.");
+    }
     const methodLabel = paymentMethod === "now" ? "Paiement à finaliser avec la boutique" : "Paiement à la livraison / sur place";
     latestOrderWhatsAppMessage = [
       "Bonjour Atelier N°, ma commande est enregistrée.",
