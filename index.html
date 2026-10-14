@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -482,7 +481,9 @@ footer a:hover { color: var(--accent); }
 .cart-footer .btn { width: 100%; }
 .small-note { color: var(--muted); font-size: 10px; line-height: 1.7; }
 
-/* Chatbot */
+/* ============================================================
+   ASSISTANT — NOUVEAU DESIGN
+   ============================================================ */
 
 .chat-launch {
   position: fixed;
@@ -498,7 +499,20 @@ footer a:hover { color: var(--accent); }
   box-shadow: 0 8px 40px rgba(0,0,0,.4);
   display: grid;
   place-items: center;
+  transition: transform .25s;
 }
+
+.chat-launch:hover { transform: scale(1.06); }
+.chat-launch::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid rgba(212,181,139,.45);
+  animation: halo 3.2s ease-out infinite;
+}
+.chat-window.open ~ .chat-launch::after,
+body.chat-open .chat-launch::after { display: none; }
 
 .orb {
   width: 33px;
@@ -514,8 +528,8 @@ footer a:hover { color: var(--accent); }
   right: 25px;
   bottom: 100px;
   z-index: 41;
-  width: min(380px, calc(100vw - 30px));
-  height: min(520px, calc(100svh - 135px));
+  width: min(410px, calc(100vw - 30px));
+  height: min(620px, calc(100svh - 135px));
   background: #101010;
   border: 1px solid var(--line);
   border-radius: 18px;
@@ -528,58 +542,276 @@ footer a:hover { color: var(--accent); }
 .chat-window.open { display: flex; animation: reveal .25s ease; }
 
 .chat-head {
-  padding: 17px;
+  padding: 15px 16px;
   display: flex;
   align-items: center;
   gap: 12px;
   border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(212,181,139,.08), transparent);
 }
 
-.chat-head .orb { width: 36px; height: 36px; }
-.chat-head b { font-size: 13px; }
-.chat-head small { display: block; margin-top: 4px; color: #a5a198; font-size: 10px; }
-.chat-head .close-btn { margin-left: auto; }
+.chat-head .orb { width: 36px; height: 36px; flex-shrink: 0; }
+.chat-id { min-width: 0; }
+.chat-head b { font-size: 13px; display: block; }
+.chat-head small {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  color: #a5a198;
+  font-size: 10px;
+}
+.chat-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #6ecf8f;
+  box-shadow: 0 0 8px #6ecf8f;
+  flex-shrink: 0;
+  transition: background .3s, box-shadow .3s;
+}
+.chat-head.thinking .chat-status-dot { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.chat-head.offline .chat-status-dot { background: #7a7570; box-shadow: none; }
+
+.chat-head .close-btn {
+  margin-left: auto;
+  width: 34px;
+  height: 34px;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+.chat-head .close-btn + .close-btn { margin-left: 6px; }
 
 .chat-messages {
-  padding: 16px;
-  overflow: auto;
+  padding: 18px 16px 6px;
+  overflow-y: auto;
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+  scrollbar-width: thin;
+  scrollbar-color: #2c2c2c transparent;
 }
+.chat-messages::-webkit-scrollbar { width: 6px; }
+.chat-messages::-webkit-scrollbar-thumb { background: #2c2c2c; border-radius: 3px; }
 
 .message {
-  max-width: 88%;
-  border-radius: 13px;
-  padding: 12px 13px;
-  font-size: 12px;
-  line-height: 1.7;
-  white-space: pre-wrap;
+  max-width: 90%;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 12.5px;
+  line-height: 1.75;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  animation: msgIn .28s ease both;
 }
 
-.message.bot { align-self: flex-start; background: #202020; color: #e8e4dc; }
-.message.user { align-self: flex-end; background: #d4b58b; color: #18130d; }
+.message.bot {
+  align-self: flex-start;
+  background: #1b1b1b;
+  border: 1px solid rgba(255,255,255,.06);
+  color: #e8e4dc;
+  border-bottom-left-radius: 5px;
+}
 
-.suggestions { display: flex; flex-wrap: wrap; gap: 6px; }
+.message.user {
+  align-self: flex-end;
+  background: linear-gradient(180deg, #ddc09a, #cba97e);
+  color: #18130d;
+  border-bottom-right-radius: 5px;
+  font-weight: 500;
+}
 
-.suggestions button {
+.message.error {
+  align-self: center;
+  max-width: 100%;
+  background: rgba(255,120,90,.08);
+  border: 1px solid rgba(255,120,90,.3);
+  color: #ffb9a5;
+  font-size: 11.5px;
+  text-align: center;
+}
+
+.message p { margin: 0 0 8px; }
+.message p:last-child { margin-bottom: 0; }
+.message ul { margin: 6px 0; padding-left: 17px; }
+.message li { margin-bottom: 3px; }
+.message strong { color: #fff; font-weight: 650; }
+.message code {
+  background: rgba(255,255,255,.08);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.msg-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,.07);
+}
+
+.msg-actions button {
+  background: rgba(212,181,139,.1);
+  border: 1px solid rgba(212,181,139,.3);
+  color: var(--accent);
+  border-radius: 20px;
+  padding: 6px 11px;
+  font-size: 10.5px;
+  transition: background .2s;
+}
+.msg-actions button:hover { background: rgba(212,181,139,.22); }
+
+/* Cartes produit dans le chat */
+.chat-cards {
+  align-self: stretch;
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 2px 2px 8px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  animation: msgIn .3s ease both;
+}
+.chat-cards::-webkit-scrollbar { display: none; }
+
+.chat-card {
+  flex: 0 0 148px;
+  scroll-snap-align: start;
+  background: #181818;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.chat-card img { height: 108px; }
+.chat-card .cc-body { padding: 9px 10px 11px; }
+.chat-card h5 {
+  margin: 0 0 4px;
+  font-size: 11.5px;
+  font-weight: 550;
+  line-height: 1.3;
+}
+.chat-card span { font-size: 11px; color: var(--accent); }
+.chat-card button {
+  margin-top: 9px;
+  width: 100%;
+  border: 1px solid var(--line);
+  background: transparent;
+  border-radius: 20px;
+  padding: 6px;
+  font-size: 10px;
+  transition: background .2s, color .2s;
+}
+.chat-card button:hover { background: var(--text); color: #111; border-color: var(--text); }
+
+/* Indicateur de frappe */
+.typing {
+  align-self: flex-start;
+  display: flex;
+  gap: 5px;
+  padding: 14px 16px;
+  background: #1b1b1b;
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 14px;
+  border-bottom-left-radius: 5px;
+}
+.typing i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: .45;
+  animation: dot 1.3s ease-in-out infinite;
+}
+.typing i:nth-child(2) { animation-delay: .18s; }
+.typing i:nth-child(3) { animation-delay: .36s; }
+
+/* Suggestions */
+.chat-suggestions {
+  display: flex;
+  gap: 6px;
+  padding: 4px 16px 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+.chat-suggestions::-webkit-scrollbar { display: none; }
+.chat-suggestions button {
+  flex-shrink: 0;
   background: transparent;
   border: 1px solid var(--line);
-  padding: 8px 10px;
+  padding: 7px 12px;
   border-radius: 20px;
-  font-size: 10px;
+  font-size: 10.5px;
+  color: #b8b4ad;
+  white-space: nowrap;
+  transition: border-color .2s, color .2s;
 }
+.chat-suggestions button:hover { border-color: var(--accent); color: var(--accent); }
+.chat-suggestions:empty { display: none; }
 
+/* Zone de saisie */
 .chat-form {
-  padding: 12px;
+  padding: 10px 12px 12px;
   display: flex;
   gap: 8px;
+  align-items: flex-end;
   border-top: 1px solid var(--line);
+  flex-shrink: 0;
 }
 
-.chat-form input { min-width: 0; border-radius: 30px; padding: 12px; }
-.chat-form button { background: var(--accent); color: #111; border: 0; border-radius: 50%; width: 42px; flex-shrink: 0; }
+.chat-form textarea {
+  flex: 1;
+  min-width: 0;
+  background: #161616;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 11px 14px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text);
+  resize: none;
+  max-height: 110px;
+  min-height: 42px;
+}
+.chat-form textarea:focus { outline: none; border-color: rgba(212,181,139,.5); }
+
+.chat-form .icon-round {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  transition: border-color .2s, background .2s;
+}
+.chat-form .icon-round:hover { border-color: var(--accent); }
+.chat-form .icon-round.recording {
+  background: #d4564a;
+  border-color: #d4564a;
+  animation: pulse 1.2s infinite;
+}
+
+.chat-form .send-btn {
+  background: var(--accent);
+  color: #111;
+  border: 0;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  font-size: 16px;
+  display: grid;
+  place-items: center;
+  transition: transform .2s, background .2s;
+}
+.chat-form .send-btn:hover { transform: scale(1.06); }
+.chat-form .send-btn.stop { background: #d4564a; color: #fff; }
 
 /* Administration locale */
 
@@ -618,6 +850,10 @@ footer a:hover { color: var(--accent); }
 @keyframes heroZoom { from { transform: scale(1); } to { transform: scale(1.07); } }
 @keyframes breathe { 0%,100% { transform: scale(.93); } 50% { transform: scale(1.07); } }
 @keyframes reveal { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes dot { 0%,60%,100% { opacity: .35; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+@keyframes halo { 0% { transform: scale(1); opacity: .8; } 100% { transform: scale(1.35); opacity: 0; } }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
 
 @media(max-width:800px) {
   header { height: 66px; padding: 0 5%; }
@@ -632,6 +868,17 @@ footer a:hover { color: var(--accent); }
   .values { gap: 15px; }
   .section-head { align-items: start; flex-direction: column; }
   .banner { background-attachment: scroll; }
+
+  .chat-window {
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100svh;
+    max-height: none;
+    border-radius: 0;
+    border: 0;
+  }
+  .chat-launch { right: 18px; bottom: 18px; width: 58px; height: 58px; }
 }
 
 @media(max-width:420px) {
@@ -839,37 +1086,32 @@ footer a:hover { color: var(--accent); }
   </div>
 </aside>
 
-<!-- Assistant -->
-<button class="chat-launch" id="chatLaunch" aria-label="Ouvrir l'assistant Atelier N°">
+<!-- ============================================================
+     ASSISTANT SORA
+     ============================================================ -->
+<button class="chat-launch" id="chatLaunch" aria-label="Ouvrir l'assistant Atelier N°" aria-expanded="false">
   <span class="orb" aria-hidden="true"></span>
 </button>
 
-<div class="chat-window" id="chatWindow" role="dialog" aria-label="Assistant Atelier N°">
-  <div class="chat-head">
+<div class="chat-window" id="chatWindow" role="dialog" aria-modal="false" aria-label="Assistant Atelier N°">
+  <div class="chat-head" id="chatHead">
     <span class="orb" aria-hidden="true"></span>
-    <div>
+    <div class="chat-id">
       <b>Sora · Atelier N°</b>
-      <small>Assistant de démonstration</small>
+      <small><i class="chat-status-dot"></i><span id="chatStatus">En ligne</span></small>
     </div>
-    <button class="close-btn" id="chatClose" aria-label="Fermer l'assistant">×</button>
+    <button class="close-btn" id="chatReset" type="button" aria-label="Nouvelle conversation" title="Nouvelle conversation">⟲</button>
+    <button class="close-btn" id="chatClose" type="button" aria-label="Fermer l'assistant">×</button>
   </div>
 
-  <div class="chat-messages" id="chatMessages" aria-live="polite">
-    <div class="message bot">
-      Bonjour et bienvenue chez Atelier N°. Je suis Sora, votre assistant.
-      Je peux vous présenter la collection, vous aider à trouver un produit
-      ou vous expliquer comment préparer une commande.
-    </div>
-    <div class="suggestions">
-      <button data-chat="Montre-moi la collection">La collection</button>
-      <button data-chat="Quels sont les prix ?">Les prix</button>
-      <button data-chat="Comment commander ?">Commander</button>
-    </div>
-  </div>
+  <div class="chat-messages" id="chatMessages" aria-live="polite" aria-atomic="false"></div>
+
+  <div class="chat-suggestions" id="chatSuggestions"></div>
 
   <form class="chat-form" id="chatForm">
-    <input id="chatInput" placeholder="Écrivez votre message..." autocomplete="off" maxlength="1000" required>
-    <button type="submit" aria-label="Envoyer le message">↑</button>
+    <button class="icon-round" id="chatMic" type="button" aria-label="Dicter un message" title="Dicter" hidden>🎙</button>
+    <textarea id="chatInput" rows="1" placeholder="Écrivez votre message…" autocomplete="off" maxlength="1000" required></textarea>
+    <button class="send-btn" id="chatSend" type="submit" aria-label="Envoyer le message">↑</button>
   </form>
 </div>
 
@@ -1084,24 +1326,21 @@ document.getElementById("cartOpen").addEventListener("click", openCart);
 document.getElementById("cartClose").addEventListener("click", closeCart);
 overlay.addEventListener("click", closeCart);
 
-document.addEventListener("keydown", event => {
-  if (event.key === "Escape") {
-    closeCart();
-    closeChat();
-  }
-});
-
-function addToCart(id) {
+/* ✏️ MODIFIÉ : accepte désormais une quantité.
+   Remplace l'ancienne fonction addToCart(id) par celle-ci. */
+function addToCart(id, quantity = 1) {
   const product = products.find(item => item.id === id);
-  if (!product) return;
+  if (!product) return false;
 
+  const qty = Math.max(1, Math.min(99, Number(quantity) || 1));
   const item = cart.find(item => item.id === id);
-  if (item) item.quantity++;
-  else cart.push({ id, quantity: 1 });
+  if (item) item.quantity += qty;
+  else cart.push({ id, quantity: qty });
 
   saveCart();
   renderCart();
-  notify(product.name + " ajouté au panier.");
+  notify(product.name + (qty > 1 ? " ×" + qty : "") + " ajouté au panier.");
+  return true;
 }
 
 function changeQuantity(id, delta) {
@@ -1287,116 +1526,660 @@ document.getElementById("resetProducts").addEventListener("click", () => {
   notify("Catalogue de démonstration réinitialisé.");
 });
 
-/* -------------------------------------------
-   ASSISTANT CONVERSATIONNEL DE DÉMONSTRATION
-   Remplacer par un appel au backend sécurisé
-   pour connecter Claude.
-------------------------------------------- */
+/* ============================================================
+   SORA — AGENT CONVERSATIONNEL
+   ------------------------------------------------------------
+   • Se connecte au backend /api/chat (Claude + outils) en SSE.
+   • Exécute les actions renvoyées par l'agent (panier, navigation).
+   • Bascule automatiquement en moteur local si le backend
+     n'est pas disponible : la démo fonctionne toujours.
+   ============================================================ */
 
-const chatWindow = document.getElementById("chatWindow");
-const chatMessages = document.getElementById("chatMessages");
+const Sora = (() => {
+  const API_URL = "/api/chat";
+  const STORAGE_KEY = "atelier_sora_history";
+  const MAX_HISTORY = 24;            // messages conservés côté client
+  const TIMEOUT_MS = 45000;
 
-function openChat() {
-  chatWindow.classList.add("open");
-  document.getElementById("chatInput").focus();
-}
+  const el = {
+    launch: document.getElementById("chatLaunch"),
+    window: document.getElementById("chatWindow"),
+    head: document.getElementById("chatHead"),
+    status: document.getElementById("chatStatus"),
+    close: document.getElementById("chatClose"),
+    reset: document.getElementById("chatReset"),
+    messages: document.getElementById("chatMessages"),
+    suggestions: document.getElementById("chatSuggestions"),
+    form: document.getElementById("chatForm"),
+    input: document.getElementById("chatInput"),
+    send: document.getElementById("chatSend"),
+    mic: document.getElementById("chatMic")
+  };
 
-function closeChat() {
-  chatWindow.classList.remove("open");
-}
+  const GREETING =
+    "Bonjour et bienvenue chez Atelier N°. Je suis **Sora**, votre assistante.\n\n" +
+    "Je connais la collection par cœur : je peux vous conseiller une pièce, " +
+    "l'ajouter à votre panier, comparer les prix ou préparer votre commande.";
 
-document.getElementById("chatLaunch").addEventListener("click", openChat);
-document.getElementById("chatClose").addEventListener("click", closeChat);
+  const DEFAULT_SUGGESTIONS = [
+    "Montre-moi la collection",
+    "Quel est votre best-seller ?",
+    "Je cherche un cadeau à moins de 50 000 FCFA",
+    "Comment commander ?"
+  ];
 
-function addMessage(text, role) {
-  const message = document.createElement("div");
-  message.className = "message " + role;
-  message.textContent = text;
-  chatMessages.append(message);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-}
+  let history = [];        // [{role:"user"|"assistant", content:"..."}]
+  let online = true;       // backend joignable ?
+  let streaming = false;
+  let controller = null;
+  let opened = false;
 
-function assistantReply(raw) {
-  const message = raw.toLowerCase().normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+  /* ---------- Utilitaires ---------- */
 
-  if (/bonjour|salut|bonsoir|hello/.test(message)) {
-    return "Bonjour et bienvenue chez Atelier N°. Que recherchez-vous aujourd'hui ?";
+  const escapeHtml = s => String(s).replace(/[&<>"']/g, c => (
+    { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+  ));
+
+  function inlineFormat(text) {
+    return escapeHtml(text)
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/`(.+?)`/g, "<code>$1</code>");
   }
 
-  if (/collection|produit|catalogue|montre/.test(message)) {
-    document.getElementById("collection").scrollIntoView({ behavior: "smooth" });
-    return "Avec plaisir. Je vous emmène vers notre collection. Vous pouvez filtrer les produits par catégorie et les ajouter au panier.";
+  /* Markdown minimal : gras, code, listes à puces, paragraphes. */
+  function renderMarkdown(text) {
+    const lines = String(text).split("\n");
+    let html = "";
+    let inList = false;
+
+    for (const line of lines) {
+      const bullet = line.match(/^\s*[-•*]\s+(.*)$/);
+      if (bullet) {
+        if (!inList) { html += "<ul>"; inList = true; }
+        html += "<li>" + inlineFormat(bullet[1]) + "</li>";
+        continue;
+      }
+      if (inList) { html += "</ul>"; inList = false; }
+      if (!line.trim()) continue;
+      html += "<p>" + inlineFormat(line) + "</p>";
+    }
+    if (inList) html += "</ul>";
+    return html || "<p></p>";
   }
 
-  if (/prix|cher|cout|fcfa|tarif/.test(message)) {
-    const available = products.slice(0, 6);
-    if (!available.length) return "Notre catalogue est vide pour le moment.";
-
-    return "Voici quelques prix de la sélection :\n" +
-      available.map(product => `${product.name} : ${money(product.price)}`).join("\n") +
-      "\n\nLes montants affichés sont ceux de cette démonstration.";
+  function scrollToEnd() {
+    el.messages.scrollTop = el.messages.scrollHeight;
   }
 
-  if (/panier|acheter|commande|commander|achat/.test(message)) {
-    openCart();
-    return "Vous pouvez vérifier votre panier, ajuster les quantités, puis préparer une demande de commande. Aucun paiement réel n'est encore activé sur cette version.";
+  function setStatus(text, mode) {
+    el.status.textContent = text;
+    el.head.classList.toggle("thinking", mode === "thinking");
+    el.head.classList.toggle("offline", mode === "offline");
   }
 
-  if (/livraison|livrer|expedition/.test(message)) {
-    return "Les conditions de livraison ne sont pas encore configurées. Contactez-nous via le formulaire pour confirmer les zones desservies, les délais et les frais.";
+  /* ---------- Rendu ---------- */
+
+  function addMessage(role, content) {
+    const node = document.createElement("div");
+    node.className = "message " + role;
+    node.innerHTML = renderMarkdown(content);
+    el.messages.append(node);
+    scrollToEnd();
+    return node;
   }
 
-  if (/wave|orange money|paiement|payer/.test(message)) {
-    return "Les paiements Wave et Orange Money ne sont pas encore connectés. N'envoyez aucun paiement sur la base de cette démonstration.";
+  /* Message bot vide qu'on remplit au fil du stream. */
+  function startStreamingBubble() {
+    const node = document.createElement("div");
+    node.className = "message bot";
+    node.innerHTML = "<p></p>";
+    el.messages.append(node);
+    scrollToEnd();
+
+    let raw = "";
+    return {
+      node,
+      push(chunk) {
+        raw += chunk;
+        node.innerHTML = renderMarkdown(raw);
+        scrollToEnd();
+      },
+      finish() {
+        if (!raw.trim()) node.remove();
+        return raw;
+      },
+      get text() { return raw; }
+    };
   }
 
-  if (/contact|humain|aide|support/.test(message)) {
-    document.getElementById("contact").scrollIntoView({ behavior: "smooth" });
-    return "Vous pouvez utiliser le formulaire de contact pour préparer un message. Son envoi automatique nécessite un service serveur.";
+  function addTyping() {
+    const node = document.createElement("div");
+    node.className = "typing";
+    node.innerHTML = "<i></i><i></i><i></i>";
+    el.messages.append(node);
+    scrollToEnd();
+    return node;
   }
 
-  if (/merci/.test(message)) {
-    return "Avec plaisir. Je reste disponible pour vous guider dans la découverte d'Atelier N°.";
+  function addError(text) {
+    const node = document.createElement("div");
+    node.className = "message error";
+    node.textContent = text;
+    el.messages.append(node);
+    scrollToEnd();
   }
 
-  return "Je suis actuellement l'assistant de démonstration d'Atelier N°. Je peux vous présenter la collection, afficher les prix, ouvrir le panier et vous orienter vers le contact. Pour les autres questions, je préfère ne pas inventer de réponse.";
-}
+  /* Cartes produit cliquables, insérées dans le fil. */
+  function addProductCards(items) {
+    if (!items || !items.length) return;
 
-document.getElementById("chatForm").addEventListener("submit", async event => {
-  event.preventDefault();
+    const wrap = document.createElement("div");
+    wrap.className = "chat-cards";
 
-  const input = document.getElementById("chatInput");
-  const text = input.value.trim();
-  if (!text) return;
+    items.forEach(product => {
+      const card = document.createElement("div");
+      card.className = "chat-card";
 
-  addMessage(text, "user");
-  input.value = "";
-  input.focus();
+      const img = document.createElement("img");
+      img.src = product.image;
+      img.alt = product.name;
+      img.loading = "lazy";
+      img.onerror = () => { img.style.display = "none"; };
 
-  const typing = document.createElement("div");
-  typing.className = "message bot";
-  typing.textContent = "Sora réfléchit…";
-  chatMessages.append(typing);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
+      const body = document.createElement("div");
+      body.className = "cc-body";
 
-  await new Promise(resolve => setTimeout(resolve, 500));
+      const title = document.createElement("h5");
+      title.textContent = product.name;
 
-  typing.remove();
-  addMessage(assistantReply(text), "bot");
-});
+      const price = document.createElement("span");
+      price.textContent = money(product.price);
 
-document.querySelectorAll("[data-chat]").forEach(button => {
-  button.addEventListener("click", () => {
-    openChat();
-    const text = button.dataset.chat;
-    addMessage(text, "user");
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = "+ Ajouter au panier";
+      btn.addEventListener("click", () => {
+        addToCart(product.id, 1);
+        btn.textContent = "✓ Ajouté";
+        btn.disabled = true;
+        setTimeout(() => {
+          btn.textContent = "+ Ajouter au panier";
+          btn.disabled = false;
+        }, 2200);
+      });
 
-    setTimeout(() => {
-      addMessage(assistantReply(text), "bot");
-    }, 250);
+      body.append(title, price, btn);
+      card.append(img, body);
+      wrap.append(card);
+    });
+
+    el.messages.append(wrap);
+    scrollToEnd();
+  }
+
+  /* Boutons d'action sous un message bot. */
+  function addQuickActions(node, actions) {
+    if (!actions || !actions.length) return;
+
+    const box = document.createElement("div");
+    box.className = "msg-actions";
+
+    actions.forEach(action => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = action.label;
+      btn.addEventListener("click", () => {
+        if (action.send) {
+          box.remove();
+          send(action.send);
+        } else if (action.run) {
+          action.run();
+        }
+      });
+      box.append(btn);
+    });
+
+    node.append(box);
+    scrollToEnd();
+  }
+
+  function setSuggestions(list) {
+    el.suggestions.replaceChildren();
+    (list || []).forEach(text => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = text;
+      btn.addEventListener("click", () => send(text));
+      el.suggestions.append(btn);
+    });
+  }
+
+  /* ---------- Actions renvoyées par l'agent ---------- */
+
+  function applyAction(action) {
+    if (!action || typeof action !== "object") return;
+
+    switch (action.type) {
+      case "ajouter_au_panier":
+        addToCart(Number(action.produit_id ?? action.id), action.quantite || 1);
+        break;
+
+      case "ouvrir_panier":
+        openCart();
+        break;
+
+      case "naviguer": {
+        const target = document.getElementById(action.section);
+        if (target) target.scrollIntoView({ behavior: "smooth" });
+        break;
+      }
+
+      case "filtrer": {
+        const wanted = String(action.categorie || "Tout");
+        const btn = [...document.querySelectorAll(".filter")]
+          .find(b => b.dataset.category.toLowerCase() === wanted.toLowerCase());
+        if (btn) btn.click();
+        document.getElementById("collection")?.scrollIntoView({ behavior: "smooth" });
+        break;
+      }
+
+      case "afficher_produits": {
+        const ids = Array.isArray(action.produits) ? action.produits : [];
+        const items = ids
+          .map(id => products.find(p => p.id === Number(id)))
+          .filter(Boolean);
+        if (items.length) addProductCards(items);
+        break;
+      }
+
+      case "toast":
+        notify(String(action.message || ""));
+        break;
+    }
+  }
+
+  /* ---------- État envoyé au backend à chaque tour ---------- */
+
+  function buildPayload() {
+    return {
+      messages: history.slice(-MAX_HISTORY),
+      contexte: {
+        catalogue: products.map(p => ({
+          id: p.id,
+          nom: p.name,
+          categorie: p.category,
+          prix: p.price,
+          description: p.description
+        })),
+        panier: cart.map(item => {
+          const p = products.find(x => x.id === item.id);
+          return p ? { id: p.id, nom: p.name, prix: p.price, quantite: item.quantity } : null;
+        }).filter(Boolean),
+        total_panier: cart.reduce((sum, item) => {
+          const p = products.find(x => x.id === item.id);
+          return sum + (p ? p.price * item.quantity : 0);
+        }, 0),
+        page: location.hash.replace("#", "") || "accueil"
+      }
+    };
+  }
+
+  /* ---------- Moteur local (repli hors-ligne) ---------- */
+
+  function localReply(raw) {
+    const m = raw.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    const findProducts = (re, limit = 3) =>
+      products.filter(p => re.test(
+        (p.name + " " + p.category + " " + p.description).toLowerCase()
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      )).slice(0, limit);
+
+    if (/bonjour|salut|bonsoir|hello|coucou/.test(m))
+      return { text: "Bonjour et bienvenue chez Atelier N° ! Que puis-je vous faire découvrir aujourd'hui ?" };
+
+    if (/moins de|budget|max|petit prix|cadeau/.test(m)) {
+      const budget = Number((m.match(/(\d[\d\s]{2,})/) || [])[1]?.replace(/\s/g, "")) || 50000;
+      const items = products.filter(p => p.price <= budget).slice(0, 4);
+      if (!items.length)
+        return { text: `Je n'ai rien à moins de ${money(budget)} pour le moment. Voulez-vous voir la collection complète ?` };
+      return {
+        text: `Voici ce qui tient dans un budget de ${money(budget)} :`,
+        action: { type: "afficher_produits", produits: items.map(p => p.id) }
+      };
+    }
+
+    if (/collection|catalogue|montre|produit|piece/.test(m)) {
+      return {
+        text: "Voici un aperçu de notre sélection. Vous pouvez aussi filtrer par catégorie juste en dessous.",
+        action: { type: "naviguer", section: "collection" }
+      };
+    }
+
+    if (/best.?seller|populaire|prefere|meilleur/.test(m)) {
+      const top = products.slice(0, 3);
+      return {
+        text: "Nos pièces les plus remarquées en ce moment :",
+        action: { type: "afficher_produits", produits: top.map(p => p.id) }
+      };
+    }
+
+    if (/prix|tarif|cout|combien|fcfa/.test(m)) {
+      const found = findProducts(/.*/, 4);
+      return {
+        text: "Voici les tarifs actuels de la sélection :",
+        action: { type: "afficher_produits", produits: found.map(p => p.id) }
+      };
+    }
+
+    if (/panier|commande|commander|acheter/.test(m)) {
+      return {
+        text: "Je vous ouvre votre panier. Vous pourrez ajuster les quantités puis préparer votre demande de commande.",
+        action: { type: "ouvrir_panier" }
+      };
+    }
+
+    if (/livraison|expedition|delai/.test(m))
+      return { text: "Les conditions de livraison ne sont pas encore configurées. Utilisez le formulaire de contact pour connaître les zones desservies, les délais et les frais." };
+
+    if (/wave|orange money|paiement|payer/.test(m))
+      return { text: "Les paiements Wave et Orange Money ne sont pas encore connectés. N'envoyez aucun paiement sur la base de cette démonstration." };
+
+    if (/contact|humain|conseiller|parler/.test(m))
+      return {
+        text: "Je vous emmène au formulaire de contact.",
+        action: { type: "naviguer", section: "contact" }
+      };
+
+    if (/merci/.test(m))
+      return { text: "Avec grand plaisir. Je reste là si vous avez besoin d'autre chose." };
+
+    return {
+      text: "Je ne suis pas certaine d'avoir bien compris — je suis en mode dégradé (le service IA n'est pas joignable). " +
+            "Je peux vous montrer la collection, les prix ou ouvrir votre panier."
+    };
+  }
+
+  /* ---------- Lecture du flux SSE ---------- */
+
+  async function readStream(response, bubble, actions) {
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const chunks = buffer.split("\n\n");
+      buffer = chunks.pop() || "";
+
+      for (const chunk of chunks) {
+        const line = chunk.split("\n").find(l => l.startsWith("data:"));
+        if (!line) continue;
+
+        let event;
+        try { event = JSON.parse(line.slice(5).trim()); }
+        catch { continue; }
+
+        if (event.type === "delta" && event.text) {
+          bubble.push(event.text);
+        } else if (event.type === "action" && event.action) {
+          if (event.action.type === "afficher_produits") {
+            actions.push(event.action);
+          } else {
+            applyAction(event.action);
+          }
+        } else if (event.type === "error") {
+          throw new Error(event.message || "Erreur du service.");
+        }
+      }
+    }
+  }
+
+  /* ---------- Envoi d'un message ---------- */
+
+  async function send(text) {
+    const content = String(text || "").trim();
+    if (!content || streaming) return;
+
+    if (!opened) open();
+
+    addMessage("user", content);
+    history.push({ role: "user", content });
+    setSuggestions([]);
+    el.input.value = "";
+    autoGrow();
+
+    streaming = true;
+    setBusy(true);
+    setStatus("Sora réfléchit…", "thinking");
+
+    const typing = addTyping();
+    controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+    const actions = [];
+    let bubble = null;
+    let answer = "";
+
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(buildPayload()),
+        signal: controller.signal
+      });
+
+      if (!response.ok || !response.body) {
+        throw new Error("HTTP " + response.status);
+      }
+
+      online = true;
+      setStatus("En ligne", "online");
+
+      typing.remove();
+      bubble = startStreamingBubble();
+
+      await readStream(response, bubble, actions);
+
+      answer = bubble.finish();
+      if (!answer.trim()) {
+        answer = "Je vous écoute — pouvez-vous préciser votre demande ?";
+        addMessage("bot", answer);
+      }
+    } catch (error) {
+      typing.remove();
+      if (bubble) bubble.finish();
+
+      /* Repli local : la page reste utilisable sans backend. */
+      const fallback = localReply(content);
+      answer = fallback.text;
+
+      if (answer.trim()) addMessage("bot", answer);
+      if (fallback.action) applyAction(fallback.action);
+
+      if (error.name !== "AbortError") {
+        online = false;
+        setStatus("Mode local", "offline");
+      }
+    } finally {
+      clearTimeout(timeout);
+      streaming = false;
+      controller = null;
+      setBusy(false);
+
+      if (online) setStatus("En ligne", "online");
+
+      history.push({ role: "assistant", content: answer || "" });
+      if (history.length > MAX_HISTORY) history = history.slice(-MAX_HISTORY);
+      persistHistory();
+
+      actions.forEach(applyAction);
+      setSuggestions(suggestNext(answer));
+      el.input.focus();
+    }
+  }
+
+  /* Suggestions contextuelles après chaque réponse. */
+  function suggestNext(answer) {
+    const a = (answer || "").toLowerCase();
+
+    if (/panier|commande/.test(a))
+      return ["Voir mon panier", "Quels sont les délais ?", "Continuer la visite"];
+    if (/prix|tarif|fcfa/.test(a))
+      return ["Je cherche un cadeau", "Montre-moi la collection", "Ajouter au panier"];
+    if (/livraison|paiement/.test(a))
+      return ["Comment commander ?", "Parler à un conseiller", "Voir la collection"];
+
+    return DEFAULT_SUGGESTIONS.slice(0, 3);
+  }
+
+  function setBusy(state) {
+    el.send.textContent = state ? "■" : "↑";
+    el.send.classList.toggle("stop", state);
+    el.send.setAttribute("aria-label", state ? "Arrêter la réponse" : "Envoyer le message");
+  }
+
+  function persistHistory() {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    } catch {}
+  }
+
+  function restoreHistory() {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "[]");
+      return Array.isArray(saved) ? saved.slice(-MAX_HISTORY) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  /* ---------- Ouverture / fermeture ---------- */
+
+  function open() {
+    opened = true;
+    el.window.classList.add("open");
+    document.body.classList.add("chat-open");
+    el.launch.setAttribute("aria-expanded", "true");
+    setTimeout(() => el.input.focus(), 120);
+  }
+
+  function close() {
+    opened = false;
+    el.window.classList.remove("open");
+    document.body.classList.remove("chat-open");
+    el.launch.setAttribute("aria-expanded", "false");
+  }
+
+  function reset() {
+    history = [];
+    persistHistory();
+    el.messages.replaceChildren();
+    addMessage("bot", GREETING);
+    setSuggestions(DEFAULT_SUGGESTIONS);
+    notify("Nouvelle conversation démarrée.");
+  }
+
+  /* ---------- Zone de saisie ---------- */
+
+  function autoGrow() {
+    el.input.style.height = "auto";
+    el.input.style.height = Math.min(el.input.scrollHeight, 110) + "px";
+  }
+
+  function initVoice() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return;
+
+    const recognition = new SR();
+    recognition.lang = "fr-FR";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    let listening = false;
+
+    recognition.addEventListener("result", event => {
+      const transcript = event.results[0][0].transcript;
+      el.input.value = transcript;
+      autoGrow();
+      send(transcript);
+    });
+
+    recognition.addEventListener("end", () => {
+      listening = false;
+      el.mic.classList.remove("recording");
+    });
+
+    recognition.addEventListener("error", () => {
+      listening = false;
+      el.mic.classList.remove("recording");
+    });
+
+    el.mic.hidden = false;
+    el.mic.addEventListener("click", () => {
+      if (listening) { recognition.stop(); return; }
+      try {
+        recognition.start();
+        listening = true;
+        el.mic.classList.add("recording");
+      } catch {}
+    });
+  }
+
+  /* ---------- Écouteurs ---------- */
+
+  el.launch.addEventListener("click", () => (opened ? close() : open()));
+  el.close.addEventListener("click", close);
+  el.reset.addEventListener("click", reset);
+
+  el.form.addEventListener("submit", event => {
+    event.preventDefault();
+    if (streaming) { controller?.abort(); return; }
+    send(el.input.value);
   });
-});
+
+  el.input.addEventListener("input", autoGrow);
+
+  el.input.addEventListener("keydown", event => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      el.form.requestSubmit();
+    }
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && opened) close();
+  });
+
+  /* ---------- Démarrage ---------- */
+
+  function init() {
+    history = restoreHistory();
+
+    if (history.length) {
+      history.forEach(message => {
+        if (message.content?.trim()) addMessage(message.role, message.content);
+      });
+    } else {
+      addMessage("bot", GREETING);
+    }
+
+    setSuggestions(DEFAULT_SUGGESTIONS);
+    setStatus("En ligne", "online");
+    initVoice();
+    autoGrow();
+
+    /* Vérification silencieuse de la disponibilité du backend. */
+    fetch(API_URL, { method: "OPTIONS" })
+      .then(() => { online = true; setStatus("En ligne", "online"); })
+      .catch(() => { online = false; setStatus("Mode local", "offline"); });
+  }
+
+  return { init, open, close, send, reset };
+})();
 
 /* -------------------------------------------
    FORMULAIRE DE CONTACT
@@ -1414,10 +2197,7 @@ document.getElementById("contactForm").addEventListener("submit", event => {
     "Nom : " + name + "\nE-mail : " + email + "\n\nMessage :\n" + message
   );
 
-  /*
-    Remplace contact@exemple.com par ta véritable adresse
-    lorsque tu configureras le site.
-  */
+  /* Remplace contact@exemple.com par ta véritable adresse. */
   window.location.href =
     "mailto:contact@exemple.com?subject=" + subject + "&body=" + body;
 });
@@ -1441,7 +2221,7 @@ document.getElementById("year").textContent = new Date().getFullYear();
 
 renderProducts();
 renderCart();
+Sora.init();
 </script>
 </body>
 </html>
-```
