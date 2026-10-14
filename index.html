@@ -411,6 +411,32 @@ footer {
 
 footer a:hover { color: var(--accent); }
 
+/* Commande simple et ticket */
+.checkout-modal { position:fixed; inset:0; z-index:90; display:none; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.78); backdrop-filter:blur(8px); }
+.checkout-modal.open { display:flex; }
+.checkout-panel { width:min(620px,100%); max-height:min(90svh,900px); overflow:auto; background:#111; border:1px solid rgba(212,181,139,.3); border-radius:18px; padding:24px; box-shadow:0 25px 90px #000b; }
+.checkout-panel h2 { font:400 34px Georgia,serif; margin:0 0 8px; }
+.checkout-panel .lead { color:var(--muted); font-size:12px; line-height:1.7; margin:0 0 22px; }
+.checkout-grid { display:grid; grid-template-columns:1fr 1fr; gap:11px; }
+.checkout-grid .wide { grid-column:1/-1; }
+.checkout-grid label { display:block; color:#bcb6ab; font-size:11px; margin:0 0 6px; }
+.checkout-grid input, .checkout-grid textarea, .checkout-grid select { width:100%; background:#191919; color:var(--text); border:1px solid var(--line); padding:13px; border-radius:8px; font:inherit; font-size:13px; }
+.checkout-grid textarea { min-height:70px; }
+.payment-options { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:18px 0; }
+.payment-option { display:flex; gap:10px; align-items:flex-start; padding:13px; border:1px solid var(--line); border-radius:10px; cursor:pointer; background:#171717; }
+.payment-option:has(input:checked) { border-color:var(--accent); background:#241e16; }
+.payment-option input { accent-color:#d4b58b; margin-top:3px; }
+.payment-option b { display:block; font-size:12px; margin-bottom:5px; }
+.payment-option small { color:var(--muted); font-size:10px; line-height:1.5; display:block; }
+.checkout-total { display:flex; justify-content:space-between; border-top:1px solid var(--line); padding-top:15px; margin:18px 0; }
+.checkout-actions { display:flex; gap:10px; justify-content:flex-end; }
+.checkout-actions .btn { cursor:pointer; }
+.ticket-view { display:none; border:1px dashed rgba(212,181,139,.6); padding:18px; margin-top:18px; border-radius:10px; background:#171510; }
+.ticket-view.open { display:block; }
+.ticket-view h3 { margin:0 0 8px; font:400 24px Georgia,serif; }
+.ticket-view p { color:#d6d0c6; font-size:12px; line-height:1.8; overflow-wrap:anywhere; }
+@media(max-width:560px) { .checkout-grid,.payment-options { grid-template-columns:1fr; } .checkout-panel { padding:18px; } .checkout-panel h2 { font-size:29px; } .checkout-actions { flex-direction:column-reverse; } .checkout-actions .btn { width:100%; } }
+
 /* Panier */
 
 .overlay {
@@ -1084,6 +1110,41 @@ body.chat-open .chat-launch::after { display: none; }
   </div>
 </aside>
 
+<!-- Commande et ticket de commande -->
+<div class="checkout-modal" id="checkoutModal" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
+  <div class="checkout-panel">
+    <div id="checkoutFormView">
+      <h2 id="checkoutTitle">Finaliser ma commande</h2>
+      <p class="lead">Remplissez vos informations de livraison. Votre commande sera enregistrée avant la confirmation.</p>
+      <form id="checkoutForm">
+        <div class="checkout-grid">
+          <div><label for="orderName">Nom complet *</label><input id="orderName" name="name" autocomplete="name" required maxlength="100" placeholder="Votre nom"></div>
+          <div><label for="orderPhone">Téléphone *</label><input id="orderPhone" name="phone" type="tel" autocomplete="tel" required maxlength="40" placeholder="77 000 00 00"></div>
+          <div><label for="orderCity">Ville *</label><input id="orderCity" name="city" autocomplete="address-level2" required maxlength="100" placeholder="Dakar, Thiès…"></div>
+          <div><label for="orderAddress">Adresse / repère *</label><input id="orderAddress" name="address" autocomplete="street-address" required maxlength="300" placeholder="Quartier, rue, repère"></div>
+          <div class="wide"><label for="orderNote">Note pour le livreur (facultatif)</label><textarea id="orderNote" name="note" maxlength="1000" placeholder="Instructions pour la livraison"></textarea></div>
+        </div>
+        <div class="payment-options">
+          <label class="payment-option"><input type="radio" name="paymentMethod" value="delivery" checked><span><b>Payer à la livraison / sur place</b><small>Vous payez lors de la remise de la commande. Aucun paiement immédiat n'est effectué.</small></span></label>
+          <label class="payment-option"><input type="radio" name="paymentMethod" value="now"><span><b>Payer maintenant</b><small>Contactez la boutique au 77 123 45 67 pour finaliser le paiement. Le site ne marque pas la commande comme payée automatiquement.</small></span></label>
+        </div>
+        <div class="checkout-total"><span>Total estimé</span><strong id="checkoutTotal">0 FCFA</strong></div>
+        <div class="checkout-actions">
+          <button class="btn secondary" id="cancelCheckout" type="button">Retour au panier</button>
+          <button class="btn" id="submitOrder" type="submit">Enregistrer la commande ↗</button>
+        </div>
+        <p class="small-note">Le prix final, la disponibilité et les frais de livraison seront confirmés par la boutique.</p>
+      </form>
+    </div>
+    <div class="ticket-view" id="orderTicket" aria-live="polite">
+      <h3>Commande enregistrée</h3>
+      <p id="ticketDetails"></p>
+      <p>Conservez votre référence pour le suivi et la livraison.</p>
+      <div class="checkout-actions"><button class="btn secondary" id="closeTicket" type="button">Fermer</button><button class="btn" id="contactOrder" type="button">Contacter la boutique ↗</button></div>
+    </div>
+  </div>
+</div>
+
 <!-- ============================================================
      ASSISTANT SORA
      ============================================================ -->
@@ -1430,65 +1491,107 @@ function renderCart() {
   document.getElementById("cartTotal").textContent = money(total);
 }
 
-document.getElementById("checkout").addEventListener("click", async () => {
-  if (!cart.length) {
-    notify("Votre panier est vide.");
-    return;
-  }
+const checkoutModal = document.getElementById("checkoutModal");
+const checkoutForm = document.getElementById("checkoutForm");
+let latestOrderWhatsAppMessage = "";
 
-  const name = prompt("Votre nom complet :");
-  if (!name || !name.trim()) return;
-  const phone = prompt("Votre numéro de téléphone (WhatsApp si possible) :");
-  if (!phone || !phone.trim()) return;
-  const city = prompt("Ville de livraison :");
-  if (!city || !city.trim()) return;
-  const address = prompt("Adresse ou point de repère pour la livraison :");
-  if (!address || !address.trim()) return;
-  const note = prompt("Précision pour la commande (facultatif) :") || "";
+function openCheckout() {
+  if (!cart.length) return notify("Votre panier est vide.");
+  document.getElementById("checkoutTotal").textContent = money(cart.reduce((sum, item) => {
+    const product = products.find(p => p.id === item.id);
+    return sum + (product ? Number(product.price) * Number(item.quantity) : 0);
+  }, 0));
+  document.getElementById("checkoutFormView").style.display = "block";
+  document.getElementById("orderTicket").classList.remove("open");
+  checkoutModal.classList.add("open");
+  document.getElementById("orderName").focus();
+}
+function closeCheckout() { checkoutModal.classList.remove("open"); }
 
+document.getElementById("checkout").addEventListener("click", openCheckout);
+document.getElementById("cancelCheckout").addEventListener("click", closeCheckout);
+document.getElementById("closeTicket").addEventListener("click", closeCheckout);
+checkoutModal.addEventListener("click", event => { if (event.target === checkoutModal) closeCheckout(); });
+document.addEventListener("keydown", event => { if (event.key === "Escape") closeCheckout(); });
+
+checkoutForm.addEventListener("submit", async event => {
+  event.preventDefault();
+  if (!cart.length) return notify("Votre panier est vide.");
+  const form = new FormData(checkoutForm);
+  const customer = {
+    name: String(form.get("name") || "").trim(),
+    phone: String(form.get("phone") || "").trim(),
+    city: String(form.get("city") || "").trim(),
+    address: String(form.get("address") || "").trim(),
+    note: String(form.get("note") || "").trim()
+  };
+  const paymentMethod = String(form.get("paymentMethod") || "delivery");
   const items = cart.map(item => {
     const product = products.find(p => p.id === item.id);
     return product ? { id: product.id, name: product.name, price: Number(product.price), quantity: Number(item.quantity) } : null;
   }).filter(Boolean);
   if (!items.length) return notify("Votre panier ne contient aucun article valide.");
 
-  const button = document.getElementById("checkout");
+  const button = document.getElementById("submitOrder");
   button.disabled = true;
   button.textContent = "Enregistrement…";
   try {
     const response = await fetch("/api/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ customer: { name: name.trim(), phone: phone.trim(), city: city.trim(), address: address.trim(), note }, items })
+      body: JSON.stringify({ customer, items, paymentMethod })
     });
     const result = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(result.error || "La commande n'a pas pu être enregistrée.");
-    notify("Demande enregistrée : " + result.reference);
-    const message = [
-      "Bonjour Atelier N°, je viens d'envoyer une demande de commande.",
-      "Référence : " + result.reference,
-      "Client : " + name.trim(),
-      "Téléphone : " + phone.trim(),
-      "Ville : " + city.trim(),
-      "Adresse : " + address.trim(),
+    if (!response.ok || !result.ok) throw new Error(result.error || "La commande n'a pas pu être enregistrée.");
+
+    const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const methodLabel = paymentMethod === "now" ? "Paiement à finaliser avec la boutique" : "Paiement à la livraison / sur place";
+    latestOrderWhatsAppMessage = [
+      "Bonjour Atelier N°, ma commande est enregistrée.",
+      "Ticket : " + result.reference,
+      "Client : " + customer.name,
+      "Téléphone client : " + customer.phone,
+      "Ville : " + customer.city,
+      "Adresse : " + customer.address,
+      "Paiement : " + methodLabel,
       "",
       ...items.map(item => item.name + " × " + item.quantity + " — " + money(item.price * item.quantity)),
       "",
-      "Total estimatif : " + money(items.reduce((sum, item) => sum + item.price * item.quantity, 0)),
-      "Merci de confirmer le prix final, la disponibilité, la livraison et le paiement."
+      "Total estimé : " + money(total),
+      "Merci de confirmer le prix final, la disponibilité et la livraison."
     ].join("\n");
-    const number = String(window.ATELIER_PUBLIC_CONFIG?.whatsappNumber || "").replace(/\D/g, "");
-    if (number) window.open("https://wa.me/" + number + "?text=" + encodeURIComponent(message), "_blank", "noopener,noreferrer");
-    else notify("Référence " + result.reference + " — le WhatsApp de la boutique reste à configurer.");
+
+    document.getElementById("checkoutFormView").style.display = "none";
+    document.getElementById("orderTicket").classList.add("open");
+    document.getElementById("ticketDetails").textContent =
+      "Référence : " + result.reference + "\n" +
+      "Client : " + customer.name + "\n" +
+      "Téléphone : " + customer.phone + "\n" +
+      "Livraison : " + customer.address + ", " + customer.city + "\n" +
+      "Paiement : " + methodLabel + "\n" +
+      "Total estimé : " + money(total) + "\n\n" +
+      "Articles : " + items.map(item => item.name + " × " + item.quantity).join(", ");
+    notify("Commande enregistrée : " + result.reference);
+
     cart = [];
     saveCart();
     renderCart();
+
+    if (paymentMethod === "now") {
+      const number = "221771234567";
+      window.open("https://wa.me/" + number + "?text=" + encodeURIComponent(latestOrderWhatsAppMessage), "_blank", "noopener,noreferrer");
+    }
   } catch (error) {
-    notify(error.message || "Erreur lors de la préparation de la commande.");
+    notify(error.message || "Erreur lors de l'enregistrement de la commande.");
   } finally {
     button.disabled = false;
-    button.textContent = "Préparer ma commande ↗";
+    button.textContent = "Enregistrer la commande ↗";
   }
+});
+
+document.getElementById("contactOrder").addEventListener("click", () => {
+  const number = "221771234567";
+  window.open("https://wa.me/" + number + "?text=" + encodeURIComponent(latestOrderWhatsAppMessage), "_blank", "noopener,noreferrer");
 });
 
 /* Administration locale désactivée sur le site public. */
