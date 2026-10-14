@@ -1033,8 +1033,7 @@ body.chat-open .chat-launch::after { display: none; }
         <textarea id="contactMessage" placeholder="Comment pouvons-nous vous aider ?" required maxlength="2000"></textarea>
         <button class="btn" type="submit">Préparer mon message ↗</button>
         <p class="small-note">
-          Ce formulaire prépare un e-mail dans votre application de
-          messagerie. Il n'envoie pas de données à un serveur.
+          Votre message est envoyé au service de support et reçoit une référence de ticket.
         </p>
       </form>
     </div>
@@ -2136,21 +2135,30 @@ const Sora = (() => {
    FORMULAIRE DE CONTACT
 ------------------------------------------- */
 
-document.getElementById("contactForm").addEventListener("submit", event => {
+document.getElementById("contactForm").addEventListener("submit", async event => {
   event.preventDefault();
-
   const name = document.getElementById("contactName").value.trim();
   const email = document.getElementById("contactEmail").value.trim();
   const message = document.getElementById("contactMessage").value.trim();
-
-  const subject = encodeURIComponent("Demande Atelier N° — " + name);
-  const body = encodeURIComponent(
-    "Nom : " + name + "\nE-mail : " + email + "\n\nMessage :\n" + message
-  );
-
-  /* Remplace contact@exemple.com par ta véritable adresse. */
-  window.location.href =
-    "mailto:contact@exemple.com?subject=" + subject + "&body=" + body;
+  const button = event.currentTarget.querySelector('button[type="submit"]');
+  button.disabled = true;
+  button.textContent = "Envoi en cours…";
+  try {
+    const response = await fetch("/api/tickets", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, topic: "contact", message })
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || "Le ticket n'a pas pu être enregistré.");
+    notify("Ticket créé : " + result.reference);
+    event.currentTarget.reset();
+  } catch (error) {
+    notify(error.message || "Le support n'est pas encore configuré.");
+  } finally {
+    button.disabled = false;
+    button.textContent = "Envoyer ma demande ↗";
+  }
 });
 
 /* -------------------------------------------
