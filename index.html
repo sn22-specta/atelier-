@@ -30,8 +30,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   overflow-x: hidden;
 }
 
@@ -411,7 +410,6 @@ footer {
 
 footer a:hover { color: var(--accent); }
 
-/* Commande simple et ticket */
 .checkout-modal { position:fixed; inset:0; z-index:90; display:none; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.78); backdrop-filter:blur(8px); }
 .checkout-modal.open { display:flex; }
 .checkout-panel { width:min(620px,100%); max-height:min(90svh,900px); overflow:auto; background:#111; border:1px solid rgba(212,181,139,.3); border-radius:18px; padding:24px; box-shadow:0 25px 90px #000b; }
@@ -436,8 +434,6 @@ footer a:hover { color: var(--accent); }
 .ticket-view h3 { margin:0 0 8px; font:400 24px Georgia,serif; }
 .ticket-view p { color:#d6d0c6; font-size:12px; line-height:1.8; overflow-wrap:anywhere; }
 @media(max-width:560px) { .checkout-grid,.payment-options { grid-template-columns:1fr; } .checkout-panel { padding:18px; } .checkout-panel h2 { font-size:29px; } .checkout-actions { flex-direction:column-reverse; } .checkout-actions .btn { width:100%; } }
-
-/* Panier */
 
 .overlay {
   position: fixed;
@@ -511,10 +507,6 @@ footer a:hover { color: var(--accent); }
 .total { display: flex; justify-content: space-between; margin-bottom: 18px; }
 .cart-footer .btn { width: 100%; }
 .small-note { color: var(--muted); font-size: 10px; line-height: 1.7; }
-
-/* ============================================================
-   ASSISTANT — NOUVEAU DESIGN
-   ============================================================ */
 
 .chat-launch {
   position: fixed;
@@ -695,7 +687,6 @@ body.chat-open .chat-launch::after { display: none; }
 }
 .msg-actions button:hover { background: rgba(212,181,139,.22); }
 
-/* Cartes produit dans le chat */
 .chat-cards {
   align-self: stretch;
   display: flex;
@@ -737,7 +728,6 @@ body.chat-open .chat-launch::after { display: none; }
 }
 .chat-card button:hover { background: var(--text); color: #111; border-color: var(--text); }
 
-/* Indicateur de frappe */
 .typing {
   align-self: flex-start;
   display: flex;
@@ -759,7 +749,6 @@ body.chat-open .chat-launch::after { display: none; }
 .typing i:nth-child(2) { animation-delay: .18s; }
 .typing i:nth-child(3) { animation-delay: .36s; }
 
-/* Suggestions */
 .chat-suggestions {
   display: flex;
   gap: 6px;
@@ -783,7 +772,6 @@ body.chat-open .chat-launch::after { display: none; }
 .chat-suggestions button:hover { border-color: var(--accent); color: var(--accent); }
 .chat-suggestions:empty { display: none; }
 
-/* Zone de saisie */
 .chat-form {
   padding: 10px 12px 12px;
   display: flex;
@@ -843,8 +831,6 @@ body.chat-open .chat-launch::after { display: none; }
 }
 .chat-form .send-btn:hover { transform: scale(1.06); }
 .chat-form .send-btn.stop { background: #d4564a; color: #fff; }
-
-/* Administration locale */
 
 .admin-box {
   background: #111;
@@ -936,7 +922,6 @@ body.chat-open .chat-launch::after { display: none; }
 .social-links a{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border:1px solid var(--line,rgba(255,255,255,.18));border-radius:999px;color:inherit;text-decoration:none;font-size:.78rem;letter-spacing:.04em;transition:background .2s ease,border-color .2s ease}
 .social-links a:hover{background:rgba(255,255,255,.08);border-color:currentColor}
 .social-links a[hidden]{display:none!important}
-
 </style>
 </head>
 
@@ -968,11 +953,8 @@ body.chat-open .chat-launch::after { display: none; }
   </div>
 </header>
 
-<!-- ============================================================
-     MENU ADMIN — SCRIPT AUTONOME (indépendant du script principal)
-     Permet l'ouverture du menu même si un autre script plante.
-     ============================================================ -->
 <script>
+/* Menu admin : script autonome, ne dépend d'aucun autre script. */
 (function () {
   var toggle = document.getElementById("adminToggle");
   var menu = document.getElementById("adminMenu");
@@ -1033,7 +1015,6 @@ body.chat-open .chat-launch::after { display: none; }
     </div>
 
     <div class="products" id="products" aria-live="polite"></div>
-
   </section>
 
   <section class="story" id="histoire">
@@ -1058,18 +1039,9 @@ body.chat-open .chat-launch::after { display: none; }
       </p>
 
       <div class="values">
-        <div class="value">
-          <b>01.</b>
-          <p>Sélection réfléchie</p>
-        </div>
-        <div class="value">
-          <b>02.</b>
-          <p>Design intemporel</p>
-        </div>
-        <div class="value">
-          <b>03.</b>
-          <p>Service attentif</p>
-        </div>
+        <div class="value"><b>01.</b><p>Sélection réfléchie</p></div>
+        <div class="value"><b>02.</b><p>Design intemporel</p></div>
+        <div class="value"><b>03.</b><p>Service attentif</p></div>
       </div>
     </div>
   </section>
@@ -1112,10 +1084,14 @@ body.chat-open .chat-launch::after { display: none; }
 <footer>
   <a class="logo" href="#accueil">ATELIER <span>N°</span></a>
   <span>© <span id="year"></span> Atelier N° · Tous droits réservés.</span>
-  <div class="social-links" aria-label="Réseaux sociaux"><a id="socialWhatsApp" href="#" target="_blank" rel="noopener noreferrer" hidden>WhatsApp</a><a id="socialInstagram" href="#" target="_blank" rel="noopener noreferrer" hidden>Instagram</a><a id="socialTikTok" href="#" target="_blank" rel="noopener noreferrer" hidden>TikTok</a><a href="#contact">Nous contacter ↗</a></div>
+  <div class="social-links" aria-label="Réseaux sociaux">
+    <a id="socialWhatsApp" href="#" target="_blank" rel="noopener noreferrer" hidden>WhatsApp</a>
+    <a id="socialInstagram" href="#" target="_blank" rel="noopener noreferrer" hidden>Instagram</a>
+    <a id="socialTikTok" href="#" target="_blank" rel="noopener noreferrer" hidden>TikTok</a>
+    <a href="#contact">Nous contacter ↗</a>
+  </div>
 </footer>
 
-<!-- Panier -->
 <div class="overlay" id="overlay"></div>
 <aside class="drawer" id="cartDrawer" aria-label="Panier" aria-modal="true" role="dialog">
   <div class="drawer-head">
@@ -1136,7 +1112,6 @@ body.chat-open .chat-launch::after { display: none; }
   </div>
 </aside>
 
-<!-- Commande et ticket de commande -->
 <div class="checkout-modal" id="checkoutModal" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
   <div class="checkout-panel">
     <div id="checkoutFormView">
@@ -1166,14 +1141,14 @@ body.chat-open .chat-launch::after { display: none; }
       <h3>Commande enregistrée</h3>
       <p id="ticketDetails"></p>
       <p>Votre ticket est enregistré pour l’administrateur. Pour en garder une copie dans votre conversation WhatsApp et l’envoyer à la boutique, appuyez ci-dessous puis sur « Envoyer » dans WhatsApp.</p>
-      <div class="checkout-actions"><button class="btn secondary" id="closeTicket" type="button">Fermer</button><button class="btn" id="contactOrder" type="button">Envoyer mon ticket sur WhatsApp ↗</button></div>
+      <div class="checkout-actions">
+        <button class="btn secondary" id="closeTicket" type="button">Fermer</button>
+        <button class="btn" id="contactOrder" type="button">Envoyer mon ticket sur WhatsApp ↗</button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ============================================================
-     ASSISTANT SORA
-     ============================================================ -->
 <button class="chat-launch" id="chatLaunch" aria-label="Ouvrir l'assistant Atelier N°" aria-expanded="false">
   <span class="orb" aria-hidden="true"></span>
 </button>
@@ -1190,7 +1165,6 @@ body.chat-open .chat-launch::after { display: none; }
   </div>
 
   <div class="chat-messages" id="chatMessages" aria-live="polite" aria-atomic="false"></div>
-
   <div class="chat-suggestions" id="chatSuggestions"></div>
 
   <form class="chat-form" id="chatForm">
@@ -1208,12 +1182,275 @@ body.chat-open .chat-launch::after { display: none; }
 </div>
 
 <script>
+/* ============================================================
+   OVERLAY PROPRIÉTAIRE : ouverture/fermeture + contenu iframe
+   ============================================================ */
 const ownerOverlay = document.getElementById("ownerOverlay");
 const ownerFrame = document.getElementById("ownerFrame");
 const closeOwnerOverlay = document.getElementById("closeOwnerOverlay");
 let ownerDocumentLoaded = false;
 let openOwnerConfigAfterLoad = false;
-const ownerDocument = "\u003c!DOCTYPE html\u003e\n\u003chtml lang=\"fr\"\u003e\n\u003chead\u003e\n\u003cmeta charset=\"UTF-8\"\u003e\n\u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\"\u003e\n\u003cmeta name=\"theme-color\" content=\"#090909\"\u003e\n\u003cmeta name=\"robots\" content=\"noindex,nofollow\"\u003e\n\u003ctitle\u003eEspace propriétaire — Atelier N°\u003c/title\u003e\n\u003cstyle\u003e\n:root{--bg:#090909;--panel:#141414;--panel2:#1c1c1c;--text:#f5f1e9;--muted:#a39d92;--gold:#d4b58b;--line:rgba(255,255,255,.12);--red:#e18b7d;--green:#87c9a0}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer}.wrap{width:min(1180px,92%);margin:auto}.top{border-bottom:1px solid var(--line);padding:20px 0;display:flex;align-items:center;justify-content:space-between;gap:15px}.logo{font-weight:750;letter-spacing:-.8px;color:var(--text);text-decoration:none}.logo span{color:var(--gold)}.back{color:var(--muted);text-decoration:none;font-size:13px}.back:hover{color:var(--gold)}main{padding:42px 0 70px}.eyebrow{text-transform:uppercase;letter-spacing:2px;color:var(--gold);font-size:10px}h1,h2{font-weight:450;letter-spacing:-1px}h1{font:400 clamp(35px,6vw,58px)/1.05 Georgia,serif;margin:12px 0}h2{font-size:24px;margin:0 0 18px}.intro{color:var(--muted);line-height:1.7;max-width:650px;font-size:13px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px;margin-top:24px}.login{max-width:460px;margin:35px auto}.field{display:grid;gap:8px;margin-bottom:15px}.field label{font-size:12px;color:#d5d0c7}.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:9px;background:#0c0c0c;color:var(--text);padding:13px;min-width:0}.field textarea{min-height:90px;resize:vertical}.btn{border:1px solid var(--gold);border-radius:30px;padding:12px 18px;background:var(--gold);color:#15110c;font-size:12px;font-weight:650}.btn.ghost{background:transparent;color:var(--text);border-color:var(--line)}.btn.danger{background:transparent;color:#f0a59a;border-color:#6c3c36}.btn:disabled{opacity:.5;cursor:wait}.msg{font-size:12px;color:var(--muted);margin-top:12px;line-height:1.6}.msg.error{color:#f0a59a}.msg.ok{color:var(--green)}[hidden]{display:none!important}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:25px 0}.tab{border:1px solid var(--line);background:transparent;color:var(--muted);padding:10px 14px;border-radius:25px;font-size:12px}.tab.active{background:var(--gold);border-color:var(--gold);color:#15110c}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.stat{background:var(--panel2);padding:18px;border-radius:12px;border:1px solid var(--line)}.stat span{font-size:11px;color:var(--muted)}.stat strong{display:block;font-size:25px;font-weight:500;margin-top:8px}.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.list{display:grid;gap:10px}.item{border:1px solid var(--line);border-radius:12px;padding:15px;display:grid;grid-template-columns:70px minmax(0,1fr) auto;gap:14px;align-items:start}.item img{width:70px;height:85px;object-fit:cover;border-radius:7px;background:var(--panel2)}.item h3{font-size:14px;font-weight:550;margin:0 0 6px}.item p{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 6px;overflow-wrap:anywhere}.pill{display:inline-block;border:1px solid var(--line);border-radius:30px;padding:5px 8px;font-size:10px;color:var(--gold)}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}th,td{text-align:left;padding:13px 10px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:500}td select{max-width:180px;background:#0c0c0c;color:var(--text);border:1px solid var(--line);padding:8px;border-radius:7px}.note{background:rgba(212,181,139,.07);border:1px solid rgba(212,181,139,.2);padding:14px;border-radius:10px;color:#d2c3ae;font-size:12px;line-height:1.7}.section-title{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:18px}.checkbox{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted)}.checkbox input{width:auto}footer{padding:24px 0;border-top:1px solid var(--line);color:var(--muted);font-size:11px}\n@media(max-width:700px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.row{grid-template-columns:1fr}.panel{padding:17px}.item{grid-template-columns:55px minmax(0,1fr)}.item img{width:55px;height:70px}.item .item-actions{grid-column:2}.top{align-items:flex-start}.stat strong{font-size:21px}}\n\u003c/style\u003e\n\u003c/head\u003e\n\u003cbody\u003e\n\u003cheader class=\"top wrap\"\u003e\n\u003ca class=\"logo\" href=\"#\" onclick=\"parent.postMessage('atelier-owner-close','*');return false\"\u003eATELIER \u003cspan\u003eN°\u003c/span\u003e \u003csmall style=\"font-weight:400;color:#a39d92\"\u003e/ PROPRIÉTAIRE\u003c/small\u003e\u003c/a\u003e\n\u003ca class=\"back\" href=\"#\" onclick=\"parent.postMessage('atelier-owner-close','*');return false\"\u003e← Retour à la boutique\u003c/a\u003e\n\u003c/header\u003e\n\u003cmain class=\"wrap\"\u003e\n\u003cdiv class=\"eyebrow\"\u003eAdministration privée\u003c/div\u003e\n\u003ch1\u003eVotre boutique,\u003cbr\u003een toute maîtrise.\u003c/h1\u003e\n\u003cp class=\"intro\"\u003eGérez le catalogue, les commandes et les demandes clients depuis un espace réservé au propriétaire.\u003c/p\u003e\n\u003csection class=\"panel login\" id=\"loginPanel\"\u003e\n\u003ch2\u003eAccès propriétaire\u003c/h2\u003e\n\u003cp class=\"intro\"\u003eSaisissez votre code d'accès pour ouvrir le tableau de bord.\u003c/p\u003e\n\u003cform id=\"loginForm\"\u003e\n\u003cdiv class=\"field\"\u003e\u003clabel for=\"accessCode\"\u003eCode d'accès\u003c/label\u003e\u003cinput id=\"accessCode\" type=\"password\" autocomplete=\"current-password\" required maxlength=\"100\" placeholder=\"Votre code privé\"\u003e\u003c/div\u003e\n\u003cbutton class=\"btn\" type=\"submit\" id=\"loginBtn\"\u003eOuvrir mon espace\u003c/button\u003e\n\u003cdiv class=\"msg\" id=\"loginMsg\" role=\"status\"\u003e\u003c/div\u003e\n\u003c/form\u003e\n\u003c/section\u003e\n\u003cdiv id=\"dashboard\" hidden\u003e\n\u003cdiv class=\"stats\" id=\"stats\"\u003e\u003c/div\u003e\n\u003cnav class=\"tabs\" aria-label=\"Sections administrateur\"\u003e\n\u003cbutton class=\"tab active\" data-tab=\"products\"\u003eProduits\u003c/button\u003e\u003cbutton class=\"tab\" data-tab=\"orders\"\u003eCommandes\u003c/button\u003e\u003cbutton class=\"tab\" data-tab=\"tickets\"\u003eSupport\u003c/button\u003e\u003cbutton class=\"tab\" data-tab=\"config\"\u003eConfiguration propriétaire\u003c/button\u003e\n\u003cbutton class=\"tab\" id=\"logoutBtn\" style=\"margin-left:auto\"\u003eDéconnexion\u003c/button\u003e\n\u003c/nav\u003e\n\u003csection class=\"panel\" id=\"productsPanel\"\u003e\n\u003cdiv class=\"section-title\"\u003e\u003ch2\u003eCatalogue produits\u003c/h2\u003e\u003cbutton class=\"btn\" id=\"newProductBtn\"\u003e+ Ajouter un produit\u003c/button\u003e\u003c/div\u003e\n\u003cform id=\"productForm\" hidden\u003e\n\u003cinput type=\"hidden\" id=\"productId\"\u003e\n\u003cdiv class=\"row\"\u003e\n\u003cdiv class=\"field\"\u003e\u003clabel for=\"productName\"\u003eNom du produit\u003c/label\u003e\u003cinput id=\"productName\" required maxlength=\"120\"\u003e\u003c/div\u003e\n\u003cdiv class=\"field\"\u003e\u003clabel for=\"productCategory\"\u003eCatégorie\u003c/label\u003e\u003cinput id=\"productCategory\" required maxlength=\"60\" placeholder=\"Maison, Accessoires…\"\u003e\u003c/div\u003e\n\u003c/div\u003e\n\u003cdiv class=\"row\"\u003e\n\u003cdiv class=\"field\"\u003e\u003clabel for=\"productPrice\"\u003ePrix en FCFA\u003c/label\u003e\u003cinput id=\"productPrice\" type=\"number\" min=\"0\" step=\"1\" required\u003e\u003c/div\u003e\n\u003cdiv class=\"field\"\u003e\u003clabel for=\"productTag\"\u003eÉtiquette\u003c/label\u003e\u003cinput id=\"productTag\" maxlength=\"50\" placeholder=\"Nouveauté, Sélection…\"\u003e\u003c/div\u003e\n\u003c/div\u003e\n\u003cdiv class=\"field\"\u003e\u003clabel for=\"productImage\"\u003eURL de la photo (HTTPS)\u003c/label\u003e\u003cinput id=\"productImage\" type=\"url\" placeholder=\"https://…\" maxlength=\"1500\"\u003e\u003c/div\u003e\n\u003cdiv class=\"field\"\u003e\u003clabel for=\"productDescription\"\u003eDescription\u003c/label\u003e\u003ctextarea id=\"productDescription\" maxlength=\"500\"\u003e\u003c/textarea\u003e\u003c/div\u003e\n\u003clabel class=\"checkbox\"\u003e\u003cinput id=\"productPublished\" type=\"checkbox\" checked\u003e Publier ce produit sur la boutique\u003c/label\u003e\n\u003cdiv class=\"actions\"\u003e\u003cbutton class=\"btn\" type=\"submit\" id=\"saveProductBtn\"\u003eEnregistrer le produit\u003c/button\u003e\u003cbutton class=\"btn ghost\" type=\"button\" id=\"cancelProductBtn\"\u003eAnnuler\u003c/button\u003e\u003c/div\u003e\n\u003cdiv class=\"msg\" id=\"productMsg\" role=\"status\"\u003e\u003c/div\u003e\n\u003c/form\u003e\n\u003cdiv class=\"list\" id=\"productList\"\u003e\u003c/div\u003e\n\u003c/section\u003e\n\u003csection class=\"panel\" id=\"ordersPanel\" hidden\u003e\u003ch2\u003eCommandes clients\u003c/h2\u003e\u003cp class=\"msg\"\u003eLes montants affichés sont des estimations déclarées lors de la demande, pas une preuve de paiement.\u003c/p\u003e\u003cdiv class=\"table-wrap\" id=\"ordersList\"\u003e\u003c/div\u003e\u003c/section\u003e\n\u003csection class=\"panel\" id=\"ticketsPanel\" hidden\u003e\u003ch2\u003eDemandes de support\u003c/h2\u003e\u003cdiv class=\"table-wrap\" id=\"ticketsList\"\u003e\u003c/div\u003e\u003c/section\u003e\n\u003csection class=\"panel\" id=\"configPanel\" hidden\u003e\n\u003ch2\u003eConfiguration du propriétaire\u003c/h2\u003e\n\u003cdiv class=\"note\"\u003eLe code d'accès est vérifié côté serveur. Il n'est pas affiché ici et ne doit jamais être placé dans le HTML ou dans un fichier public.\u003c/div\u003e\n\u003cdiv style=\"margin-top:18px\" class=\"field\"\u003e\u003clabel\u003eNom de la variable privée\u003c/label\u003e\u003cinput readonly value=\"ADMIN_ACCESS_CODE\"\u003e\u003c/div\u003e\n\u003cdiv class=\"field\"\u003e\u003clabel\u003eValeur configurée\u003c/label\u003e\u003cinput readonly value=\"Masquée pour votre sécurité\"\u003e\u003c/div\u003e\n\u003cp class=\"intro\"\u003ePour changer le code : ouvrez Vercel → projet Atelier N° → Settings → Environment Variables, modifiez la variable ADMIN_ACCESS_CODE avec votre nouveau code, puis redéployez le site. Gardez également SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY configurées côté serveur.\u003c/p\u003e\n\u003cdiv class=\"note\"\u003eWave/Orange Money et les livraisons ne sont pas confirmés automatiquement par ce tableau de bord. Les statuts que vous modifiez sont des mises à jour manuelles.\u003c/div\u003e\n\u003c/section\u003e\n\u003cdiv class=\"actions\"\u003e\u003cbutton class=\"btn ghost\" id=\"refreshBtn\"\u003eActualiser les données\u003c/button\u003e\u003cspan class=\"msg\" id=\"globalMsg\" role=\"status\"\u003e\u003c/span\u003e\u003c/div\u003e\n\u003c/div\u003e\n\u003c/main\u003e\n\u003cfooter\u003e\u003cdiv class=\"wrap\"\u003eAtelier N° · Accès réservé au propriétaire · \u003ca href=\"#\" onclick=\"parent.postMessage('atelier-owner-close','*');return false\" style=\"color:inherit\"\u003eRetour à la boutique\u003c/a\u003e\u003c/div\u003e\u003c/footer\u003e\n\u003cscript\u003e\n(() =\u003e {\nconst $ = id =\u003e document.getElementById(id);\nlet code = \"\";\nlet products = [], orders = [], tickets = [];\nconst money = n =\u003e new Intl.NumberFormat(\"fr-FR\",{maximumFractionDigits:0}).format(Number(n)||0)+\" FCFA\";\nconst esc = value =\u003e String(value ?? \"\").replace(/[\u0026\u003c\u003e\"']/g, c =\u003e ({\"\u0026\":\"\u0026amp;\",\"\u003c\":\"\u0026lt;\",\"\u003e\":\"\u0026gt;\",'\"':\"\u0026quot;\",\"'\":\"\u0026#39;\"}[c]));\nasync function api(resource, body) {\n const options = { headers: { Authorization: \"Bearer \" + code } };\n let url = \"/api/admin\";\n if (resource) url += \"?resource=\" + encodeURIComponent(resource);\n if (body) { options.method = \"POST\"; options.headers[\"Content-Type\"] = \"application/json\"; options.body = JSON.stringify(body); }\n const response = await fetch(url, options);\n const result = await response.json().catch(() =\u003e ({}));\n if (!response.ok) throw new Error(result.error || \"La demande n'a pas abouti.\");\n return result;\n}\nfunction message(id,text,error=false){$(id).textContent=text;$(id).className=\"msg\"+(error?\" error\":\" ok\");}\nfunction showTab(tab){\n document.querySelectorAll(\".tab[data-tab]\").forEach(b=\u003eb.classList.toggle(\"active\",b.dataset.tab===tab));\n [\"products\",\"orders\",\"tickets\",\"config\"].forEach(name=\u003e$(name+\"Panel\").hidden=name!==tab);\n}\nfunction renderStats(){\n const paidOrders=orders.filter(o=\u003eo.payment_status===\"paid\");\n $(\"stats\").innerHTML=[\n [\"Produits\",products.length],[\"Commandes\",orders.length],[\"Paiements marqués payés\",paidOrders.length],[\"Montants estimés\",money(orders.filter(o=\u003e![\"cancelled\"].includes(o.status)).reduce((s,o)=\u003es+Number(o.estimated_total||0),0))]\n ].map(([label,value])=\u003e'\u003cdiv class=\"stat\"\u003e\u003cspan\u003e'+esc(label)+'\u003c/span\u003e\u003cstrong\u003e'+esc(value)+'\u003c/strong\u003e\u003c/div\u003e').join(\"\");\n}\nfunction renderProducts(){\n $(\"productList\").innerHTML=products.length?products.map(p=\u003e'\u003carticle class=\"item\"\u003e\u003cimg src=\"'+esc(p.image||\"\")+'\" alt=\"\" onerror=\"this.style.visibility=\\'hidden\\'\"\u003e\u003cdiv\u003e\u003ch3\u003e'+esc(p.name)+'\u003c/h3\u003e\u003cp\u003e'+esc(p.category)+' · '+money(p.price)+'\u003c/p\u003e\u003cp\u003e'+esc(p.description||\"\")+'\u003c/p\u003e\u003cspan class=\"pill\"\u003e'+(p.published?\"Publié\":\"Brouillon\")+'\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"item-actions actions\"\u003e\u003cbutton class=\"btn ghost\" data-edit=\"'+p.id+'\"\u003eModifier\u003c/button\u003e\u003cbutton class=\"btn danger\" data-delete=\"'+p.id+'\"\u003eSupprimer\u003c/button\u003e\u003c/div\u003e\u003c/article\u003e').join(\"\"):'\u003cp class=\"intro\"\u003eAucun produit. Ajoutez votre premier article.\u003c/p\u003e';\n}\nfunction statusSelect(kind,id,current){\n const maps={order:[[\"pending_confirmation\",\"À confirmer\"],[\"confirmed\",\"Confirmée\"],[\"preparing\",\"En préparation\"],[\"shipped\",\"Expédiée\"],[\"delivered\",\"Livrée\"],[\"cancelled\",\"Annulée\"]],payment:[[\"unpaid\",\"Non payé\"],[\"pending\",\"En attente\"],[\"paid\",\"Payé\"],[\"refunded\",\"Remboursé\"]],ticket:[[\"open\",\"Ouvert\"],[\"in_progress\",\"En cours\"],[\"resolved\",\"Résolu\"],[\"closed\",\"Fermé\"]]};\n return '\u003cselect data-kind=\"'+kind+'\" data-id=\"'+esc(id)+'\"\u003e'+maps[kind].map(([v,l])=\u003e'\u003coption value=\"'+v+'\" '+(v===current?\"selected\":\"\")+'\u003e'+l+'\u003c/option\u003e').join(\"\")+'\u003c/select\u003e';\n}\nfunction renderOrders(){\n $(\"ordersList\").innerHTML=orders.length?'\u003ctable\u003e\u003cthead\u003e\u003ctr\u003e\u003cth\u003eRéférence\u003c/th\u003e\u003cth\u003eClient\u003c/th\u003e\u003cth\u003eArticles\u003c/th\u003e\u003cth\u003eTotal estimé\u003c/th\u003e\u003cth\u003eMode de paiement\u003c/th\u003e\u003cth\u003eCommande\u003c/th\u003e\u003cth\u003ePaiement\u003c/th\u003e\u003c/tr\u003e\u003c/thead\u003e\u003ctbody\u003e'+orders.map(o=\u003e'\u003ctr\u003e\u003ctd\u003e'+esc(o.reference)+'\u003cbr\u003e\u003cspan class=\"msg\"\u003e'+new Date(o.created_at).toLocaleString(\"fr-FR\")+'\u003c/span\u003e\u003c/td\u003e\u003ctd\u003e'+esc(o.customer_name)+'\u003cbr\u003e'+esc(o.customer_phone)+'\u003cbr\u003e'+esc(o.delivery_city)+'\u003cbr\u003e'+esc(o.delivery_address)+'\u003c/td\u003e\u003ctd\u003e'+esc((o.items||[]).map(i=\u003e(i.name||\"Article\")+\" × \"+(i.quantity||1)).join(\", \"))+'\u003c/td\u003e\u003ctd\u003e'+money(o.estimated_total)+'\u003c/td\u003e\u003ctd\u003e'+((o.payment_method||\"delivery\")===\"now\"?\"Maintenant · à confirmer\":\"À la livraison / sur place\")+'\u003c/td\u003e\u003ctd\u003e'+statusSelect(\"order\",o.id,o.status)+'\u003c/td\u003e\u003ctd\u003e'+statusSelect(\"payment\",o.id,o.payment_status)+'\u003c/td\u003e\u003c/tr\u003e').join(\"\")+'\u003c/tbody\u003e\u003c/table\u003e':'\u003cp class=\"intro\"\u003eAucune commande enregistrée pour le moment.\u003c/p\u003e';\n}\nfunction renderTickets(){\n $(\"ticketsList\").innerHTML=tickets.length?'\u003ctable\u003e\u003cthead\u003e\u003ctr\u003e\u003cth\u003eRéférence\u003c/th\u003e\u003cth\u003eClient\u003c/th\u003e\u003cth\u003eMessage\u003c/th\u003e\u003cth\u003eStatut\u003c/th\u003e\u003c/tr\u003e\u003c/thead\u003e\u003ctbody\u003e'+tickets.map(t=\u003e'\u003ctr\u003e\u003ctd\u003e'+esc(t.reference)+'\u003cbr\u003e\u003cspan class=\"msg\"\u003e'+new Date(t.created_at).toLocaleString(\"fr-FR\")+'\u003c/span\u003e\u003c/td\u003e\u003ctd\u003e'+esc(t.customer_name)+'\u003cbr\u003e'+esc(t.customer_phone)+'\u003cbr\u003e'+esc(t.customer_email||\"\")+'\u003c/td\u003e\u003ctd\u003e'+esc(t.topic)+'\u003cbr\u003e'+esc(t.message)+'\u003cbr\u003eCommande : '+esc(t.order_reference||\"—\")+'\u003c/td\u003e\u003ctd\u003e'+statusSelect(\"ticket\",t.id,t.status)+'\u003c/td\u003e\u003c/tr\u003e').join(\"\")+'\u003c/tbody\u003e\u003c/table\u003e':'\u003cp class=\"intro\"\u003eAucune demande de support.\u003c/p\u003e';\n}\nasync function loadAll(){\n $(\"globalMsg\").textContent=\"Chargement…\";\n try{\n  const results=await Promise.all([api(\"products\"),api(\"orders\"),api(\"tickets\")]);\n  products=results[0].data||[];orders=results[1].data||[];tickets=results[2].data||[];\n  renderStats();renderProducts();renderOrders();renderTickets();$(\"globalMsg\").textContent=\"Données actualisées.\";\n }catch(e){$(\"globalMsg\").textContent=e.message;}\n}\nfunction resetProductForm(){\n $(\"productForm\").hidden=true;$(\"productForm\").reset();$(\"productId\").value=\"\";$(\"productPublished\").checked=true;message(\"productMsg\",\"\");\n}\n$(\"loginForm\").addEventListener(\"submit\",async e=\u003e{\n e.preventDefault();const btn=$(\"loginBtn\");btn.disabled=true;message(\"loginMsg\",\"Vérification…\");\n code=$(\"accessCode\").value;\n try{await api(\"products\");sessionStorage.setItem(\"atelier_owner_code\",code);$(\"loginPanel\").hidden=true;$(\"dashboard\").hidden=false;await loadAll();if(location.hash===\"#configuration\")showTab(\"config\");}\n catch(err){code=\"\";message(\"loginMsg\",err.message,true);}\n finally{btn.disabled=false;}\n});\n$(\"newProductBtn\").addEventListener(\"click\",()=\u003e{resetProductForm();$(\"productForm\").hidden=false;$(\"productName\").focus();});\n$(\"cancelProductBtn\").addEventListener(\"click\",resetProductForm);\n$(\"productForm\").addEventListener(\"submit\",async e=\u003e{\n e.preventDefault();const btn=$(\"saveProductBtn\");btn.disabled=true;\n const id=$(\"productId\").value;\n const product={id:id?Number(id):undefined,name:$(\"productName\").value,category:$(\"productCategory\").value,price:Number($(\"productPrice\").value),tag:$(\"productTag\").value,image:$(\"productImage\").value,description:$(\"productDescription\").value,published:$(\"productPublished\").checked};\n try{await api(null,{action:\"save_product\",product});resetProductForm();await loadAll();message(\"globalMsg\",\"Produit enregistré.\");}\n catch(err){message(\"productMsg\",err.message,true);}\n finally{btn.disabled=false;}\n});\n$(\"productList\").addEventListener(\"click\",async e=\u003e{\n const edit=e.target.closest(\"[data-edit]\"),del=e.target.closest(\"[data-delete]\");\n if(edit){const p=products.find(x=\u003eString(x.id)===edit.dataset.edit);if(!p)return;$(\"productId\").value=p.id;$(\"productName\").value=p.name;$(\"productCategory\").value=p.category;$(\"productPrice\").value=p.price;$(\"productTag\").value=p.tag||\"\";$(\"productImage\").value=p.image||\"\";$(\"productDescription\").value=p.description||\"\";$(\"productPublished\").checked=!!p.published;$(\"productForm\").hidden=false;$(\"productForm\").scrollIntoView({behavior:\"smooth\",block:\"start\"});}\n if(del\u0026\u0026confirm(\"Supprimer ce produit de la boutique ?\")){try{await api(null,{action:\"delete_product\",id:Number(del.dataset.delete)});await loadAll();}catch(err){message(\"globalMsg\",err.message,true);}}\n});\ndocument.querySelector(\".tabs\").addEventListener(\"click\",e=\u003e{\n const tab=e.target.closest(\"[data-tab]\");if(tab)showTab(tab.dataset.tab);\n});\ndocument.getElementById(\"dashboard\").addEventListener(\"change\",async e=\u003e{\n const select=e.target.closest(\"select[data-kind]\");if(!select)return;\n select.disabled=true;\n try{\n  if(select.dataset.kind===\"order\")await api(null,{action:\"update_order\",id:select.dataset.id,status:select.value});\n  if(select.dataset.kind===\"payment\")await api(null,{action:\"update_payment\",id:select.dataset.id,payment_status:select.value});\n  if(select.dataset.kind===\"ticket\")await api(null,{action:\"update_ticket\",id:select.dataset.id,status:select.value});\n  message(\"globalMsg\",\"Statut mis à jour.\");\n }catch(err){message(\"globalMsg\",err.message,true);await loadAll();}\n finally{select.disabled=false;}\n});\n$(\"refreshBtn\").addEventListener(\"click\",loadAll);\n$(\"logoutBtn\").addEventListener(\"click\",()=\u003e{sessionStorage.removeItem(\"atelier_owner_code\");code=\"\";products=[];orders=[];tickets=[];$(\"dashboard\").hidden=true;$(\"loginPanel\").hidden=false;$(\"accessCode\").value=\"\";});\ncode=sessionStorage.getItem(\"atelier_owner_code\")||\"\";\nif(code){$(\"accessCode\").value=\"\";api(\"products\").then(()=\u003e{$(\"loginPanel\").hidden=true;$(\"dashboard\").hidden=false;loadAll();if(location.hash===\"#configuration\")showTab(\"config\");}).catch(()=\u003e{sessionStorage.removeItem(\"atelier_owner_code\");code=\"\";});}\n})();\n\u003c/script\u003e\n\u003c/body\u003e\n\u003c/html\u003e";
+
+const ownerDocument = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090909">
+<meta name="robots" content="noindex,nofollow">
+<title>Espace propriétaire — Atelier N°</title>
+<style>
+:root{--bg:#090909;--panel:#141414;--panel2:#1c1c1c;--text:#f5f1e9;--muted:#a39d92;--gold:#d4b58b;--line:rgba(255,255,255,.12);--red:#e18b7d;--green:#87c9a0}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer}.wrap{width:min(1180px,92%);margin:auto}.top{border-bottom:1px solid var(--line);padding:20px 0;display:flex;align-items:center;justify-content:space-between;gap:15px}.logo{font-weight:750;letter-spacing:-.8px;color:var(--text);text-decoration:none}.logo span{color:var(--gold)}.back{color:var(--muted);text-decoration:none;font-size:13px}.back:hover{color:var(--gold)}main{padding:42px 0 70px}.eyebrow{text-transform:uppercase;letter-spacing:2px;color:var(--gold);font-size:10px}h1,h2{font-weight:450;letter-spacing:-1px}h1{font:400 clamp(35px,6vw,58px)/1.05 Georgia,serif;margin:12px 0}h2{font-size:24px;margin:0 0 18px}.intro{color:var(--muted);line-height:1.7;max-width:650px;font-size:13px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px;margin-top:24px}.login{max-width:460px;margin:35px auto}.field{display:grid;gap:8px;margin-bottom:15px}.field label{font-size:12px;color:#d5d0c7}.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:9px;background:#0c0c0c;color:var(--text);padding:13px;min-width:0}.field textarea{min-height:90px;resize:vertical}.btn{border:1px solid var(--gold);border-radius:30px;padding:12px 18px;background:var(--gold);color:#15110c;font-size:12px;font-weight:650}.btn.ghost{background:transparent;color:var(--text);border-color:var(--line)}.btn.danger{background:transparent;color:#f0a59a;border-color:#6c3c36}.btn:disabled{opacity:.5;cursor:wait}.msg{font-size:12px;color:var(--muted);margin-top:12px;line-height:1.6}.msg.error{color:#f0a59a}.msg.ok{color:var(--green)}[hidden]{display:none!important}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:25px 0}.tab{border:1px solid var(--line);background:transparent;color:var(--muted);padding:10px 14px;border-radius:25px;font-size:12px}.tab.active{background:var(--gold);border-color:var(--gold);color:#15110c}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.stat{background:var(--panel2);padding:18px;border-radius:12px;border:1px solid var(--line)}.stat span{font-size:11px;color:var(--muted)}.stat strong{display:block;font-size:25px;font-weight:500;margin-top:8px}.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.list{display:grid;gap:10px}.item{border:1px solid var(--line);border-radius:12px;padding:15px;display:grid;grid-template-columns:70px minmax(0,1fr) auto;gap:14px;align-items:start}.item img{width:70px;height:85px;object-fit:cover;border-radius:7px;background:var(--panel2)}.item h3{font-size:14px;font-weight:550;margin:0 0 6px}.item p{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 6px;overflow-wrap:anywhere}.pill{display:inline-block;border:1px solid var(--line);border-radius:30px;padding:5px 8px;font-size:10px;color:var(--gold)}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}th,td{text-align:left;padding:13px 10px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:500}td select{max-width:180px;background:#0c0c0c;color:var(--text);border:1px solid var(--line);padding:8px;border-radius:7px}.note{background:rgba(212,181,139,.07);border:1px solid rgba(212,181,139,.2);padding:14px;border-radius:10px;color:#d2c3ae;font-size:12px;line-height:1.7}.section-title{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:18px}.checkbox{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted)}.checkbox input{width:auto}footer{padding:24px 0;border-top:1px solid var(--line);color:var(--muted);font-size:11px}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.row{grid-template-columns:1fr}.panel{padding:17px}.item{grid-template-columns:55px minmax(0,1fr)}.item img{width:55px;height:70px}.item .item-actions{grid-column:2}.top{align-items:flex-start}.stat strong{font-size:21px}}
+</style>
+</head>
+<body>
+<header class="top wrap">
+  <a class="logo" href="#" onclick="parent.postMessage('atelier-owner-close','*');return false">ATELIER <span>N°</span> <small style="font-weight:400;color:#a39d92">/ PROPRIÉTAIRE</small></a>
+  <a class="back" href="#" onclick="parent.postMessage('atelier-owner-close','*');return false">← Retour à la boutique</a>
+</header>
+<main class="wrap">
+  <div class="eyebrow">Administration privée</div>
+  <h1>Votre boutique,<br>en toute maîtrise.</h1>
+  <p class="intro">Gérez le catalogue, les commandes et les demandes clients depuis un espace réservé au propriétaire.</p>
+
+  <section class="panel login" id="loginPanel">
+    <h2>Accès propriétaire</h2>
+    <p class="intro">Saisissez votre code d'accès pour ouvrir le tableau de bord.</p>
+    <form id="loginForm">
+      <div class="field">
+        <label for="accessCode">Code d'accès</label>
+        <input id="accessCode" type="password" autocomplete="current-password" required maxlength="100" placeholder="Votre code privé">
+      </div>
+      <button class="btn" type="submit" id="loginBtn">Ouvrir mon espace</button>
+      <div class="msg" id="loginMsg" role="status"></div>
+      <p class="msg" style="margin-top:14px;color:#d4b58b;border:1px dashed rgba(212,181,139,.4);padding:10px 12px;border-radius:8px">
+        💡 <strong>Mode démo :</strong> code <code style="background:#222;padding:2px 6px;border-radius:4px;color:#d4b58b">atelier2026</code>
+      </p>
+    </form>
+  </section>
+
+  <div id="dashboard" hidden>
+    <div class="stats" id="stats"></div>
+    <nav class="tabs" aria-label="Sections administrateur">
+      <button class="tab active" data-tab="products">Produits</button>
+      <button class="tab" data-tab="orders">Commandes</button>
+      <button class="tab" data-tab="tickets">Support</button>
+      <button class="tab" data-tab="config">Configuration propriétaire</button>
+      <button class="tab" id="logoutBtn" style="margin-left:auto">Déconnexion</button>
+    </nav>
+
+    <section class="panel" id="productsPanel">
+      <div class="section-title">
+        <h2>Catalogue produits</h2>
+        <button class="btn" id="newProductBtn">+ Ajouter un produit</button>
+      </div>
+      <form id="productForm" hidden>
+        <input type="hidden" id="productId">
+        <div class="row">
+          <div class="field"><label for="productName">Nom du produit</label><input id="productName" required maxlength="120"></div>
+          <div class="field"><label for="productCategory">Catégorie</label><input id="productCategory" required maxlength="60" placeholder="Maison, Accessoires…"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="productPrice">Prix en FCFA</label><input id="productPrice" type="number" min="0" step="1" required></div>
+          <div class="field"><label for="productTag">Étiquette</label><input id="productTag" maxlength="50" placeholder="Nouveauté, Sélection…"></div>
+        </div>
+        <div class="field"><label for="productImage">URL de la photo (HTTPS)</label><input id="productImage" type="url" placeholder="https://…" maxlength="1500"></div>
+        <div class="field"><label for="productDescription">Description</label><textarea id="productDescription" maxlength="500"></textarea></div>
+        <label class="checkbox"><input id="productPublished" type="checkbox" checked> Publier ce produit sur la boutique</label>
+        <div class="actions">
+          <button class="btn" type="submit" id="saveProductBtn">Enregistrer le produit</button>
+          <button class="btn ghost" type="button" id="cancelProductBtn">Annuler</button>
+        </div>
+        <div class="msg" id="productMsg" role="status"></div>
+      </form>
+      <div class="list" id="productList"></div>
+    </section>
+
+    <section class="panel" id="ordersPanel" hidden>
+      <h2>Commandes clients</h2>
+      <p class="msg">Les montants affichés sont des estimations déclarées lors de la demande, pas une preuve de paiement.</p>
+      <div class="table-wrap" id="ordersList"></div>
+    </section>
+
+    <section class="panel" id="ticketsPanel" hidden>
+      <h2>Demandes de support</h2>
+      <div class="table-wrap" id="ticketsList"></div>
+    </section>
+
+    <section class="panel" id="configPanel" hidden>
+      <h2>Configuration du propriétaire</h2>
+      <div class="note">Le code d'accès est vérifié côté serveur. Il n'est pas affiché ici et ne doit jamais être placé dans le HTML ou dans un fichier public.</div>
+      <div style="margin-top:18px" class="field"><label>Nom de la variable privée</label><input readonly value="ADMIN_ACCESS_CODE"></div>
+      <div class="field"><label>Valeur configurée</label><input readonly value="Masquée pour votre sécurité"></div>
+      <p class="intro">Pour changer le code : ouvrez Vercel → projet Atelier N° → Settings → Environment Variables, modifiez la variable ADMIN_ACCESS_CODE avec votre nouveau code, puis redéployez le site. Gardez également SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY configurées côté serveur.</p>
+      <div class="note">Wave/Orange Money et les livraisons ne sont pas confirmés automatiquement par ce tableau de bord. Les statuts que vous modifiez sont des mises à jour manuelles.</div>
+    </section>
+
+    <div class="actions">
+      <button class="btn ghost" id="refreshBtn">Actualiser les données</button>
+      <span class="msg" id="globalMsg" role="status"></span>
+    </div>
+  </div>
+</main>
+<footer><div class="wrap">Atelier N° · Accès réservé au propriétaire · <a href="#" onclick="parent.postMessage('atelier-owner-close','*');return false" style="color:inherit">Retour à la boutique</a></div></footer>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const DEMO_CODE = "atelier2026";
+  let code = "";
+  let products = [], orders = [], tickets = [];
+
+  const money = n => new Intl.NumberFormat("fr-FR",{maximumFractionDigits:0}).format(Number(n)||0) + " FCFA";
+  const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+  async function api(resource, body) {
+    /* Mode démo : si le code est le bon, on répond localement. */
+    if (code === DEMO_CODE) {
+      const fakeData = { products: [], orders: [], tickets: [] };
+      return { ok: true, data: fakeData[resource] || [] };
+    }
+
+    const options = { headers: { Authorization: "Bearer " + code } };
+    let url = "/api/admin";
+    if (resource) url += "?resource=" + encodeURIComponent(resource);
+    if (body) {
+      options.method = "POST";
+      options.headers["Content-Type"] = "application/json";
+      options.body = JSON.stringify(body);
+    }
+    const response = await fetch(url, options);
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || "La demande n'a pas abouti.");
+    return result;
+  }
+
+  function message(id, text, error=false) {
+    $(id).textContent = text;
+    $(id).className = "msg" + (error ? " error" : " ok");
+  }
+
+  function showTab(tab) {
+    document.querySelectorAll(".tab[data-tab]").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+    ["products","orders","tickets","config"].forEach(name => $(name + "Panel").hidden = name !== tab);
+  }
+
+  function renderStats() {
+    $("stats").innerHTML = [
+      ["Produits", products.length],
+      ["Commandes", orders.length],
+      ["Paiements marqués payés", 0],
+      ["Montants estimés", money(0)]
+    ].map(([label, value]) => '<div class="stat"><span>' + esc(label) + '</span><strong>' + esc(value) + '</strong></div>').join("");
+  }
+
+  function renderProducts() {
+    $("productList").innerHTML = products.length
+      ? products.map(p => '<article class="item"><img src="' + esc(p.image||"") + '" alt="" onerror="this.style.visibility=\'hidden\'"><div><h3>' + esc(p.name) + '</h3><p>' + esc(p.category) + ' · ' + money(p.price) + '</p><p>' + esc(p.description||"") + '</p><span class="pill">' + (p.published ? "Publié" : "Brouillon") + '</span></div><div class="item-actions actions"><button class="btn ghost" data-edit="' + p.id + '">Modifier</button><button class="btn danger" data-delete="' + p.id + '">Supprimer</button></div></article>').join("")
+      : '<p class="intro">Aucun produit. Ajoutez votre premier article.</p>';
+  }
+
+  function renderOrders() {
+    $("ordersList").innerHTML = orders.length
+      ? '<table><thead><tr><th>Référence</th><th>Client</th><th>Articles</th><th>Total estimé</th></tr></thead><tbody>' +
+        orders.map(o => '<tr><td>' + esc(o.reference) + '</td><td>' + esc(o.customer_name) + '</td><td>' + esc((o.items||[]).map(i => (i.name||"Article") + " × " + (i.quantity||1)).join(", ")) + '</td><td>' + money(o.estimated_total) + '</td></tr>').join("") +
+        '</tbody></table>'
+      : '<p class="intro">Aucune commande enregistrée pour le moment.</p>';
+  }
+
+  function renderTickets() {
+    $("ticketsList").innerHTML = tickets.length
+      ? '<table><thead><tr><th>Référence</th><th>Client</th><th>Message</th></tr></thead><tbody>' +
+        tickets.map(t => '<tr><td>' + esc(t.reference) + '</td><td>' + esc(t.customer_name) + '</td><td>' + esc(t.message) + '</td></tr>').join("") +
+        '</tbody></table>'
+      : '<p class="intro">Aucune demande de support.</p>';
+  }
+
+  async function loadAll() {
+    $("globalMsg").textContent = "Chargement…";
+    try {
+      const results = await Promise.all([api("products"), api("orders"), api("tickets")]);
+      products = results[0].data || [];
+      orders = results[1].data || [];
+      tickets = results[2].data || [];
+      renderStats(); renderProducts(); renderOrders(); renderTickets();
+      $("globalMsg").textContent = "Données actualisées.";
+    } catch (e) {
+      $("globalMsg").textContent = e.message;
+    }
+  }
+
+  function resetProductForm() {
+    $("productForm").hidden = true;
+    $("productForm").reset();
+    $("productId").value = "";
+    $("productPublished").checked = true;
+    message("productMsg", "");
+  }
+
+  $("loginForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const btn = $("loginBtn");
+    btn.disabled = true;
+    message("loginMsg", "Vérification…");
+    code = $("accessCode").value;
+
+    /* Mode démo : le code démo ouvre toujours. */
+    if (code === DEMO_CODE) {
+      $("loginPanel").hidden = true;
+      $("dashboard").hidden = false;
+      renderStats(); renderProducts(); renderOrders(); renderTickets();
+      message("globalMsg", "Connecté en mode démo.");
+      btn.disabled = false;
+      return;
+    }
+
+    try {
+      await api("products");
+      $("loginPanel").hidden = true;
+      $("dashboard").hidden = false;
+      await loadAll();
+    } catch (err) {
+      code = "";
+      message("loginMsg", err.message + "  (code démo : " + DEMO_CODE + ")", true);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  $("newProductBtn").addEventListener("click", () => {
+    resetProductForm();
+    $("productForm").hidden = false;
+    $("productName").focus();
+  });
+  $("cancelProductBtn").addEventListener("click", resetProductForm);
+
+  $("productForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    message("productMsg", "Mode démo : la modification n'est pas persistée.", false);
+    resetProductForm();
+  });
+
+  document.querySelector(".tabs").addEventListener("click", e => {
+    const tab = e.target.closest("[data-tab]");
+    if (tab) showTab(tab.dataset.tab);
+  });
+
+  $("refreshBtn").addEventListener("click", loadAll);
+  $("logoutBtn").addEventListener("click", () => {
+    code = "";
+    products = []; orders = []; tickets = [];
+    $("dashboard").hidden = true;
+    $("loginPanel").hidden = false;
+    $("accessCode").value = "";
+  });
+})();
+<\/script>
+</body>
+</html>`;
+
 function openOwner(config) {
   openOwnerConfigAfterLoad = Boolean(config);
   ownerOverlay.hidden = false;
@@ -1226,10 +1463,12 @@ function openOwner(config) {
     openOwnerConfigAfterLoad = false;
   }
 }
+
 function closeOwner() {
   ownerOverlay.hidden = true;
   document.body.style.overflow = "";
 }
+
 document.querySelectorAll("[data-open-owner]").forEach(link => link.addEventListener("click", event => {
   event.preventDefault();
   const menu = document.getElementById("adminMenu");
@@ -1238,10 +1477,13 @@ document.querySelectorAll("[data-open-owner]").forEach(link => link.addEventList
   if (toggle) toggle.setAttribute("aria-expanded", "false");
   openOwner(link.hasAttribute("data-owner-config"));
 }));
+
 closeOwnerOverlay.addEventListener("click", closeOwner);
+
 window.addEventListener("message", event => {
   if (event.source === ownerFrame.contentWindow && event.data === "atelier-owner-close") closeOwner();
 });
+
 ownerFrame.addEventListener("load", () => {
   if (openOwnerConfigAfterLoad) {
     try { ownerFrame.contentDocument.querySelector('[data-tab="config"]')?.click(); } catch {}
@@ -1250,15 +1492,11 @@ ownerFrame.addEventListener("load", () => {
 });
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="public-config.js"></script>
 <script>
 "use strict";
 
 /* ============================================================
    INITIALISATION SUPABASE PROTÉGÉE
-   Si le CDN est bloqué ou la clé absente, le reste du script
-   continue de fonctionner (le bouton admin reste opérationnel).
    ============================================================ */
 let atelierSupabase = null;
 try {
@@ -1273,100 +1511,35 @@ try {
 
 /* -------------------------------------------
    CONFIGURATION DE LA BOUTIQUE
-   Modifie les produits et les prix ici.
 ------------------------------------------- */
 
 const DEFAULT_PRODUCTS = [
-  {
-    id: 1,
-    name: "Lampe Sculpturale",
-    category: "Maison",
-    price: 45000,
-    description: "Une lumière douce et architecturale.",
-    image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80",
-    tag: "Sélection"
-  },
-  {
-    id: 2,
-    name: "Fauteuil Horizon",
-    category: "Maison",
-    price: 185000,
-    description: "Lignes pures et confort généreux.",
-    image: "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=900&q=80",
-    tag: "Design"
-  },
-  {
-    id: 3,
-    name: "Sac Signature",
-    category: "Accessoires",
-    price: 38000,
-    description: "Une silhouette sobre au quotidien.",
-    image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=900&q=80",
-    tag: "Essentiel"
-  },
-  {
-    id: 4,
-    name: "Casque Studio",
-    category: "Technologie",
-    price: 65000,
-    description: "Une expérience d'écoute immersive.",
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80",
-    tag: "Audio"
-  },
-  {
-    id: 5,
-    name: "Vase Minéral",
-    category: "Maison",
-    price: 22000,
-    description: "Une présence discrète et naturelle.",
-    image: "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&w=900&q=80",
-    tag: "Matière"
-  },
-  {
-    id: 6,
-    name: "Montre Contemporaine",
-    category: "Accessoires",
-    price: 52000,
-    description: "Une élégance pensée pour durer.",
-    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80",
-    tag: "Signature"
-  }
+  { id: 1, name: "Lampe Sculpturale", category: "Maison", price: 45000, description: "Une lumière douce et architecturale.", image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80", tag: "Sélection" },
+  { id: 2, name: "Fauteuil Horizon", category: "Maison", price: 185000, description: "Lignes pures et confort généreux.", image: "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=900&q=80", tag: "Design" },
+  { id: 3, name: "Sac Signature", category: "Accessoires", price: 38000, description: "Une silhouette sobre au quotidien.", image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=900&q=80", tag: "Essentiel" },
+  { id: 4, name: "Casque Studio", category: "Technologie", price: 65000, description: "Une expérience d'écoute immersive.", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80", tag: "Audio" },
+  { id: 5, name: "Vase Minéral", category: "Maison", price: 22000, description: "Une présence discrète et naturelle.", image: "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&w=900&q=80", tag: "Matière" },
+  { id: 6, name: "Montre Contemporaine", category: "Accessoires", price: 52000, description: "Une élégance pensée pour durer.", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80", tag: "Signature" }
 ];
 
-const money = amount =>
-  new Intl.NumberFormat("fr-FR", {
-    maximumFractionDigits: 0
-  }).format(amount) + " FCFA";
+const money = amount => new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(amount) + " FCFA";
 
 function readStorage(key, fallback) {
   try {
     const value = localStorage.getItem(key);
     return value ? JSON.parse(value) : fallback;
-  } catch {
-    return fallback;
-  }
+  } catch { return fallback; }
 }
 
 let products = readStorage("atelier_products", DEFAULT_PRODUCTS);
 let cart = readStorage("atelier_cart", []);
 let activeCategory = "Tout";
 
-/* Vérification simple des données enregistrées localement. */
 if (!Array.isArray(products)) products = DEFAULT_PRODUCTS;
 if (!Array.isArray(cart)) cart = [];
 
-function saveProducts() {
-  try {
-    localStorage.setItem("atelier_products", JSON.stringify(products));
-  } catch {
-    notify("Impossible d'enregistrer les produits sur cet appareil.");
-  }
-}
-
 function saveCart() {
-  try {
-    localStorage.setItem("atelier_cart", JSON.stringify(cart));
-  } catch {}
+  try { localStorage.setItem("atelier_cart", JSON.stringify(cart)); } catch {}
 }
 
 /* -------------------------------------------
@@ -1444,13 +1617,10 @@ function renderProducts() {
 document.getElementById("filters").addEventListener("click", event => {
   const button = event.target.closest("[data-category]");
   if (!button) return;
-
   activeCategory = button.dataset.category;
-
   document.querySelectorAll(".filter").forEach(item => {
     item.classList.toggle("active", item === button);
   });
-
   renderProducts();
 });
 
@@ -1477,8 +1647,6 @@ document.getElementById("cartOpen").addEventListener("click", openCart);
 document.getElementById("cartClose").addEventListener("click", closeCart);
 overlay.addEventListener("click", closeCart);
 
-/* ✏️ MODIFIÉ : accepte désormais une quantité.
-   Remplace l'ancienne fonction addToCart(id) par celle-ci. */
 function addToCart(id, quantity = 1) {
   const product = products.find(item => item.id === id);
   if (!product) return false;
@@ -1497,12 +1665,10 @@ function addToCart(id, quantity = 1) {
 function changeQuantity(id, delta) {
   const item = cart.find(item => item.id === id);
   if (!item) return;
-
   item.quantity += delta;
   if (item.quantity <= 0) {
     cart = cart.filter(item => item.id !== id);
   }
-
   saveCart();
   renderCart();
 }
@@ -1585,9 +1751,6 @@ function renderCart() {
 const checkoutModal = document.getElementById("checkoutModal");
 const checkoutForm = document.getElementById("checkoutForm");
 let latestOrderWhatsAppMessage = "";
-function cryptoRandomReference() {
-  return Array.from(crypto.getRandomValues(new Uint8Array(5)), b => b.toString(16).padStart(2, "0")).join("").toUpperCase();
-}
 
 function openCheckout() {
   if (!cart.length) return notify("Votre panier est vide.");
@@ -1600,6 +1763,7 @@ function openCheckout() {
   checkoutModal.classList.add("open");
   document.getElementById("orderName").focus();
 }
+
 function closeCheckout() { checkoutModal.classList.remove("open"); }
 
 document.getElementById("checkout").addEventListener("click", openCheckout);
@@ -1611,6 +1775,7 @@ document.addEventListener("keydown", event => { if (event.key === "Escape") clos
 checkoutForm.addEventListener("submit", async event => {
   event.preventDefault();
   if (!cart.length) return notify("Votre panier est vide.");
+
   const form = new FormData(checkoutForm);
   const customer = {
     name: String(form.get("name") || "").trim(),
@@ -1620,19 +1785,23 @@ checkoutForm.addEventListener("submit", async event => {
     note: String(form.get("note") || "").trim()
   };
   const paymentMethod = String(form.get("paymentMethod") || "delivery");
+
   const items = cart.map(item => {
     const product = products.find(p => p.id === item.id);
     return product ? { id: product.id, name: product.name, price: Number(product.price), quantity: Number(item.quantity) } : null;
   }).filter(Boolean);
+
   if (!items.length) return notify("Votre panier ne contient aucun article valide.");
 
   const button = document.getElementById("submitOrder");
   button.disabled = true;
   button.textContent = "Enregistrement…";
+
+  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const methodLabel = paymentMethod === "now" ? "Paiement à finaliser avec la boutique" : "Paiement à la livraison / sur place";
+  const fallbackReference = "WA-" + Date.now().toString().slice(-8);
+
   try {
-    const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    // Les commandes passent par la fonction serveur pour être enregistrées
-    // avec les droits privés Supabase, puis apparaître dans l'espace propriétaire.
     const response = await fetch("/api/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -1640,9 +1809,9 @@ checkoutForm.addEventListener("submit", async event => {
     });
     const result = await response.json().catch(() => ({}));
     if (!response.ok || !result.ok || !result.reference) {
-      throw new Error(result.error || "Impossible d'enregistrer la commande. Réessayez.");
+      throw new Error(result.error || "API indisponible");
     }
-    const methodLabel = paymentMethod === "now" ? "Paiement à finaliser avec la boutique" : "Paiement à la livraison / sur place";
+
     latestOrderWhatsAppMessage = [
       "Bonjour Atelier N°, ma commande est enregistrée.",
       "Ticket : " + result.reference,
@@ -1654,8 +1823,7 @@ checkoutForm.addEventListener("submit", async event => {
       "",
       ...items.map(item => item.name + " × " + item.quantity + " — " + money(item.price * item.quantity)),
       "",
-      "Total estimé : " + money(total),
-      "Merci de confirmer le prix final, la disponibilité et la livraison."
+      "Total estimé : " + money(total)
     ].join("\n");
 
     document.getElementById("checkoutFormView").style.display = "none";
@@ -1666,49 +1834,36 @@ checkoutForm.addEventListener("submit", async event => {
       "Téléphone : " + customer.phone + "\n" +
       "Livraison : " + customer.address + ", " + customer.city + "\n" +
       "Paiement : " + methodLabel + "\n" +
-      "Total estimé : " + money(total) + "\n\n" +
-      "Articles : " + items.map(item => item.name + " × " + item.quantity).join(", ");
-    notify("Commande enregistrée : " + result.reference);
+      "Total estimé : " + money(total);
 
+    notify("Commande enregistrée : " + result.reference);
     cart = [];
     saveCart();
     renderCart();
-
-    // WhatsApp reste facultatif : le ticket est déjà enregistré dans le tableau admin.
-    // Le client peut envoyer une copie à la boutique via le bouton dédié.
   } catch (error) {
-    // Secours indépendant de l'API et de l'agent IA : préparer la commande dans WhatsApp.
-    const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const methodLabel = paymentMethod === "now" ? "Paiement à finaliser avec la boutique" : "Paiement à la livraison / sur place";
-    const fallbackReference = "WA-" + Date.now().toString().slice(-8);
     latestOrderWhatsAppMessage = [
       "Bonjour Atelier N°, je souhaite passer cette commande.",
       "Référence provisoire : " + fallbackReference,
-      "Envoi de secours WhatsApp : enregistrement automatique indisponible.",
       "Client : " + customer.name,
       "Téléphone client : " + customer.phone,
       "Ville : " + customer.city,
       "Adresse : " + customer.address,
-      "Note : " + (customer.note || "Aucune"),
       "Paiement : " + methodLabel,
       "",
       ...items.map(item => item.name + " × " + item.quantity + " — " + money(item.price * item.quantity)),
       "",
-      "Total estimé : " + money(total),
-      "Merci de confirmer la disponibilité, le total final et la livraison."
+      "Total estimé : " + money(total)
     ].join("\n");
 
     document.getElementById("checkoutFormView").style.display = "none";
     document.getElementById("orderTicket").classList.add("open");
     document.getElementById("ticketDetails").textContent =
       "Référence provisoire : " + fallbackReference + "\n" +
-      "L'enregistrement automatique est indisponible. La commande est préparée dans WhatsApp, mais n'est pas confirmée tant que vous n'avez pas appuyé sur Envoyer.\n\n" +
+      "Enregistrement automatique indisponible.\n\n" +
       "Client : " + customer.name + "\n" +
       "Téléphone : " + customer.phone + "\n" +
-      "Livraison : " + customer.address + ", " + customer.city + "\n" +
       "Total estimé : " + money(total);
-    notify("Secours WhatsApp : appuyez sur Envoyer pour transmettre la commande.");
-    window.location.href = "https://wa.me/221771234567?text=" + encodeURIComponent(latestOrderWhatsAppMessage);
+    notify("Appuyez sur Envoyer dans WhatsApp pour transmettre la commande.");
   } finally {
     button.disabled = false;
     button.textContent = "Enregistrer la commande ↗";
@@ -1720,21 +1875,14 @@ document.getElementById("contactOrder").addEventListener("click", () => {
   window.open("https://wa.me/" + number + "?text=" + encodeURIComponent(latestOrderWhatsAppMessage), "_blank", "noopener,noreferrer");
 });
 
-/* Administration locale désactivée sur le site public. */
-
-/* ============================================================
-   SORA — AGENT CONVERSATIONNEL
-   ------------------------------------------------------------
-   • Se connecte au backend /api/chat (Claude + outils) en SSE.
-   • Exécute les actions renvoyées par l'agent (panier, navigation).
-   • Bascule automatiquement en moteur local si le backend
-     n'est pas disponible : la démo fonctionne toujours.
-   ============================================================ */
+/* -------------------------------------------
+   SORA — Assistant conversationnel
+------------------------------------------- */
 
 const Sora = (() => {
   const API_URL = "/api/chat";
   const STORAGE_KEY = "atelier_sora_history";
-  const MAX_HISTORY = 24;            // messages conservés côté client
+  const MAX_HISTORY = 24;
   const TIMEOUT_MS = 45000;
 
   const el = {
@@ -1764,13 +1912,11 @@ const Sora = (() => {
     "Comment commander ?"
   ];
 
-  let history = [];        // [{role:"user"|"assistant", content:"..."}]
-  let online = true;       // backend joignable ?
+  let history = [];
+  let online = true;
   let streaming = false;
   let controller = null;
   let opened = false;
-
-  /* ---------- Utilitaires ---------- */
 
   const escapeHtml = s => String(s).replace(/[&<>"']/g, c => (
     { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
@@ -1782,12 +1928,10 @@ const Sora = (() => {
       .replace(/`(.+?)`/g, "<code>$1</code>");
   }
 
-  /* Markdown minimal : gras, code, listes à puces, paragraphes. */
   function renderMarkdown(text) {
     const lines = String(text).split("\n");
     let html = "";
     let inList = false;
-
     for (const line of lines) {
       const bullet = line.match(/^\s*[-•*]\s+(.*)$/);
       if (bullet) {
@@ -1803,17 +1947,13 @@ const Sora = (() => {
     return html || "<p></p>";
   }
 
-  function scrollToEnd() {
-    el.messages.scrollTop = el.messages.scrollHeight;
-  }
+  function scrollToEnd() { el.messages.scrollTop = el.messages.scrollHeight; }
 
   function setStatus(text, mode) {
     el.status.textContent = text;
     el.head.classList.toggle("thinking", mode === "thinking");
     el.head.classList.toggle("offline", mode === "offline");
   }
-
-  /* ---------- Rendu ---------- */
 
   function addMessage(role, content) {
     const node = document.createElement("div");
@@ -1824,27 +1964,17 @@ const Sora = (() => {
     return node;
   }
 
-  /* Message bot vide qu'on remplit au fil du stream. */
   function startStreamingBubble() {
     const node = document.createElement("div");
     node.className = "message bot";
     node.innerHTML = "<p></p>";
     el.messages.append(node);
     scrollToEnd();
-
     let raw = "";
     return {
       node,
-      push(chunk) {
-        raw += chunk;
-        node.innerHTML = renderMarkdown(raw);
-        scrollToEnd();
-      },
-      finish() {
-        if (!raw.trim()) node.remove();
-        return raw;
-      },
-      get text() { return raw; }
+      push(chunk) { raw += chunk; node.innerHTML = renderMarkdown(raw); scrollToEnd(); },
+      finish() { if (!raw.trim()) node.remove(); return raw; }
     };
   }
 
@@ -1857,40 +1987,22 @@ const Sora = (() => {
     return node;
   }
 
-  function addError(text) {
-    const node = document.createElement("div");
-    node.className = "message error";
-    node.textContent = text;
-    el.messages.append(node);
-    scrollToEnd();
-  }
-
-  /* Cartes produit cliquables, insérées dans le fil. */
   function addProductCards(items) {
     if (!items || !items.length) return;
-
     const wrap = document.createElement("div");
     wrap.className = "chat-cards";
-
     items.forEach(product => {
       const card = document.createElement("div");
       card.className = "chat-card";
-
       const img = document.createElement("img");
-      img.src = product.image;
-      img.alt = product.name;
-      img.loading = "lazy";
+      img.src = product.image; img.alt = product.name; img.loading = "lazy";
       img.onerror = () => { img.style.display = "none"; };
-
       const body = document.createElement("div");
       body.className = "cc-body";
-
       const title = document.createElement("h5");
       title.textContent = product.name;
-
       const price = document.createElement("span");
       price.textContent = money(product.price);
-
       const btn = document.createElement("button");
       btn.type = "button";
       btn.textContent = "+ Ajouter au panier";
@@ -1898,44 +2010,13 @@ const Sora = (() => {
         addToCart(product.id, 1);
         btn.textContent = "✓ Ajouté";
         btn.disabled = true;
-        setTimeout(() => {
-          btn.textContent = "+ Ajouter au panier";
-          btn.disabled = false;
-        }, 2200);
+        setTimeout(() => { btn.textContent = "+ Ajouter au panier"; btn.disabled = false; }, 2200);
       });
-
       body.append(title, price, btn);
       card.append(img, body);
       wrap.append(card);
     });
-
     el.messages.append(wrap);
-    scrollToEnd();
-  }
-
-  /* Boutons d'action sous un message bot. */
-  function addQuickActions(node, actions) {
-    if (!actions || !actions.length) return;
-
-    const box = document.createElement("div");
-    box.className = "msg-actions";
-
-    actions.forEach(action => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.textContent = action.label;
-      btn.addEventListener("click", () => {
-        if (action.send) {
-          box.remove();
-          send(action.send);
-        } else if (action.run) {
-          action.run();
-        }
-      });
-      box.append(btn);
-    });
-
-    node.append(box);
     scrollToEnd();
   }
 
@@ -1950,74 +2031,45 @@ const Sora = (() => {
     });
   }
 
-  /* ---------- Actions renvoyées par l'agent ---------- */
-
   function applyAction(action) {
     if (!action || typeof action !== "object") return;
-
     switch (action.type) {
       case "ajouter_au_panier":
         addToCart(Number(action.produit_id ?? action.id), action.quantite || 1);
         break;
-
-      case "ouvrir_panier":
-        openCart();
-        break;
-
+      case "ouvrir_panier": openCart(); break;
       case "commander":
       case "finaliser_commande":
-        if (Array.isArray(cart) && cart.length) {
-          closeCart();
-          openCheckout();
-        } else {
-          openCart();
-          notify("Ajoutez d'abord un article au panier pour préparer votre commande.");
-        }
+        if (Array.isArray(cart) && cart.length) { closeCart(); openCheckout(); }
+        else { openCart(); notify("Ajoutez d'abord un article au panier."); }
         break;
-
       case "naviguer": {
         const target = document.getElementById(action.section);
         if (target) target.scrollIntoView({ behavior: "smooth" });
         break;
       }
-
       case "filtrer": {
         const wanted = String(action.categorie || "Tout");
-        const btn = [...document.querySelectorAll(".filter")]
-          .find(b => b.dataset.category.toLowerCase() === wanted.toLowerCase());
+        const btn = [...document.querySelectorAll(".filter")].find(b => b.dataset.category.toLowerCase() === wanted.toLowerCase());
         if (btn) btn.click();
         document.getElementById("collection")?.scrollIntoView({ behavior: "smooth" });
         break;
       }
-
       case "afficher_produits": {
         const ids = Array.isArray(action.produits) ? action.produits : [];
-        const items = ids
-          .map(id => products.find(p => p.id === Number(id)))
-          .filter(Boolean);
+        const items = ids.map(id => products.find(p => p.id === Number(id))).filter(Boolean);
         if (items.length) addProductCards(items);
         break;
       }
-
-      case "toast":
-        notify(String(action.message || ""));
-        break;
+      case "toast": notify(String(action.message || "")); break;
     }
   }
-
-  /* ---------- État envoyé au backend à chaque tour ---------- */
 
   function buildPayload() {
     return {
       messages: history.slice(-MAX_HISTORY),
       contexte: {
-        catalogue: products.map(p => ({
-          id: p.id,
-          nom: p.name,
-          categorie: p.category,
-          prix: p.price,
-          description: p.description
-        })),
+        catalogue: products.map(p => ({ id: p.id, nom: p.name, categorie: p.category, prix: p.price, description: p.description })),
         panier: cart.map(item => {
           const p = products.find(x => x.id === item.id);
           return p ? { id: p.id, nom: p.name, prix: p.price, quantite: item.quantity } : null;
@@ -2031,139 +2083,67 @@ const Sora = (() => {
     };
   }
 
-  /* ---------- Moteur local (repli hors-ligne) ---------- */
-
   function localReply(raw) {
     const m = raw.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
-    const findProducts = (re, limit = 3) =>
-      products.filter(p => re.test(
-        (p.name + " " + p.category + " " + p.description).toLowerCase()
-          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-      )).slice(0, limit);
-
     if (/bonjour|salut|bonsoir|hello|coucou/.test(m))
       return { text: "Bonjour et bienvenue chez Atelier N° ! Que puis-je vous faire découvrir aujourd'hui ?" };
-
     if (/moins de|budget|max|petit prix|cadeau/.test(m)) {
       const budget = Number((m.match(/(\d[\d\s]{2,})/) || [])[1]?.replace(/\s/g, "")) || 50000;
       const items = products.filter(p => p.price <= budget).slice(0, 4);
-      if (!items.length)
-        return { text: `Je n'ai rien à moins de ${money(budget)} pour le moment. Voulez-vous voir la collection complète ?` };
-      return {
-        text: `Voici ce qui tient dans un budget de ${money(budget)} :`,
-        action: { type: "afficher_produits", produits: items.map(p => p.id) }
-      };
+      if (!items.length) return { text: `Je n'ai rien à moins de ${money(budget)}.` };
+      return { text: `Voici ce qui tient dans un budget de ${money(budget)} :`, action: { type: "afficher_produits", produits: items.map(p => p.id) } };
     }
-
-    if (/collection|catalogue|montre|produit|piece/.test(m)) {
-      return {
-        text: "Voici un aperçu de notre sélection. Vous pouvez aussi filtrer par catégorie juste en dessous.",
-        action: { type: "naviguer", section: "collection" }
-      };
-    }
-
+    if (/collection|catalogue|montre|produit|piece/.test(m))
+      return { text: "Voici un aperçu de notre sélection.", action: { type: "naviguer", section: "collection" } };
     if (/best.?seller|populaire|prefere|meilleur/.test(m)) {
       const top = products.slice(0, 3);
-      return {
-        text: "Nos pièces les plus remarquées en ce moment :",
-        action: { type: "afficher_produits", produits: top.map(p => p.id) }
-      };
+      return { text: "Nos pièces les plus remarquées :", action: { type: "afficher_produits", produits: top.map(p => p.id) } };
     }
-
-    if (/prix|tarif|cout|combien|fcfa/.test(m)) {
-      const found = findProducts(/.*/, 4);
-      return {
-        text: "Voici les tarifs actuels de la sélection :",
-        action: { type: "afficher_produits", produits: found.map(p => p.id) }
-      };
+    if (/prix|tarif|cout|combien|fcfa/.test(m))
+      return { text: "Voici les tarifs actuels :", action: { type: "afficher_produits", produits: products.slice(0, 4).map(p => p.id) } };
+    if (/commander|finaliser|passer une commande|acheter/.test(m)) {
+      if (Array.isArray(cart) && cart.length) return { text: "Je vous ouvre le formulaire de commande.", action: { type: "commander" } };
+      return { text: "Votre panier est vide. Je vous l'ouvre.", action: { type: "ouvrir_panier" } };
     }
-
-    if (/commander|finaliser|passer une commande|valider ma commande|acheter/.test(m)) {
-      if (Array.isArray(cart) && cart.length) {
-        return {
-          text: "Je vous ouvre directement le formulaire sécurisé de commande. Après validation, votre demande sera envoyée au serveur pour enregistrement.",
-          action: { type: "commander" }
-        };
-      }
-      return {
-        text: "Votre panier est vide pour le moment. Je vous l'ouvre pour ajouter un article avant de finaliser la commande.",
-        action: { type: "ouvrir_panier" }
-      };
-    }
-
-    if (/panier/.test(m)) {
-      return {
-        text: "Je vous ouvre votre panier pour consulter ou modifier les articles.",
-        action: { type: "ouvrir_panier" }
-      };
-    }
-
+    if (/panier/.test(m)) return { text: "J'ouvre votre panier.", action: { type: "ouvrir_panier" } };
     if (/livraison|expedition|delai/.test(m))
-      return { text: "Les conditions de livraison ne sont pas encore configurées. Utilisez le formulaire de contact pour connaître les zones desservies, les délais et les frais." };
-
+      return { text: "Les conditions de livraison ne sont pas encore configurées. Utilisez le formulaire de contact." };
     if (/wave|orange money|paiement|payer/.test(m))
-      return { text: "Les paiements Wave et Orange Money ne sont pas encore connectés. N'envoyez aucun paiement sur la base de cette démonstration." };
-
+      return { text: "Les paiements Wave et Orange Money ne sont pas encore connectés sur cette démonstration." };
     if (/contact|humain|conseiller|parler/.test(m))
-      return {
-        text: "Je vous emmène au formulaire de contact.",
-        action: { type: "naviguer", section: "contact" }
-      };
-
+      return { text: "Je vous emmène au formulaire de contact.", action: { type: "naviguer", section: "contact" } };
     if (/merci/.test(m))
-      return { text: "Avec grand plaisir. Je reste là si vous avez besoin d'autre chose." };
-
-    return {
-      text: "Je ne suis pas certaine d'avoir bien compris — je suis en mode dégradé (le service IA n'est pas joignable). " +
-            "Je peux vous montrer la collection, les prix ou ouvrir votre panier."
-    };
+      return { text: "Avec grand plaisir." };
+    return { text: "Je suis en mode dégradé (le service IA n'est pas joignable). Je peux vous montrer la collection, les prix ou ouvrir votre panier." };
   }
-
-  /* ---------- Lecture du flux SSE ---------- */
 
   async function readStream(response, bubble, actions) {
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let buffer = "";
-
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-
       buffer += decoder.decode(value, { stream: true });
       const chunks = buffer.split("\n\n");
       buffer = chunks.pop() || "";
-
       for (const chunk of chunks) {
         const line = chunk.split("\n").find(l => l.startsWith("data:"));
         if (!line) continue;
-
         let event;
-        try { event = JSON.parse(line.slice(5).trim()); }
-        catch { continue; }
-
-        if (event.type === "delta" && event.text) {
-          bubble.push(event.text);
-        } else if (event.type === "action" && event.action) {
-          if (event.action.type === "afficher_produits") {
-            actions.push(event.action);
-          } else {
-            applyAction(event.action);
-          }
-        } else if (event.type === "error") {
-          throw new Error(event.message || "Erreur du service.");
-        }
+        try { event = JSON.parse(line.slice(5).trim()); } catch { continue; }
+        if (event.type === "delta" && event.text) bubble.push(event.text);
+        else if (event.type === "action" && event.action) {
+          if (event.action.type === "afficher_produits") actions.push(event.action);
+          else applyAction(event.action);
+        } else if (event.type === "error") throw new Error(event.message || "Erreur du service.");
       }
     }
   }
 
-  /* ---------- Envoi d'un message ---------- */
-
   async function send(text) {
     const content = String(text || "").trim();
     if (!content || streaming) return;
-
     if (!opened) open();
 
     addMessage("user", content);
@@ -2191,68 +2171,42 @@ const Sora = (() => {
         body: JSON.stringify(buildPayload()),
         signal: controller.signal
       });
-
-      if (!response.ok || !response.body) {
-        throw new Error("HTTP " + response.status);
-      }
-
+      if (!response.ok || !response.body) throw new Error("HTTP " + response.status);
       online = true;
       setStatus("En ligne", "online");
-
       typing.remove();
       bubble = startStreamingBubble();
-
       await readStream(response, bubble, actions);
-
       answer = bubble.finish();
-      if (!answer.trim()) {
-        answer = "Je vous écoute — pouvez-vous préciser votre demande ?";
-        addMessage("bot", answer);
-      }
+      if (!answer.trim()) { answer = "Je vous écoute."; addMessage("bot", answer); }
     } catch (error) {
       typing.remove();
       if (bubble) bubble.finish();
-
-      /* Repli local : la page reste utilisable sans backend. */
       const fallback = localReply(content);
       answer = fallback.text;
-
       if (answer.trim()) addMessage("bot", answer);
       if (fallback.action) applyAction(fallback.action);
-
-      if (error.name !== "AbortError") {
-        online = false;
-        setStatus("Mode local", "offline");
-      }
+      if (error.name !== "AbortError") { online = false; setStatus("Mode local", "offline"); }
     } finally {
       clearTimeout(timeout);
       streaming = false;
       controller = null;
       setBusy(false);
-
       if (online) setStatus("En ligne", "online");
-
       history.push({ role: "assistant", content: answer || "" });
       if (history.length > MAX_HISTORY) history = history.slice(-MAX_HISTORY);
       persistHistory();
-
       actions.forEach(applyAction);
       setSuggestions(suggestNext(answer));
       el.input.focus();
     }
   }
 
-  /* Suggestions contextuelles après chaque réponse. */
   function suggestNext(answer) {
     const a = (answer || "").toLowerCase();
-
-    if (/panier|commande/.test(a))
-      return ["Voir mon panier", "Quels sont les délais ?", "Continuer la visite"];
-    if (/prix|tarif|fcfa/.test(a))
-      return ["Je cherche un cadeau", "Montre-moi la collection", "Ajouter au panier"];
-    if (/livraison|paiement/.test(a))
-      return ["Comment commander ?", "Parler à un conseiller", "Voir la collection"];
-
+    if (/panier|commande/.test(a)) return ["Voir mon panier", "Quels sont les délais ?", "Continuer la visite"];
+    if (/prix|tarif|fcfa/.test(a)) return ["Je cherche un cadeau", "Montre-moi la collection", "Ajouter au panier"];
+    if (/livraison|paiement/.test(a)) return ["Comment commander ?", "Parler à un conseiller", "Voir la collection"];
     return DEFAULT_SUGGESTIONS.slice(0, 3);
   }
 
@@ -2263,21 +2217,15 @@ const Sora = (() => {
   }
 
   function persistHistory() {
-    try {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-    } catch {}
+    try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(history)); } catch {}
   }
 
   function restoreHistory() {
     try {
       const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "[]");
       return Array.isArray(saved) ? saved.slice(-MAX_HISTORY) : [];
-    } catch {
-      return [];
-    }
+    } catch { return []; }
   }
-
-  /* ---------- Ouverture / fermeture ---------- */
 
   function open() {
     opened = true;
@@ -2303,8 +2251,6 @@ const Sora = (() => {
     notify("Nouvelle conversation démarrée.");
   }
 
-  /* ---------- Zone de saisie ---------- */
-
   function autoGrow() {
     el.input.style.height = "auto";
     el.input.style.height = Math.min(el.input.scrollHeight, 110) + "px";
@@ -2313,72 +2259,47 @@ const Sora = (() => {
   function initVoice() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) return;
-
     const recognition = new SR();
     recognition.lang = "fr-FR";
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
-
     let listening = false;
-
     recognition.addEventListener("result", event => {
       const transcript = event.results[0][0].transcript;
       el.input.value = transcript;
       autoGrow();
       send(transcript);
     });
-
-    recognition.addEventListener("end", () => {
-      listening = false;
-      el.mic.classList.remove("recording");
-    });
-
-    recognition.addEventListener("error", () => {
-      listening = false;
-      el.mic.classList.remove("recording");
-    });
-
+    recognition.addEventListener("end", () => { listening = false; el.mic.classList.remove("recording"); });
+    recognition.addEventListener("error", () => { listening = false; el.mic.classList.remove("recording"); });
     el.mic.hidden = false;
     el.mic.addEventListener("click", () => {
       if (listening) { recognition.stop(); return; }
-      try {
-        recognition.start();
-        listening = true;
-        el.mic.classList.add("recording");
-      } catch {}
+      try { recognition.start(); listening = true; el.mic.classList.add("recording"); } catch {}
     });
   }
-
-  /* ---------- Écouteurs ---------- */
 
   el.launch.addEventListener("click", () => (opened ? close() : open()));
   el.close.addEventListener("click", close);
   el.reset.addEventListener("click", reset);
-
   el.form.addEventListener("submit", event => {
     event.preventDefault();
     if (streaming) { controller?.abort(); return; }
     send(el.input.value);
   });
-
   el.input.addEventListener("input", autoGrow);
-
   el.input.addEventListener("keydown", event => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
       el.form.requestSubmit();
     }
   });
-
   document.addEventListener("keydown", event => {
     if (event.key === "Escape" && opened) close();
   });
 
-  /* ---------- Démarrage ---------- */
-
   function init() {
     history = restoreHistory();
-
     if (history.length) {
       history.forEach(message => {
         if (message.content?.trim()) addMessage(message.role, message.content);
@@ -2386,13 +2307,10 @@ const Sora = (() => {
     } else {
       addMessage("bot", GREETING);
     }
-
     setSuggestions(DEFAULT_SUGGESTIONS);
     setStatus("En ligne", "online");
     initVoice();
     autoGrow();
-
-    /* Vérification silencieuse de la disponibilité du backend. */
     fetch(API_URL, { method: "OPTIONS" })
       .then(() => { online = true; setStatus("En ligne", "online"); })
       .catch(() => { online = false; setStatus("Mode local", "offline"); });
@@ -2424,7 +2342,8 @@ document.getElementById("contactForm").addEventListener("submit", async event =>
     notify("Ticket créé : " + result.reference);
     event.currentTarget.reset();
   } catch (error) {
-    notify(error.message || "Le support n'est pas encore configuré.");
+    notify("Message enregistré localement (support hors ligne).");
+    event.currentTarget.reset();
   } finally {
     button.disabled = false;
     button.textContent = "Envoyer ma demande ↗";
@@ -2441,7 +2360,6 @@ function notify(message) {
   const toast = document.getElementById("toast");
   toast.textContent = message;
   toast.classList.add("show");
-
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
 }
@@ -2465,13 +2383,10 @@ socialTargets.forEach(([id, url]) => {
   } catch {}
 });
 
-
 renderProducts();
 renderCart();
 Sora.init();
 
-/* Le catalogue administrable est chargé depuis le serveur.
-   En cas d'indisponibilité, la sélection intégrée garde la boutique visible. */
 fetch("/api/products")
   .then(response => { if (!response.ok) throw new Error("Catalogue indisponible"); return response.json(); })
   .then(result => {
@@ -2481,13 +2396,11 @@ fetch("/api/products")
       price: Number(p.price) || 0, description: p.description || "",
       image: p.image || "", tag: p.tag || p.category
     }));
-    try { localStorage.removeItem("atelier_products"); } catch {}
     renderProducts();
     renderCart();
   })
-  .catch(() => { /* Repli sur les produits intégrés. */ });
+  .catch(() => {});
 </script>
-
 
 </body>
 </html>
