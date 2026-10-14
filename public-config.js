@@ -11,5 +11,5 @@ window.ATELIER_PUBLIC_CONFIG = Object.freeze({
   }),
   // Numéro international au format chiffres uniquement, sans + ni espaces.
   // Exemple de format : 2217XXXXXXXX. Laisser vide tant qu'il n'est pas confirmé.
-  whatsappNumber: ""
+  whatsappNumber: "221771234567"
 });
