@@ -1226,7 +1226,7 @@ const ownerDocument = `<!DOCTYPE html>
       <button class="btn" type="submit" id="loginBtn">Ouvrir mon espace</button>
       <div class="msg" id="loginMsg" role="status"></div>
       <p class="msg" style="margin-top:14px;color:#d4b58b;border:1px dashed rgba(212,181,139,.4);padding:10px 12px;border-radius:8px">
-        💡 <strong>Mode démo :</strong> code <code style="background:#222;padding:2px 6px;border-radius:4px;color:#d4b58b">atelier2026</code>
+        💡 <strong>Mode démo :</strong> code <code style="background:#222;padding:2px 6px;border-radius:4px;color:#d4b58b">LNYGM</code>
       </p>
     </form>
   </section>
@@ -1299,7 +1299,7 @@ const ownerDocument = `<!DOCTYPE html>
 <script>
 (() => {
   const $ = id => document.getElementById(id);
-  const DEMO_CODE = "atelier2026";
+  const DEMO_CODE = "LNYGM";
   let code = "";
   let products = [], orders = [], tickets = [];
 
@@ -1414,7 +1414,7 @@ const ownerDocument = `<!DOCTYPE html>
       await loadAll();
     } catch (err) {
       code = "";
-      message("loginMsg", err.message + "  (code démo : " + DEMO_CODE + ")", true);
+      message("loginMsg", err.message + "  (code : " + DEMO_CODE + ")", true);
     } finally {
       btn.disabled = false;
     }
