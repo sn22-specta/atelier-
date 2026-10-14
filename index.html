@@ -350,9 +350,8 @@ img { display: block; max-width: 100%; }
       <h2>Espace propriétaire</h2>
       <p>Gérez vos produits directement.</p>
       <form id="loginForm">
-        <div class="field"><label for="adminEmail">E-mail administrateur</label><input type="email" id="adminEmail" required autocomplete="username" placeholder="admin@votreboutique.com"></div>
-        <div class="field"><label for="adminPassword">Mot de passe</label><input type="password" id="adminPassword" required autocomplete="current-password" placeholder="Mot de passe Supabase"></div>
-        <p style="color:#888;font-size:12px;line-height:1.6;margin:0 0 14px">Accès réservé au compte administrateur autorisé dans Supabase.</p>
+        <div class="field"><label for="adminSecretCode">Code secret administrateur</label><input type="password" id="adminSecretCode" required autocomplete="current-password" placeholder="Votre code secret"></div>
+        <p style="color:#888;font-size:12px;line-height:1.6;margin:0 0 14px">Accès privé vérifié côté serveur. Ne partagez jamais ce code.</p>
         <button type="submit" class="btn-primary" style="width:100%">Se connecter</button>
       </form>
     </div>
@@ -556,6 +555,8 @@ let cart = [];
 let orders = [];
 let editingId = null;
 let supabaseClient = null;
+let adminSecretCode = "";
+let adminOrdersPoll = null;
 let ordersChannel = null;
 let productsChannel = null;
 let currentAdmin = null;
@@ -758,12 +759,23 @@ function mapSupabaseOrder(row) {
     status:statusMap[row.status] || row.status
   };
 }
+async function adminApi(action, extra={}) {
+  if(!supabaseClient || !adminSecretCode) throw new Error("Session administrateur absente.");
+  const {data,error}=await supabaseClient.functions.invoke("atelier-admin-api", {
+    body:{action,...extra},
+    headers:{"x-admin-code":adminSecretCode}
+  });
+  if(error) throw error;
+  if(data?.error) throw new Error(data.error);
+  return data;
+}
 async function loadRemoteOrders(silent=true) {
   if (!supabaseClient || !currentAdmin) return;
-  const {data,error}=await supabaseClient.from("orders").select("id,reference,customer_name,customer_phone,delivery_city,delivery_address,customer_note,items,estimated_total,status,payment_method,created_at").order("created_at",{ascending:false}).limit(500);
-  if(error) { console.error("Chargement commandes:",error); if(!silent) notify("Impossible de charger les commandes Supabase."); return; }
-  orders=(data||[]).map(mapSupabaseOrder);
-  renderAdminOrders(); renderAdminStats();
+  try {
+    const result=await adminApi("orders:list");
+    orders=(result.data||[]).map(mapSupabaseOrder);
+    renderAdminOrders(); renderAdminStats();
+  } catch(error) { console.error("Chargement commandes:",error); if(!silent) notify(error.message || "Impossible de charger les commandes Supabase."); }
 }
 function subscribeToOrders() {
   if (!supabaseClient || !currentAdmin) return;
@@ -786,10 +798,19 @@ function initSupabase() {
 
 async function loadRemoteProducts(showError=false) {
   if(!supabaseClient) return;
-  const {data,error}=await supabaseClient.from("products").select("id,name,category,price,description,image,tag,published,created_at,updated_at").order("id",{ascending:true});
-  if(error) { console.error("Chargement catalogue Supabase:",error); if(showError) notify("Impossible de synchroniser le catalogue."); return; }
-  products=(data||[]).map(p=>({id:Number(p.id),name:p.name,category:p.category,price:Number(p.price)||0,description:p.description||"",image:p.image||"",tag:p.tag||"",published:p.published}));
-  renderShop(); renderAdminProducts(); renderAdminStats();
+  try {
+    let data;
+    if(currentAdmin) {
+      const result=await adminApi("products:list");
+      data=result.data;
+    } else {
+      const result=await supabaseClient.from("products").select("id,name,category,price,description,image,tag,published,created_at,updated_at").eq("published",true).order("id",{ascending:true});
+      if(result.error) throw result.error;
+      data=result.data;
+    }
+    products=(data||[]).map(p=>({id:Number(p.id),name:p.name,category:p.category,price:Number(p.price)||0,description:p.description||"",image:p.image||"",tag:p.tag||"",published:p.published}));
+    renderShop(); renderAdminProducts(); renderAdminStats();
+  } catch(error) { console.error("Chargement catalogue Supabase:",error); if(showError) notify(error.message || "Impossible de synchroniser le catalogue."); }
 }
 function subscribeToProducts() {
   if(!supabaseClient) return;
@@ -800,11 +821,8 @@ function subscribeToProducts() {
 }
 async function saveProductImage(image) {
   if(!image || !image.startsWith("data:")) return image || "";
-  const blob=await fetch(image).then(r=>r.blob());
-  const path="products/"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,10)+".jpg";
-  const {error}=await supabaseClient.storage.from("atelier-products").upload(path,blob,{contentType:"image/jpeg",upsert:false});
-  if(error) throw error;
-  return supabaseClient.storage.from("atelier-products").getPublicUrl(path).data.publicUrl;
+  const result=await adminApi("image:upload",{base64:image});
+  return result.url;
 }
 
 /* ================================================================
@@ -814,7 +832,7 @@ function openAdmin() {
   $("adminModal").classList.add("open");
   document.body.style.overflow = "hidden";
   if ($("adminDash").hidden) {
-    setTimeout(() => { const i = $("adminEmail"); if (i) i.focus(); }, 120);
+    setTimeout(() => { const i = $("adminSecretCode"); if (i) i.focus(); }, 120);
   }
 }
 
@@ -826,38 +844,36 @@ function closeAdmin() {
 async function adminLogin(e) {
   if(e) e.preventDefault();
   if(!supabaseClient) return notify("Supabase n'est pas configuré.");
-  const email=$("adminEmail").value.trim();
-  const password=$("adminPassword").value;
+  const code=$("adminSecretCode").value.trim();
   const button=$("loginForm").querySelector('button[type="submit"]');
-  if(button){button.disabled=true;button.textContent="Connexion…";}
+  if(button){button.disabled=true;button.textContent="Vérification…";}
   try {
-    const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
-    if(error) throw error;
-    const {data:membership,error:membershipError}=await supabaseClient.from("store_admins").select("user_id").eq("user_id",data.user.id).maybeSingle();
-    if(membershipError || !membership) {
-      await supabaseClient.auth.signOut();
-      throw new Error("Ce compte n'est pas autorisé à administrer la boutique.");
-    }
-    currentAdmin=data.user;
+    adminSecretCode=code;
+    await adminApi("login");
+    currentAdmin={role:"owner"};
     $("adminLogin").hidden=true; $("adminDash").hidden=false;
     await loadRemoteProducts(true);
     await loadRemoteOrders(false);
-    subscribeToOrders();
+    if(adminOrdersPoll) clearInterval(adminOrdersPoll);
+    adminOrdersPoll=setInterval(()=>loadRemoteOrders(true),15000);
     renderAdminProducts(); renderAdminStats();
-    notify("Connexion sécurisée établie.");
+    notify("Connexion administrateur établie.");
   } catch(error) {
+    adminSecretCode="";
+    currentAdmin=null;
     console.error("Connexion admin:",error);
-    notify(error.message || "Connexion impossible. Vérifiez l'e-mail et le mot de passe.");
+    notify(error.message || "Code incorrect ou service indisponible.");
   } finally {
     if(button){button.disabled=false;button.textContent="Se connecter";}
   }
 }
 async function adminLogout() {
   if(ordersChannel && supabaseClient) { await supabaseClient.removeChannel(ordersChannel); ordersChannel=null; }
-  if(supabaseClient) await supabaseClient.auth.signOut();
+  if(adminOrdersPoll) { clearInterval(adminOrdersPoll); adminOrdersPoll=null; }
+  adminSecretCode="";
   currentAdmin=null;
   $("adminLogin").hidden=false; $("adminDash").hidden=true;
-  $("adminPassword").value="";
+  $("adminSecretCode").value="";
   notify("Déconnecté");
 }
 
@@ -983,8 +999,7 @@ async function saveProduct(e) {
   try {
     image=await saveProductImage(image);
     const record={name,category,price,tag,image,description,published:true,updated_at:new Date().toISOString()};
-    const result=wasEditing ? await supabaseClient.from("products").update(record).eq("id",editingId) : await supabaseClient.from("products").insert(record);
-    if(result.error) throw result.error;
+    await adminApi("products:save",{product:{...record,id:wasEditing?editingId:undefined}});
     await loadRemoteProducts(false); cancelForm();
     notify(wasEditing ? "Produit modifié et synchronisé." : "Produit ajouté et synchronisé.");
   } catch(error) {
@@ -997,8 +1012,7 @@ async function deleteProduct(id) {
   if(!currentAdmin || !supabaseClient) return notify("Connectez-vous à l'administration.");
   if(!confirm("Supprimer définitivement ce produit pour tous les visiteurs ?")) return;
   try {
-    const {error}=await supabaseClient.from("products").delete().eq("id",id);
-    if(error) throw error;
+    await adminApi("products:delete",{id});
     await loadRemoteProducts(false); notify("Produit supprimé de la boutique.");
   } catch(error) { console.error("Suppression produit:",error); notify("Impossible de supprimer ce produit."); }
 }
