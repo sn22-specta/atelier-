@@ -317,6 +317,71 @@ img { display: block; max-width: 100%; }
   .header { padding: 12px 14px; }
   .btn { padding: 8px 12px; font-size: 12px; }
 }
+
+/* Grille catalogue mobile inspirée des boutiques mode */
+@media (max-width: 600px) {
+  #shopGrid.grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 12px;
+  }
+  #shopGrid .card {
+    min-width: 0;
+    border-radius: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    transform: none;
+  }
+  #shopGrid .card:hover { transform: none; }
+  #shopGrid .card-img {
+    aspect-ratio: 3 / 4;
+    border-radius: 8px;
+    background: #f0f0f0;
+  }
+  #shopGrid .card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  #shopGrid .card-body {
+    padding: 10px 1px 0;
+    gap: 0;
+  }
+  #shopGrid .card-body h3 {
+    font-size: 14px;
+    line-height: 1.3;
+    margin: 0 0 5px;
+    font-weight: 650;
+  }
+  #shopGrid .card-body p {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #a7a7a7;
+    margin: 0 0 8px;
+    flex: initial;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 0;
+  }
+  #shopGrid .card-foot {
+    padding-top: 0;
+    border-top: 0;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  #shopGrid .card-price { font-size: 14px; }
+  #shopGrid .btn-add {
+    padding: 7px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+  }
+}
+@media (min-width: 601px) and (max-width: 900px) {
+  #shopGrid.grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+}
 </style>
 </head>
 <body>
