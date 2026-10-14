@@ -1139,8 +1139,8 @@ body.chat-open .chat-launch::after { display: none; }
     <div class="ticket-view" id="orderTicket" aria-live="polite">
       <h3>Commande enregistrée</h3>
       <p id="ticketDetails"></p>
-      <p>Conservez votre référence pour le suivi et la livraison.</p>
-      <div class="checkout-actions"><button class="btn secondary" id="closeTicket" type="button">Fermer</button><button class="btn" id="contactOrder" type="button">Contacter la boutique ↗</button></div>
+      <p>Votre ticket est enregistré pour l’administrateur. Pour en garder une copie dans votre conversation WhatsApp et l’envoyer à la boutique, appuyez ci-dessous puis sur « Envoyer » dans WhatsApp.</p>
+      <div class="checkout-actions"><button class="btn secondary" id="closeTicket" type="button">Fermer</button><button class="btn" id="contactOrder" type="button">Envoyer mon ticket sur WhatsApp ↗</button></div>
     </div>
   </div>
 </div>
@@ -1577,10 +1577,8 @@ checkoutForm.addEventListener("submit", async event => {
     saveCart();
     renderCart();
 
-    if (paymentMethod === "now") {
-      const number = "221771234567";
-      window.open("https://wa.me/" + number + "?text=" + encodeURIComponent(latestOrderWhatsAppMessage), "_blank", "noopener,noreferrer");
-    }
+    // WhatsApp reste facultatif : le ticket est déjà enregistré dans le tableau admin.
+    // Le client peut envoyer une copie à la boutique via le bouton dédié.
   } catch (error) {
     // Secours indépendant de l'API et de l'agent IA : préparer la commande dans WhatsApp.
     const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
