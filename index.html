@@ -900,6 +900,12 @@ body.chat-open .chat-launch::after { display: none; }
     transition-duration: .01ms !important;
   }
 }
+
+.social-links{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:16px}
+.social-links a{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border:1px solid var(--line,rgba(255,255,255,.18));border-radius:999px;color:inherit;text-decoration:none;font-size:.78rem;letter-spacing:.04em;transition:background .2s ease,border-color .2s ease}
+.social-links a:hover{background:rgba(255,255,255,.08);border-color:currentColor}
+.social-links a[hidden]{display:none!important}
+
 </style>
 </head>
 
@@ -918,7 +924,7 @@ body.chat-open .chat-launch::after { display: none; }
   </nav>
 
   <div class="header-actions">
-    <button class="icon-btn" id="adminToggle" type="button">Admin</button>
+    
     <button class="icon-btn" id="cartOpen" type="button">
       Panier (<span id="cartCount">0</span>)
     </button>
@@ -965,24 +971,6 @@ body.chat-open .chat-launch::after { display: none; }
 
     <div class="products" id="products" aria-live="polite"></div>
 
-    <div class="admin-box" id="adminBox">
-      <div class="eyebrow">Espace de gestion local</div>
-      <h3>Ajouter un produit</h3>
-      <p class="small-note">
-        Démonstration locale : les changements sont enregistrés dans
-        le navigateur de cet appareil. Ce panneau n'est pas une
-        authentification sécurisée pour une boutique publique.
-      </p>
-      <form id="productForm" class="admin-grid">
-        <input id="pName" placeholder="Nom du produit" required maxlength="80">
-        <input id="pPrice" type="number" min="0" placeholder="Prix en FCFA" required>
-        <input id="pCategory" placeholder="Catégorie : Maison, Accessoires..." required>
-        <input id="pImage" type="url" placeholder="URL de l'image HTTPS" required>
-        <input id="pDescription" placeholder="Description courte" required maxlength="150">
-        <button class="btn" type="submit">Ajouter le produit</button>
-      </form>
-      <button class="btn secondary" id="resetProducts" type="button">Réinitialiser la démo</button>
-    </div>
   </section>
 
   <section class="story" id="histoire">
@@ -1051,8 +1039,7 @@ body.chat-open .chat-launch::after { display: none; }
         <textarea id="contactMessage" placeholder="Comment pouvons-nous vous aider ?" required maxlength="2000"></textarea>
         <button class="btn" type="submit">Préparer mon message ↗</button>
         <p class="small-note">
-          Ce formulaire prépare un e-mail dans votre application de
-          messagerie. Il n'envoie pas de données à un serveur.
+          Votre message est envoyé au service de support et reçoit une référence de ticket.
         </p>
       </form>
     </div>
@@ -1062,7 +1049,7 @@ body.chat-open .chat-launch::after { display: none; }
 <footer>
   <a class="logo" href="#accueil">ATELIER <span>N°</span></a>
   <span>© <span id="year"></span> Atelier N° · Tous droits réservés.</span>
-  <a href="#contact">Nous contacter ↗</a>
+  <div class="social-links" aria-label="Réseaux sociaux"><a id="socialWhatsApp" href="#" target="_blank" rel="noopener noreferrer" hidden>WhatsApp</a><a id="socialInstagram" href="#" target="_blank" rel="noopener noreferrer" hidden>Instagram</a><a id="socialTikTok" href="#" target="_blank" rel="noopener noreferrer" hidden>TikTok</a><a href="#contact">Nous contacter ↗</a></div>
 </footer>
 
 <!-- Panier -->
@@ -1117,6 +1104,7 @@ body.chat-open .chat-launch::after { display: none; }
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="/public-config.js"></script>
 <script>
 "use strict";
 
@@ -1431,100 +1419,68 @@ function renderCart() {
   document.getElementById("cartTotal").textContent = money(total);
 }
 
-document.getElementById("checkout").addEventListener("click", () => {
+document.getElementById("checkout").addEventListener("click", async () => {
   if (!cart.length) {
     notify("Votre panier est vide.");
     return;
   }
 
-  const lines = cart.map(item => {
-    const product = products.find(product => product.id === item.id);
-    return product
-      ? `${product.name} × ${item.quantity} : ${money(product.price * item.quantity)}`
-      : "";
+  const name = prompt("Votre nom complet :");
+  if (!name || !name.trim()) return;
+  const phone = prompt("Votre numéro de téléphone (WhatsApp si possible) :");
+  if (!phone || !phone.trim()) return;
+  const city = prompt("Ville de livraison :");
+  if (!city || !city.trim()) return;
+  const address = prompt("Adresse ou point de repère pour la livraison :");
+  if (!address || !address.trim()) return;
+  const note = prompt("Précision pour la commande (facultatif) :") || "";
+
+  const items = cart.map(item => {
+    const product = products.find(p => p.id === item.id);
+    return product ? { id: product.id, name: product.name, price: Number(product.price), quantity: Number(item.quantity) } : null;
   }).filter(Boolean);
+  if (!items.length) return notify("Votre panier ne contient aucun article valide.");
 
-  const total = cart.reduce((sum, item) => {
-    const product = products.find(product => product.id === item.id);
-    return sum + (product ? product.price * item.quantity : 0);
-  }, 0);
-
-  const message = [
-    "Bonjour Atelier N°, je souhaite préparer cette commande :",
-    "",
-    ...lines,
-    "",
-    "Total estimé : " + money(total),
-    "",
-    "Merci de me préciser les modalités de commande et de paiement."
-  ].join("\n");
-
-  const url = "https://wa.me/?text=" + encodeURIComponent(message);
-  window.open(url, "_blank", "noopener,noreferrer");
-});
-
-/* -------------------------------------------
-   ADMINISTRATION LOCALE
-------------------------------------------- */
-
-const adminBox = document.getElementById("adminBox");
-
-document.getElementById("adminToggle").addEventListener("click", () => {
-  const opening = !adminBox.classList.contains("open");
-  adminBox.classList.toggle("open", opening);
-
-  if (opening) {
-    document.getElementById("collection").scrollIntoView({ behavior: "smooth" });
-    setTimeout(() => document.getElementById("pName").focus(), 400);
-  }
-});
-
-document.getElementById("productForm").addEventListener("submit", event => {
-  event.preventDefault();
-
-  const name = document.getElementById("pName").value.trim();
-  const price = Number(document.getElementById("pPrice").value);
-  const category = document.getElementById("pCategory").value.trim();
-  const image = document.getElementById("pImage").value.trim();
-  const description = document.getElementById("pDescription").value.trim();
-
-  if (!name || !category || !description || !Number.isFinite(price) || price < 0) {
-    notify("Vérifiez les informations du produit.");
-    return;
-  }
-
+  const button = document.getElementById("checkout");
+  button.disabled = true;
+  button.textContent = "Enregistrement…";
   try {
-    const parsed = new URL(image);
-    if (parsed.protocol !== "https:") throw new Error("HTTPS requis");
-  } catch {
-    notify("Entrez une URL d'image HTTPS valide.");
-    return;
+    const response = await fetch("/api/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ customer: { name: name.trim(), phone: phone.trim(), city: city.trim(), address: address.trim(), note }, items })
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || "La commande n'a pas pu être enregistrée.");
+    notify("Demande enregistrée : " + result.reference);
+    const message = [
+      "Bonjour Atelier N°, je viens d'envoyer une demande de commande.",
+      "Référence : " + result.reference,
+      "Client : " + name.trim(),
+      "Téléphone : " + phone.trim(),
+      "Ville : " + city.trim(),
+      "Adresse : " + address.trim(),
+      "",
+      ...items.map(item => item.name + " × " + item.quantity + " — " + money(item.price * item.quantity)),
+      "",
+      "Total estimatif : " + money(items.reduce((sum, item) => sum + item.price * item.quantity, 0)),
+      "Merci de confirmer le prix final, la disponibilité, la livraison et le paiement."
+    ].join("\n");
+    const number = String(window.ATELIER_PUBLIC_CONFIG?.whatsappNumber || "").replace(/\D/g, "");
+    if (number) window.open("https://wa.me/" + number + "?text=" + encodeURIComponent(message), "_blank", "noopener,noreferrer");
+    else notify("Référence " + result.reference + " — le WhatsApp de la boutique reste à configurer.");
+    cart = [];
+    saveCart();
+    renderCart();
+  } catch (error) {
+    notify(error.message || "Erreur lors de la préparation de la commande.");
+  } finally {
+    button.disabled = false;
+    button.textContent = "Préparer ma commande ↗";
   }
-
-  products.unshift({
-    id: Date.now(),
-    name,
-    category,
-    price,
-    image,
-    description,
-    tag: "Nouveau"
-  });
-
-  saveProducts();
-  renderProducts();
-  event.target.reset();
-  notify("Produit ajouté sur cet appareil.");
 });
 
-document.getElementById("resetProducts").addEventListener("click", () => {
-  if (!confirm("Réinitialiser le catalogue de démonstration ?")) return;
-
-  products = DEFAULT_PRODUCTS.map(product => ({ ...product }));
-  saveProducts();
-  renderProducts();
-  notify("Catalogue de démonstration réinitialisé.");
-});
+/* Administration locale désactivée sur le site public. */
 
 /* ============================================================
    SORA — AGENT CONVERSATIONNEL
@@ -2185,21 +2141,30 @@ const Sora = (() => {
    FORMULAIRE DE CONTACT
 ------------------------------------------- */
 
-document.getElementById("contactForm").addEventListener("submit", event => {
+document.getElementById("contactForm").addEventListener("submit", async event => {
   event.preventDefault();
-
   const name = document.getElementById("contactName").value.trim();
   const email = document.getElementById("contactEmail").value.trim();
   const message = document.getElementById("contactMessage").value.trim();
-
-  const subject = encodeURIComponent("Demande Atelier N° — " + name);
-  const body = encodeURIComponent(
-    "Nom : " + name + "\nE-mail : " + email + "\n\nMessage :\n" + message
-  );
-
-  /* Remplace contact@exemple.com par ta véritable adresse. */
-  window.location.href =
-    "mailto:contact@exemple.com?subject=" + subject + "&body=" + body;
+  const button = event.currentTarget.querySelector('button[type="submit"]');
+  button.disabled = true;
+  button.textContent = "Envoi en cours…";
+  try {
+    const response = await fetch("/api/tickets", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, topic: "contact", message })
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || "Le ticket n'a pas pu être enregistré.");
+    notify("Ticket créé : " + result.reference);
+    event.currentTarget.reset();
+  } catch (error) {
+    notify(error.message || "Le support n'est pas encore configuré.");
+  } finally {
+    button.disabled = false;
+    button.textContent = "Envoyer ma demande ↗";
+  }
 });
 
 /* -------------------------------------------
@@ -2218,6 +2183,24 @@ function notify(message) {
 }
 
 document.getElementById("year").textContent = new Date().getFullYear();
+
+const publicConfig = window.ATELIER_PUBLIC_CONFIG || {};
+const socialTargets = [
+  ["socialWhatsApp", publicConfig.social?.whatsapp],
+  ["socialInstagram", publicConfig.social?.instagram],
+  ["socialTikTok", publicConfig.social?.tiktok]
+];
+socialTargets.forEach(([id, url]) => {
+  const link = document.getElementById(id);
+  if (!link || typeof url !== "string" || !url.trim()) return;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:") return;
+    link.href = parsed.href;
+    link.hidden = false;
+  } catch {}
+});
+
 
 renderProducts();
 renderCart();
