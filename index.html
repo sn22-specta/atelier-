@@ -1838,6 +1838,17 @@ const Sora = (() => {
         openCart();
         break;
 
+      case "commander":
+      case "finaliser_commande":
+        if (Array.isArray(cart) && cart.length) {
+          closeCart();
+          openCheckout();
+        } else {
+          openCart();
+          notify("Ajoutez d'abord un article au panier pour préparer votre commande.");
+        }
+        break;
+
       case "naviguer": {
         const target = document.getElementById(action.section);
         if (target) target.scrollIntoView({ behavior: "smooth" });
@@ -1942,9 +1953,22 @@ const Sora = (() => {
       };
     }
 
-    if (/panier|commande|commander|acheter/.test(m)) {
+    if (/commander|finaliser|passer une commande|valider ma commande|acheter/.test(m)) {
+      if (Array.isArray(cart) && cart.length) {
+        return {
+          text: "Je vous ouvre directement le formulaire sécurisé de commande. Après validation, votre demande sera envoyée au serveur pour enregistrement.",
+          action: { type: "commander" }
+        };
+      }
       return {
-        text: "Je vous ouvre votre panier. Vous pourrez ajuster les quantités puis préparer votre demande de commande.",
+        text: "Votre panier est vide pour le moment. Je vous l'ouvre pour ajouter un article avant de finaliser la commande.",
+        action: { type: "ouvrir_panier" }
+      };
+    }
+
+    if (/panier/.test(m)) {
+      return {
+        text: "Je vous ouvre votre panier pour consulter ou modifier les articles.",
         action: { type: "ouvrir_panier" }
       };
     }
