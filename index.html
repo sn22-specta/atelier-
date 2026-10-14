@@ -1176,6 +1176,11 @@ body.chat-open .chat-launch::after { display: none; }
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<div id="ownerOverlay" hidden style="position:fixed;inset:0;z-index:99999;background:#090909">
+  <button type="button" id="closeOwnerOverlay" aria-label="Fermer l'espace propriétaire" style="position:absolute;z-index:2;right:16px;top:12px;border:1px solid #777;border-radius:24px;background:#111;color:#fff;padding:10px 16px;cursor:pointer">Fermer l'espace propriétaire ×</button>
+  <iframe id="ownerFrame" title="Espace propriétaire Atelier N°" style="display:block;width:100%;height:100%;border:0;background:#090909" referrerpolicy="same-origin"></iframe>
+</div>
+
 <script>
 const ownerOverlay = document.getElementById("ownerOverlay");
 const ownerFrame = document.getElementById("ownerFrame");
@@ -2457,9 +2462,6 @@ document.addEventListener("click", event => {
 });
 </script>
 
-<div id="ownerOverlay" hidden style="position:fixed;inset:0;z-index:99999;background:#090909">
-  <button type="button" id="closeOwnerOverlay" aria-label="Fermer l'espace propriétaire" style="position:absolute;z-index:2;right:16px;top:12px;border:1px solid #777;border-radius:24px;background:#111;color:#fff;padding:10px 16px;cursor:pointer">Fermer l'espace propriétaire ×</button>
-  <iframe id="ownerFrame" title="Espace propriétaire Atelier N°" style="display:block;width:100%;height:100%;border:0;background:#090909" referrerpolicy="same-origin"></iframe>
-</div>
+
 </body>
 </html>
