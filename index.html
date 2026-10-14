@@ -90,7 +90,12 @@ nav {
 
 nav a:hover { color: var(--accent); }
 
-.header-actions { display: flex; gap: 10px; }
+.header-actions { display: flex; gap: 10px; align-items:center; }
+.admin-menu-wrap { position:relative; }
+.admin-menu { position:absolute; top:calc(100% + 10px); right:0; min-width:210px; padding:7px; background:#141414; border:1px solid var(--line); border-radius:12px; box-shadow:0 16px 45px #0009; z-index:80; }
+.admin-menu a { display:block; padding:11px 12px; border-radius:7px; color:#d6d0c6; font-size:12px; }
+.admin-menu a:hover { background:#24211c; color:var(--accent); }
+.admin-menu[hidden] { display:none; }
 
 .icon-btn {
   border: 1px solid var(--line);
@@ -924,7 +929,13 @@ body.chat-open .chat-launch::after { display: none; }
   </nav>
 
   <div class="header-actions">
-    
+    <div class="admin-menu-wrap">
+      <button class="icon-btn" id="adminToggle" type="button" aria-expanded="false" aria-controls="adminMenu">Espace admin ▾</button>
+      <div class="admin-menu" id="adminMenu" hidden>
+        <a href="/admin.html">Accès propriétaire</a>
+        <a href="/admin.html#configuration">Configuration propriétaire</a>
+      </div>
+    </div>
     <button class="icon-btn" id="cartOpen" type="button">
       Panier (<span id="cartCount">0</span>)
     </button>
@@ -2205,6 +2216,37 @@ socialTargets.forEach(([id, url]) => {
 renderProducts();
 renderCart();
 Sora.init();
+
+/* Le catalogue administrable est chargé depuis le serveur.
+   En cas d'indisponibilité, la sélection intégrée garde la boutique visible. */
+fetch("/api/products")
+  .then(response => { if (!response.ok) throw new Error("Catalogue indisponible"); return response.json(); })
+  .then(result => {
+    if (!result.ok || !Array.isArray(result.data) || !result.data.length) return;
+    products = result.data.map(p => ({
+      id: Number(p.id), name: p.name, category: p.category,
+      price: Number(p.price) || 0, description: p.description || "",
+      image: p.image || "", tag: p.tag || p.category
+    }));
+    try { localStorage.removeItem("atelier_products"); } catch {}
+    renderProducts();
+    renderCart();
+  })
+  .catch(() => { /* Repli sur les produits intégrés. */ });
+
+const adminToggle = document.getElementById("adminToggle");
+const adminMenu = document.getElementById("adminMenu");
+adminToggle?.addEventListener("click", () => {
+  const isOpen = !adminMenu.hidden;
+  adminMenu.hidden = isOpen;
+  adminToggle.setAttribute("aria-expanded", String(!isOpen));
+});
+document.addEventListener("click", event => {
+  if (!event.target.closest(".admin-menu-wrap")) {
+    if (adminMenu) adminMenu.hidden = true;
+    adminToggle?.setAttribute("aria-expanded", "false");
+  }
+});
 </script>
 </body>
 </html>
