@@ -968,6 +968,32 @@ body.chat-open .chat-launch::after { display: none; }
   </div>
 </header>
 
+<!-- ============================================================
+     MENU ADMIN — SCRIPT AUTONOME (indépendant du script principal)
+     Permet l'ouverture du menu même si un autre script plante.
+     ============================================================ -->
+<script>
+(function () {
+  var toggle = document.getElementById("adminToggle");
+  var menu = document.getElementById("adminMenu");
+  if (!toggle || !menu) return;
+
+  toggle.addEventListener("click", function (event) {
+    event.stopPropagation();
+    var willOpen = menu.hidden;
+    menu.hidden = !willOpen;
+    toggle.setAttribute("aria-expanded", String(willOpen));
+  });
+
+  document.addEventListener("click", function (event) {
+    if (!event.target.closest(".admin-menu-wrap")) {
+      menu.hidden = true;
+      toggle.setAttribute("aria-expanded", "false");
+    }
+  });
+})();
+</script>
+
 <main>
   <section class="hero" id="accueil">
     <div class="hero-image" aria-hidden="true"></div>
@@ -1206,8 +1232,10 @@ function closeOwner() {
 }
 document.querySelectorAll("[data-open-owner]").forEach(link => link.addEventListener("click", event => {
   event.preventDefault();
-  if (adminMenu) adminMenu.hidden = true;
-  adminToggle?.setAttribute("aria-expanded", "false");
+  const menu = document.getElementById("adminMenu");
+  const toggle = document.getElementById("adminToggle");
+  if (menu) menu.hidden = true;
+  if (toggle) toggle.setAttribute("aria-expanded", "false");
   openOwner(link.hasAttribute("data-owner-config"));
 }));
 closeOwnerOverlay.addEventListener("click", closeOwner);
@@ -1220,16 +1248,28 @@ ownerFrame.addEventListener("load", () => {
     openOwnerConfigAfterLoad = false;
   }
 });
-
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="public-config.js"></script>
 <script>
 "use strict";
 
-const ATELIER_SUPABASE_URL = "https://mdafofdfznufdwscvroq.supabase.co";
-const ATELIER_SUPABASE_KEY = "sb_publishable_11bcDyC21WlB9kz1OaXsNw_qMoi_ykZ";
-const atelierSupabase = window.supabase.createClient(ATELIER_SUPABASE_URL, ATELIER_SUPABASE_KEY);
+/* ============================================================
+   INITIALISATION SUPABASE PROTÉGÉE
+   Si le CDN est bloqué ou la clé absente, le reste du script
+   continue de fonctionner (le bouton admin reste opérationnel).
+   ============================================================ */
+let atelierSupabase = null;
+try {
+  const ATELIER_SUPABASE_URL = "https://mdafofdfznufdwscvroq.supabase.co";
+  const ATELIER_SUPABASE_KEY = "sb_publishable_11bcDyC21WlB9kz1OaXsNw_qMoi_ykZ";
+  if (window.supabase && typeof window.supabase.createClient === "function") {
+    atelierSupabase = window.supabase.createClient(ATELIER_SUPABASE_URL, ATELIER_SUPABASE_KEY);
+  }
+} catch (err) {
+  console.warn("Supabase indisponible :", err);
+}
 
 /* -------------------------------------------
    CONFIGURATION DE LA BOUTIQUE
@@ -2446,20 +2486,6 @@ fetch("/api/products")
     renderCart();
   })
   .catch(() => { /* Repli sur les produits intégrés. */ });
-
-const adminToggle = document.getElementById("adminToggle");
-const adminMenu = document.getElementById("adminMenu");
-adminToggle?.addEventListener("click", () => {
-  const isOpen = !adminMenu.hidden;
-  adminMenu.hidden = isOpen;
-  adminToggle.setAttribute("aria-expanded", String(!isOpen));
-});
-document.addEventListener("click", event => {
-  if (!event.target.closest(".admin-menu-wrap")) {
-    if (adminMenu) adminMenu.hidden = true;
-    adminToggle?.setAttribute("aria-expanded", "false");
-  }
-});
 </script>
 
 
