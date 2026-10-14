@@ -120,11 +120,11 @@ create policy "Store admins can update orders" on public.orders for update to au
 grant select on public.products to anon, authenticated;
 grant insert, update, delete on public.products to authenticated;
 drop policy if exists "Published products are publicly readable" on public.products;
-create policy "Published products are publicly readable" on public.products for select to anon, authenticated
+create policy "Published products are publicly readable" on public.products for select to anon
   using (published = true);
-drop policy if exists "Admins can read all products" on public.products;
-create policy "Admins can read all products" on public.products for select to authenticated
-  using (public.is_store_admin());
+drop policy if exists "Products visible to signed-in users" on public.products;
+create policy "Products visible to signed-in users" on public.products for select to authenticated
+  using (published = true or public.is_store_admin());
 drop policy if exists "Admins can insert products" on public.products;
 create policy "Admins can insert products" on public.products for insert to authenticated
   with check (public.is_store_admin());
