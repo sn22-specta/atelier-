@@ -24,6 +24,7 @@ module.exports = async function handler(req, res) {
   const address = typeof customer.address === "string" ? customer.address.trim().slice(0, 300) : "";
   const note = typeof customer.note === "string" ? customer.note.trim().slice(0, 1000) : "";
   const items = Array.isArray(body.items) ? body.items.slice(0, 40) : [];
+  const paymentMethod = body.paymentMethod === "now" ? "now" : "delivery";
 
   if (!name || !phone || !city || !address || !items.length) {
     return reply(res, 400, { error: "Nom, téléphone, ville, adresse et articles sont obligatoires." });
@@ -65,7 +66,8 @@ module.exports = async function handler(req, res) {
         items: normalizedItems,
         estimated_total: estimatedTotal,
         status: "pending_confirmation",
-        payment_status: "unpaid"
+        payment_method: paymentMethod,
+        payment_status: paymentMethod === "now" ? "pending" : "unpaid"
       })
     });
     if (!response.ok) {
@@ -76,7 +78,9 @@ module.exports = async function handler(req, res) {
       ok: true,
       reference,
       status: "pending_confirmation",
-      message: "Votre demande est enregistrée, mais elle doit encore être confirmée par la boutique. Aucun paiement n'a été effectué."
+      paymentMethod,
+      paymentStatus: paymentMethod === "now" ? "pending" : "unpaid",
+      message: "Votre commande est enregistrée. La boutique doit confirmer la disponibilité, le prix final et la livraison. Aucun paiement n'a été automatiquement effectué."
     });
   } catch (error) {
     console.error("Order endpoint error:", error?.message || error);
