@@ -667,6 +667,7 @@ button:disabled { opacity: .58; cursor: wait; transform: none !important; }
         <button class="tab active" data-tab="products">Produits</button>
         <button class="tab" data-tab="stats">Statistiques</button>
         <button class="tab" data-tab="orders">Commandes</button>
+        <button class="tab" data-tab="suppliers">Fournisseurs</button>
         <button class="tab" data-tab="config">Configuration</button>
       </div>
 
@@ -733,6 +734,34 @@ button:disabled { opacity: .58; cursor: wait; transform: none !important; }
       <!-- TAB COMMANDES -->
       <div class="tab-panel" data-panel="orders">
         <div id="adminOrdersList"></div>
+      </div>
+
+      <!-- TAB FOURNISSEURS -->
+      <div class="tab-panel" data-panel="suppliers">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+          <div><h3 style="margin:0 0 5px">Fournisseurs</h3><small>Approuvez les comptes, examinez les produits proposés et fixez le prix public.</small></div>
+          <button class="btn" id="btnRefreshSuppliers" type="button">Actualiser</button>
+        </div>
+        <div id="adminSupplierProfiles" class="admin-products"><div class="empty-state">Ouvrez cet onglet pour charger les fournisseurs.</div></div>
+        <h3 style="margin:26px 0 12px">Produits proposés</h3>
+        <div id="adminSupplierProducts" class="admin-products"><div class="empty-state">Aucune donnée chargée.</div></div>
+        <h3 style="margin:26px 0 12px">Attribuer une commande</h3>
+        <p style="color:#888;font-size:13px">Sélectionnez une commande et un fournisseur actif. Les affectations affichent au fournisseur les informations nécessaires à la livraison.</p>
+        <form id="supplierAssignForm" class="product-form">
+          <div class="field-row">
+            <div class="field"><label for="supplierOrderSelect">Commande</label><select id="supplierOrderSelect" required></select></div>
+            <div class="field"><label for="supplierSelect">Fournisseur actif</label><select id="supplierSelect" required></select></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="supplierProductSelect">Produit fournisseur (facultatif)</label><select id="supplierProductSelect"><option value="">Sélectionner si applicable</option></select></div>
+            <div class="field-row">
+              <div class="field"><label for="supplierAssignQty">Quantité</label><input id="supplierAssignQty" type="number" min="1" value="1" required></div>
+              <div class="field"><label for="supplierUnitPrice">Prix unitaire fournisseur (FCFA)</label><input id="supplierUnitPrice" type="number" min="0" step="1" required></div>
+            </div>
+          </div>
+          <button class="btn-primary" type="submit">Attribuer la commande</button>
+        </form>
+        <div id="adminSupplierAssignments" class="admin-products"></div>
       </div>
 
       <!-- TAB CONFIG -->
@@ -1221,6 +1250,31 @@ function switchTab(name) {
   document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.dataset.panel === name));
 }
 
+async function loadAdminSuppliers() {
+  const profilesEl=$("adminSupplierProfiles"), productsEl=$("adminSupplierProducts");
+  profilesEl.innerHTML='<div class="empty-state">Chargement…</div>';
+  productsEl.innerHTML='<div class="empty-state">Chargement…</div>';
+  try {
+    const [profilesResult, productsResult, assignmentsResult] = await Promise.all([
+      adminApi("suppliers:list"), adminApi("supplier-products:list"), adminApi("supplier-orders:list")
+    ]);
+    const profiles=profilesResult.data||[], proposals=productsResult.data||[], assignments=assignmentsResult.data||[];
+    profilesEl.innerHTML=profiles.length?profiles.map(s=>'<div class="admin-product"><div><h4>'+esc(s.business_name)+'</h4><p>'+esc(s.contact_name||"")+' · '+esc(s.phone||"")+' · '+esc(s.status)+'</p><p>'+esc(s.user_id)+'</p></div><div class="actions">'+(s.status==="active"?'<button class="btn-danger" data-supplier-status="'+esc(s.user_id)+'" data-status="suspended">Suspendre</button>':'<button class="btn-edit" data-supplier-status="'+esc(s.user_id)+'" data-status="active">Activer</button>')+'</div></div>').join(""):'<div class="empty-state">Aucun fournisseur inscrit.</div>';
+    profilesEl.querySelectorAll("[data-supplier-status]").forEach(b=>b.addEventListener("click",async()=>{try{await adminApi("suppliers:set-status",{user_id:b.dataset.supplierStatus,status:b.dataset.status});notify("Statut du fournisseur mis à jour.");await loadAdminSuppliers()}catch(e){notify(e.message||"Erreur fournisseur.")}}));
+    productsEl.innerHTML=proposals.length?proposals.map(p=>'<div class="admin-product"><img src="'+esc(p.image_url||"")+'" alt="" onerror="this.style.visibility=\'hidden\'"><div><h4>'+esc(p.name)+'</h4><p>'+esc(p.category)+' · Achat : '+fmtPrice(p.supplier_price)+' · Stock : '+esc(p.available_quantity)+'</p><p>Fournisseur : '+esc(p.supplier_profiles?.business_name||p.supplier_id)+' · '+esc(p.status)+'</p><p>'+esc(p.description||"")+'</p><label>Prix de vente public (FCFA) <input type="number" min="1" step="1" id="retail-'+esc(p.id)+'" value="'+Math.max(1,Math.ceil(Number(p.supplier_price)*1.3))+'" style="width:150px;margin-top:6px"></label><label style="display:block;margin-top:8px"><input type="checkbox" id="publish-'+esc(p.id)+'" checked style="width:auto"> Publier dans la boutique après validation</label><input id="note-'+esc(p.id)+'" placeholder="Note à l’attention du fournisseur" maxlength="1000" style="margin-top:8px"></div><div class="actions"><button class="btn-edit" data-review="'+esc(p.id)+'" data-review-status="approved">Valider</button><button class="btn-danger" data-review="'+esc(p.id)+'" data-review-status="rejected">Refuser</button></div></div>').join(""):'<div class="empty-state">Aucun produit proposé.</div>';
+    productsEl.querySelectorAll("[data-review]").forEach(b=>b.addEventListener("click",async()=>{try{const id=b.dataset.review,status=b.dataset.reviewStatus;const retail=Number($("retail-"+id)?.value||0);if(status==="approved"&&!(retail>0))throw new Error("Le prix de vente doit être supérieur à zéro.");await adminApi("supplier-products:review",{id,status,retail_price:retail,published:$("publish-"+id)?.checked===true,admin_note:$("note-"+id)?.value||""});notify(status==="approved"?"Produit validé.":"Produit refusé.");await loadRemoteProducts(true);await loadAdminSuppliers()}catch(e){notify(e.message||"Impossible de traiter ce produit.")}}));
+    const active=profiles.filter(s=>s.status==="active");
+    $("supplierSelect").innerHTML=active.map(s=>'<option value="'+esc(s.user_id)+'">'+esc(s.business_name)+'</option>').join("");
+    $("supplierProductSelect").innerHTML='<option value="">Aucun produit lié</option>'+proposals.filter(p=>p.status==="approved").map(p=>'<option value="'+esc(p.id)+'">'+esc(p.name)+' — '+esc(p.supplier_profiles?.business_name||"Fournisseur")+'</option>').join("");
+    $("supplierOrderSelect").innerHTML=orders.map(o=>'<option value="'+esc(o.id)+'">'+esc(o.reference||o.id)+' — '+esc(o.customerName||"Client")+'</option>').join("");
+    $("adminSupplierAssignments").innerHTML=assignments.length?assignments.map(a=>'<div class="admin-product"><div><h4>'+esc(a.orders?.reference||a.order_id)+'</h4><p>'+esc(a.supplier_profiles?.business_name||a.supplier_id)+' · '+esc(a.status)+' · '+a.quantity+' × '+fmtPrice(a.supplier_unit_price)+'</p><p>'+esc(a.orders?.customer_name||"")+' · '+esc(a.orders?.delivery_city||"")+'</p></div></div>').join(""):'<div class="empty-state">Aucune commande attribuée.</div>';
+  } catch(error) {
+    profilesEl.innerHTML='<div class="empty-state">Erreur de chargement : '+esc(error.message||"service indisponible")+'</div>';
+    productsEl.innerHTML='';
+    console.error("Fournisseurs:",error);
+  }
+}
+
 function renderAdmin() { renderAdminProducts(); renderAdminOrders(); renderAdminStats(); }
 function renderAdminStats() {
   const el=$("adminStats"); if(!el) return;
@@ -1433,6 +1487,9 @@ function init() {
   document.querySelectorAll(".tab").forEach(t => {
     t.addEventListener("click", () => switchTab(t.dataset.tab));
   });
+  $("btnRefreshSuppliers").addEventListener("click",loadAdminSuppliers);
+  document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{if(t.dataset.tab==="suppliers")loadAdminSuppliers()}));
+  $("supplierAssignForm").addEventListener("submit",async e=>{e.preventDefault();try{await adminApi("supplier-orders:assign",{order_id:$("supplierOrderSelect").value,supplier_id:$("supplierSelect").value,supplier_product_id:$("supplierProductSelect").value||null,quantity:Number($("supplierAssignQty").value),supplier_unit_price:Number($("supplierUnitPrice").value)});notify("Commande attribuée au fournisseur.");$("supplierAssignForm").reset();$("supplierAssignQty").value="1";await loadAdminSuppliers()}catch(error){notify(error.message||"Impossible d’attribuer la commande.")}});
 
   /* Form produit */
   $("btnNewProduct").addEventListener("click", startNew);
