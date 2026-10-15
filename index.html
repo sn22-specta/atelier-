@@ -1512,7 +1512,9 @@ function presentProduct(p){
   if(!p)return;
   const w=$("chatWindow");
   if(!w.classList.contains("open")){w.classList.add("open");$("chatLaunch").setAttribute("aria-expanded","true");}
-  const pitch=(p.name||"Ce produit")+" est une belle option pour votre sélection. "+(p.description||"Une pièce choisie pour apporter une touche soignée à votre quotidien.")+" Son prix est de "+fmtPrice(p.price)+". Si cette pièce correspond à votre besoin, vous pouvez l’ajouter au panier dès maintenant.";
+  const description=(p.description||"Une pièce choisie pour apporter une touche soignée à votre quotidien.").replace(/\\s+/g," ").trim();
+  const shortDescription=description.split(" ").slice(0,10).join(" ");
+  const pitch=(p.name||"Ce produit")+". "+shortDescription+(description.split(" ").length>10?"…":"")+". Prix : "+fmtPrice(p.price)+".";
   chatBubble("bot",pitch);
   if(assistantSettings.speak_products) speakAssistant(pitch);
   const el=$("chatSuggestions");el.replaceChildren();
