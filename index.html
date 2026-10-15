@@ -601,9 +601,10 @@ button:disabled { opacity: .58; cursor: wait; transform: none !important; }
 }
 
 
-/* Désactivation de la fiche produit flottante */
-.product-viewer { display:none !important; }
-#shopGrid .card { cursor:default !important; }
+/* Fiche produit interactive */
+.product-viewer { display:none; }
+.product-viewer.is-open { display:flex; }
+#shopGrid .card { cursor:pointer; }
 
 /* Conseiller de vente visuel configurable par l’administration */
 .chat-launch { width:66px;height:66px;right:22px;bottom:22px;border-radius:50%;padding:4px;overflow:visible; }
@@ -950,11 +951,12 @@ function ensureProductViewer() {
   if ($("productViewer")) return;
   const viewer=document.createElement("div");
   viewer.id="productViewer"; viewer.className="product-viewer";
-  viewer.innerHTML='<div class="product-viewer-panel" role="dialog" aria-modal="true" aria-labelledby="viewerTitle"><button type="button" class="product-viewer-close" aria-label="Fermer">×</button><div class="product-stage" id="viewerStage"><img id="viewerImage" alt=""><model-viewer id="viewerModel" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="18deg" shadow-intensity="1" exposure="1" environment-image="neutral" interaction-prompt="auto" ar></model-viewer></div><div class="product-viewer-info"><div class="product-viewer-kicker">Atelier N° · Présentation produit</div><h2 id="viewerTitle"></h2><p id="viewerDescription"></p><div class="product-viewer-price" id="viewerPrice"></div><div class="product-viewer-actions"><button type="button" class="btn-primary" id="viewerAdd">Ajouter au panier</button><button type="button" class="btn" id="viewerCloseSecondary">Continuer</button></div></div></div>';
+  viewer.innerHTML='<div class="product-viewer-panel" role="dialog" aria-modal="true" aria-labelledby="viewerTitle"><button type="button" class="product-viewer-close" aria-label="Fermer">×</button><div class="product-stage" id="viewerStage"><img id="viewerImage" alt=""><model-viewer id="viewerModel" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="18deg" shadow-intensity="1" exposure="1" environment-image="neutral" interaction-prompt="auto" ar></model-viewer></div><div class="product-viewer-info"><div class="product-viewer-kicker">Atelier N° · Présentation produit</div><h2 id="viewerTitle"></h2><p id="viewerDescription"></p><div class="product-viewer-price" id="viewerPrice"></div><div class="product-viewer-actions"><button type="button" class="btn" id="viewerSpeak">Écouter la présentation</button><button type="button" class="btn-primary" id="viewerAdd">Ajouter au panier</button><button type="button" class="btn" id="viewerCloseSecondary">Continuer</button></div></div></div>';
   document.body.appendChild(viewer);
   const close=()=>{viewer.classList.remove("is-open");document.body.style.overflow="";};
   viewer.querySelector(".product-viewer-close").addEventListener("click",close);
   $("viewerCloseSecondary").addEventListener("click",close);
+  $("viewerSpeak").addEventListener("click",()=>{const p=products.find(x=>Number(x.id)===Number(viewer.dataset.productId));if(p){const d=(p.description||"Découvrez ce produit Atelier N°.").replace(/\s+/g," ").trim();speakAssistant((p.name||"Ce produit")+". "+d+". Prix : "+fmtPrice(p.price)+".");}});
   viewer.addEventListener("click",e=>{if(e.target===viewer)close();});
   document.addEventListener("keydown",e=>{if(e.key==="Escape")close();});
   $("viewerAdd").addEventListener("click",()=>{const id=Number(viewer.dataset.productId);if(id)addToCart(id);close();});
@@ -971,6 +973,10 @@ function openProductViewer(id) {
   $("productViewer").dataset.productId=String(p.id);
   $("productViewer").classList.add("is-open");
   document.body.style.overflow="hidden";
+  if (assistantSettings && assistantSettings.speak_products) {
+    const d=(p.description||"Découvrez ce produit Atelier N°.").replace(/\s+/g," ").trim();
+    speakAssistant((p.name||"Ce produit")+". "+d+". Prix : "+fmtPrice(p.price)+".");
+  }
 }
 
 /* ================================================================
@@ -1529,47 +1535,27 @@ function presentProduct(p){
 let piperTtsModulePromise = null;
 let piperAudio = null;
 
-async function speakAssistant(text){
+function speakAssistant(text){
   const spokenText = String(text || "").trim();
   if (!spokenText) return;
-
-  if (piperAudio) {
-    piperAudio.pause();
-    piperAudio = null;
-  }
-  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-
-  // Voix neuronale française gratuite chargée depuis un paquet open source.
-  // Le modèle est téléchargé au premier usage puis mis en cache par le navigateur.
-  try {
-    if (!piperTtsModulePromise) {
-      piperTtsModulePromise = import("https://esm.sh/@mintplex-labs/piper-tts-web");
-    }
-    const tts = await piperTtsModulePromise;
-    const wav = await tts.predict({ text: spokenText, voiceId: "fr_FR-upmc-medium" });
-    const audioUrl = URL.createObjectURL(wav);
-    piperAudio = new Audio(audioUrl);
-    piperAudio.onended = () => { URL.revokeObjectURL(audioUrl); piperAudio = null; };
-    piperAudio.onerror = () => { URL.revokeObjectURL(audioUrl); piperAudio = null; };
-    await piperAudio.play();
-    return;
-  } catch (error) {
-    console.warn("Voix neuronale française indisponible, utilisation de la voix du navigateur.", error);
-    piperTtsModulePromise = null;
-  }
-
-  // Repli automatique pour préserver la lecture si le modèle en ligne échoue.
   if (!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) {
-    notify("La synthèse vocale n’est pas prise en charge par ce navigateur.");
+    notify("La lecture vocale n’est pas disponible dans ce navigateur. Essaie Safari ou Chrome à jour.");
     return;
   }
+  // Synthèse vocale native : aucun service externe ni clé API.
+  window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(spokenText);
   utterance.lang = "fr-FR";
-  utterance.rate = 1;
+  utterance.rate = 0.92;
   utterance.pitch = 1;
-  const voices = window.speechSynthesis.getVoices();
-  const frenchVoice = voices.find(voice => voice.lang && voice.lang.toLowerCase().startsWith("fr"));
-  if (frenchVoice) utterance.voice = frenchVoice;
+  const chooseVoice = () => {
+    const voices = window.speechSynthesis.getVoices();
+    const frenchVoice = voices.find(v => /^fr([-_]|$)/i.test(v.lang || ""));
+    if (frenchVoice) utterance.voice = frenchVoice;
+  };
+  chooseVoice();
+  utterance.onerror = () => notify("La lecture vocale a été interrompue. Appuie sur « Écouter la présentation » pour réessayer.");
+  window.speechSynthesis.onvoiceschanged = chooseVoice;
   window.speechSynthesis.speak(utterance);
 }
 function toggleChat(){const w=$("chatWindow");const open=!w.classList.contains("open");w.classList.toggle("open",open);$("chatLaunch").setAttribute("aria-expanded",String(open));if(open)$("chatInput").focus();}
