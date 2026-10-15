@@ -1521,36 +1521,28 @@ function presentProduct(p){
   $("chatMessages").scrollTop=$("chatMessages").scrollHeight;
 }
 
-function speakAssistant(text){
-  if(!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) { notify("La lecture vocale n’est pas disponible sur ce navigateur."); return; }
-  window.speechSynthesis.cancel();
-  const utterance=new SpeechSynthesisUtterance(String(text||""));
-  utterance.lang="fr-FR";
-  const mode=assistantSettings.voice==="auto"?(assistantSettings.avatar==="man"?"male":assistantSettings.avatar==="woman"?"female":"robot"):assistantSettings.voice;
-  const chooseVoice=()=>{
-    const voices=window.speechSynthesis.getVoices();
-    const french=voices.filter(v=>/^fr([-_]|$)/i.test(v.lang));
-    let chosen=null;
-    if(mode==="male") chosen=french.find(v=>/thomas|henri|paul|daniel|male|homme/i.test(v.name));
-    else if(mode==="female") chosen=french.find(v=>/amelie|audrey|julie|celine|léa|lea|female|femme/i.test(v.name));
-    else chosen=french.find(v=>/google français|google francais|premium|enhanced|natural/i.test(v.name));
-    if(!chosen) chosen=french.find(v=>v.localService)||french[0]||voices[0];
-    if(chosen) utterance.voice=chosen;
-    // Rythme publicitaire plus posé, avec une intonation chaleureuse.
-    utterance.rate=mode==="robot"?0.91:0.88;
-    utterance.pitch=mode==="male"?0.94:mode==="female"?1.12:0.98;
-    utterance.volume=1;
-    window.speechSynthesis.speak(utterance);
-  };
-  const voices=window.speechSynthesis.getVoices();
-  if(voices.length) chooseVoice();
-  else {
-    window.speechSynthesis.addEventListener("voiceschanged",function onVoices(){
-      window.speechSynthesis.removeEventListener("voiceschanged",onVoices);
-      chooseVoice();
-    },{once:true});
-    // Fallback si le navigateur ne déclenche pas voiceschanged rapidement.
-    setTimeout(()=>{if(window.speechSynthesis.speaking===false)chooseVoice();},250);
+async function speakAssistant(text){
+  const spokenText=String(text||"").trim();
+  if(!spokenText) return;
+  if("speechSynthesis" in window) window.speechSynthesis.cancel();
+  try {
+    const publicKey=window.ATELIER_PUBLIC_CONFIG?.supabasePublishableKey;
+    const response=await fetch("https://mdafofdfznufdwscvroq.supabase.co/functions/v1/atelier-voice",{
+      method:"POST",
+      headers:{"Content-Type":"application/json",...(publicKey?{"apikey":publicKey}:{})},
+      body:JSON.stringify({text:spokenText})
+    });
+    if(!response.ok) throw new Error("ElevenLabs indisponible ("+response.status+").");
+    const audioBlob=await response.blob();
+    if(!audioBlob.size) throw new Error("La réponse audio est vide.");
+    const audioUrl=URL.createObjectURL(audioBlob);
+    const audio=new Audio(audioUrl);
+    audio.onended=()=>URL.revokeObjectURL(audioUrl);
+    audio.onerror=()=>{URL.revokeObjectURL(audioUrl);notify("Impossible de lire l’audio ElevenLabs.");};
+    await audio.play();
+  } catch(error) {
+    console.error("Atelier N° — ElevenLabs:",error);
+    notify("La voix ElevenLabs n’a pas pu démarrer. Vérifie la fonction atelier-voice et sa clé secrète dans Supabase.");
   }
 }
 function toggleChat(){const w=$("chatWindow");const open=!w.classList.contains("open");w.classList.toggle("open",open);$("chatLaunch").setAttribute("aria-expanded",String(open));if(open)$("chatInput").focus();}
