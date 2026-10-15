@@ -96,6 +96,8 @@ img { display: block; max-width: 100%; }
 }
 .hero h1 em { color: #d4b58b; font-style: normal; }
 .hero p { color: #999; max-width: 500px; margin: 0 auto; }
+.presentation-speak { margin-top: 26px; min-height: 46px; }
+.presentation-speak:focus-visible { outline: 2px solid #f5f1e9; outline-offset: 4px; }
 
 .section { padding: 60px 20px; max-width: 1200px; margin: 0 auto; }
 .section h2 {
@@ -627,6 +629,7 @@ button:disabled { opacity: .58; cursor: wait; transform: none !important; }
   <section class="hero">
     <h1>L'art de<br><em>choisir.</em></h1>
     <p>Une sélection d'objets choisis pour leur caractère, leur matière et leur design intemporel.</p>
+    <button type="button" class="btn-primary presentation-speak" id="presentationSpeak">Écouter la présentation</button>
   </section>
 
   <section class="lookbook-strip" aria-label="Inspiration Atelier N°">
@@ -1586,6 +1589,9 @@ function init() {
   setChatSuggestions(["Voir la collection","Quel est votre prix ?","Comment commander ?"]);
 
   /* Boutons principaux */
+  $("presentationSpeak").addEventListener("click", () => {
+    speakAssistant("Bienvenue chez Atelier N°. Découvrez une sélection pensée pour celles et ceux qui apprécient le style, les belles matières et les détails qui font la différence. Parcourez notre collection, trouvez la pièce qui vous ressemble et ajoutez vos coups de cœur au panier en quelques instants. Atelier N°. Le plaisir de choisir, tout simplement.");
+  });
   $("btnAdmin").addEventListener("click", openAdmin);
   $("btnCart").addEventListener("click", openCart);
   $("adminClose").addEventListener("click", closeAdmin);
