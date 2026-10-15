@@ -1526,37 +1526,51 @@ function presentProduct(p){
   $("chatMessages").scrollTop=$("chatMessages").scrollHeight;
 }
 
+let piperTtsModulePromise = null;
+let piperAudio = null;
+
 async function speakAssistant(text){
   const spokenText = String(text || "").trim();
   if (!spokenText) return;
 
+  if (piperAudio) {
+    piperAudio.pause();
+    piperAudio = null;
+  }
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+
+  // Voix neuronale française gratuite chargée depuis un paquet open source.
+  // Le modèle est téléchargé au premier usage puis mis en cache par le navigateur.
+  try {
+    if (!piperTtsModulePromise) {
+      piperTtsModulePromise = import("https://esm.sh/@mintplex-labs/piper-tts-web");
+    }
+    const tts = await piperTtsModulePromise;
+    const wav = await tts.predict({ text: spokenText, voiceId: "fr_FR-upmc-medium" });
+    const audioUrl = URL.createObjectURL(wav);
+    piperAudio = new Audio(audioUrl);
+    piperAudio.onended = () => { URL.revokeObjectURL(audioUrl); piperAudio = null; };
+    piperAudio.onerror = () => { URL.revokeObjectURL(audioUrl); piperAudio = null; };
+    await piperAudio.play();
+    return;
+  } catch (error) {
+    console.warn("Voix neuronale française indisponible, utilisation de la voix du navigateur.", error);
+    piperTtsModulePromise = null;
+  }
+
+  // Repli automatique pour préserver la lecture si le modèle en ligne échoue.
   if (!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) {
     notify("La synthèse vocale n’est pas prise en charge par ce navigateur.");
     return;
   }
-
-  window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(spokenText);
   utterance.lang = "fr-FR";
   utterance.rate = 1;
   utterance.pitch = 1;
-
-  const chooseVoice = () => {
-    const voices = window.speechSynthesis.getVoices();
-    const frenchVoice = voices.find(voice => voice.lang && voice.lang.toLowerCase().startsWith("fr"));
-    if (frenchVoice) utterance.voice = frenchVoice;
-    window.speechSynthesis.speak(utterance);
-  };
-
   const voices = window.speechSynthesis.getVoices();
-  if (voices.length) {
-    const frenchVoice = voices.find(voice => voice.lang && voice.lang.toLowerCase().startsWith("fr"));
-    if (frenchVoice) utterance.voice = frenchVoice;
-    window.speechSynthesis.speak(utterance);
-  } else {
-    window.speechSynthesis.addEventListener("voiceschanged", chooseVoice, { once: true });
-    window.speechSynthesis.speak(utterance);
-  }
+  const frenchVoice = voices.find(voice => voice.lang && voice.lang.toLowerCase().startsWith("fr"));
+  if (frenchVoice) utterance.voice = frenchVoice;
+  window.speechSynthesis.speak(utterance);
 }
 function toggleChat(){const w=$("chatWindow");const open=!w.classList.contains("open");w.classList.toggle("open",open);$("chatLaunch").setAttribute("aria-expanded",String(open));if(open)$("chatInput").focus();}
 function chatBubble(role,text){const n=document.createElement("div");n.className="chat-message "+role;n.textContent=text;$("chatMessages").appendChild(n);$("chatMessages").scrollTop=$("chatMessages").scrollHeight;}
