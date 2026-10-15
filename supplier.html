@@ -83,7 +83,7 @@
     const email=$("email").value.trim(), password=$("password").value;
     const business_name=$("businessName").value.trim(), contact_name=$("contactName").value.trim(), phone=$("phone").value.trim();
     if(!email||password.length<12||!business_name||!contact_name||!phone) throw new Error("Renseignez tous les champs et utilisez un mot de passe de 12 caractères minimum.");
-    const {data,error}=await sb.auth.signUp({email,password,options:{data:{account_type:"supplier"}}});
+    const {data,error}=await sb.auth.signUp({email,password,options:{data:{account_type:"supplier",business_name,contact_name,phone}}});
     if(error) throw error;
     if(data.session && data.user){
       const {error:pe}=await sb.from("supplier_profiles").insert({user_id:data.user.id,business_name,contact_name,phone,status:"pending"});
