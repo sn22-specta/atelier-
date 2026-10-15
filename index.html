@@ -598,6 +598,10 @@ button:disabled { opacity: .58; cursor: wait; transform: none !important; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
 
+
+/* Désactivation de la fiche produit flottante */
+.product-viewer { display:none !important; }
+#shopGrid .card { cursor:default !important; }
 </style>
 </head>
 <body>
@@ -976,10 +980,6 @@ function renderShop() {
           '<button class="btn-add" data-add="' + p.id + '">+ Panier</button>' +
         '</div>' +
       '</div>';
-    card.addEventListener("click", (event) => {
-      if (event.target.closest("[data-add]")) return;
-      openProductViewer(p.id);
-    });
     grid.appendChild(card);
   });
 
