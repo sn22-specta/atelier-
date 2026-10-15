@@ -619,6 +619,46 @@ button:disabled { opacity: .58; cursor: wait; transform: none !important; }
 #assistantPreview { display:flex;align-items:center;gap:10px; }
 @media(max-width:600px){.chat-launch{right:14px;bottom:14px;width:60px;height:60px}.chat-window{right:10px;bottom:84px}}
 
+/* =========================================================
+   PRODUIT OUVERT : MISE EN ÉVIDENCE
+========================================================= */
+/* La fiche passe au-dessus de tout (menu, panier, WhatsApp, chat) */
+.product-viewer {
+  z-index: 3000;
+  background: rgba(0,0,0,.74);
+  backdrop-filter: blur(10px) brightness(.6);
+  -webkit-backdrop-filter: blur(10px) brightness(.6);
+}
+.product-viewer-panel {
+  border: 1px solid var(--an-gold);
+  box-shadow: 0 0 0 1px rgba(234,216,184,.25), 0 0 90px rgba(201,168,120,.35), 0 40px 120px #000;
+  animation: viewerSpotlight .45s cubic-bezier(.2,.8,.2,1) both;
+}
+.product-stage { box-shadow: inset 0 0 80px rgba(201,168,120,.18); }
+.product-stage img { animation: productFloat 4.5s ease-in-out infinite, productGlow 3s ease-in-out infinite; }
+@keyframes viewerSpotlight { from { opacity:0; transform: translateY(24px) scale(.94); } to { opacity:1; transform: none; } }
+@keyframes productGlow {
+  0%,100% { filter: drop-shadow(0 28px 18px #0008) drop-shadow(0 0 14px rgba(234,216,184,.25)); }
+  50%     { filter: drop-shadow(0 38px 22px #0009) drop-shadow(0 0 34px rgba(234,216,184,.55)); }
+}
+
+/* Éléments flottants masqués pendant l'ouverture d'une fiche */
+body.viewer-open .whatsapp-float,
+body.viewer-open .chat-launch,
+body.viewer-open .chat-window { opacity: 0; pointer-events: none; }
+.toast { z-index: 3500; }
+
+/* Les autres produits s'effacent, le produit choisi ressort */
+#shopGrid .card { transition: opacity .4s ease, filter .4s ease, transform .4s ease, border-color .4s ease, box-shadow .4s ease; }
+body.viewer-open #shopGrid .card:not(.is-selected) { opacity: .25; filter: grayscale(.7) blur(1.5px); transform: scale(.96); }
+body.viewer-open #shopGrid .card.is-selected {
+  opacity: 1; filter: none; transform: scale(1.04); position: relative; z-index: 2;
+  border-color: var(--an-gold-light);
+  box-shadow: 0 0 0 1px var(--an-gold), 0 0 60px rgba(201,168,120,.5);
+}
+@media (prefers-reduced-motion: reduce) {
+  .product-viewer-panel, .product-stage img { animation: none; }
+}
 </style>
 </head>
 <body>
@@ -950,21 +990,38 @@ function saveCart()     { writeLS(LS_CART, cart); }
 function saveOrders()   { writeLS(LS_ORDERS, orders); }
 
 
-/* Visionneuse produit flottante */
+/* ================================================================
+   VISIONNEUSE PRODUIT (mise en évidence)
+================================================================ */
+function closeProductViewer() {
+  const viewer = $("productViewer");
+  if (viewer) {
+    viewer.classList.remove("is-open");
+    viewer.setAttribute("aria-hidden", "true");
+  }
+  document.body.style.overflow = "";
+  document.body.classList.remove("viewer-open");
+  document.querySelectorAll("#shopGrid .card.is-selected").forEach(c => c.classList.remove("is-selected"));
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+}
+
 function ensureProductViewer() {
   if ($("productViewer")) return;
   const viewer=document.createElement("div");
   viewer.id="productViewer"; viewer.className="product-viewer";
   viewer.innerHTML='<div class="product-viewer-panel" role="dialog" aria-modal="true" aria-labelledby="viewerTitle"><button type="button" class="product-viewer-close" aria-label="Fermer">×</button><div class="product-stage" id="viewerStage"><img id="viewerImage" alt=""><model-viewer id="viewerModel" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="18deg" shadow-intensity="1" exposure="1" environment-image="neutral" interaction-prompt="auto" ar></model-viewer></div><div class="product-viewer-info"><div class="product-viewer-kicker">Atelier N° · Présentation produit</div><h2 id="viewerTitle"></h2><p id="viewerDescription"></p><div class="product-viewer-price" id="viewerPrice"></div><div class="product-viewer-actions"><button type="button" class="btn" id="viewerSpeak">Écouter la présentation</button><button type="button" class="btn-primary" id="viewerAdd">Ajouter au panier</button><button type="button" class="btn" id="viewerCloseSecondary">Continuer</button></div></div></div>';
   document.body.appendChild(viewer);
-  const close=()=>{viewer.classList.remove("is-open");viewer.setAttribute("aria-hidden","true");document.body.style.overflow="";if("speechSynthesis" in window)window.speechSynthesis.cancel();};
-  viewer.querySelector(".product-viewer-close").addEventListener("click",close);
-  $("viewerCloseSecondary").addEventListener("click",close);
-  $("viewerSpeak").addEventListener("click",()=>{const p=products.find(x=>Number(x.id)===Number(viewer.dataset.productId));if(p){const d=(p.description||"Découvrez ce produit Atelier N°.").replace(/\s+/g," ").trim();speakAssistant((p.name||"Ce produit")+". "+d+". Prix : "+fmtPrice(p.price)+".");}});
-  viewer.addEventListener("click",e=>{if(e.target===viewer)close();});
-  document.addEventListener("keydown",e=>{if(e.key==="Escape")close();});
-  $("viewerAdd").addEventListener("click",()=>{const id=Number(viewer.dataset.productId);if(id)addToCart(id);close();});
+  viewer.querySelector(".product-viewer-close").addEventListener("click",closeProductViewer);
+  $("viewerCloseSecondary").addEventListener("click",closeProductViewer);
+  $("viewerSpeak").addEventListener("click",()=>{
+    const p=products.find(x=>Number(x.id)===Number(viewer.dataset.productId));
+    if(p){const d=(p.description||"Découvrez ce produit Atelier N°.").replace(/\s+/g," ").trim();speakAssistant((p.name||"Ce produit")+". "+d+". Prix : "+fmtPrice(p.price)+".");}
+  });
+  viewer.addEventListener("click",e=>{if(e.target===viewer)closeProductViewer();});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&viewer.classList.contains("is-open"))closeProductViewer();});
+  $("viewerAdd").addEventListener("click",()=>{const id=Number(viewer.dataset.productId);if(id)addToCart(id);closeProductViewer();});
 }
+
 function openProductViewer(id) {
   const p=products.find(x=>Number(x.id)===Number(id)); if(!p)return;
   ensureProductViewer();
@@ -978,6 +1035,13 @@ function openProductViewer(id) {
   $("productViewer").classList.add("is-open");
   $("productViewer").setAttribute("aria-hidden","false");
   document.body.style.overflow="hidden";
+
+  /* Mise en évidence : le produit choisi ressort, les autres s'effacent */
+  document.body.classList.add("viewer-open");
+  document.querySelectorAll("#shopGrid .card").forEach(c=>c.classList.toggle("is-selected", Number(c.dataset.id)===Number(p.id)));
+  const chat=$("chatWindow"); if(chat) chat.classList.remove("open");
+  const launch=$("chatLaunch"); if(launch) launch.setAttribute("aria-expanded","false");
+
   if (assistantSettings && assistantSettings.speak_products) {
     const d=(p.description||"Découvrez ce produit Atelier N°.").replace(/\s+/g," ").trim();
     speakAssistant((p.name||"Ce produit")+". "+d+". Prix : "+fmtPrice(p.price)+".");
@@ -1004,6 +1068,7 @@ function renderShop() {
   products.forEach(p => {
     const card = document.createElement("div");
     card.className = "card";
+    card.dataset.id = p.id;
     card.innerHTML =
       '<div class="card-img">' +
         '<img src="' + esc(p.image || "") + '" alt="' + esc(p.name) + '" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">' +
@@ -1037,17 +1102,23 @@ function renderShop() {
   grid.querySelectorAll("[data-add]").forEach(btn => {
     btn.addEventListener("click", () => addToCart(Number(btn.dataset.add)));
   });
+
+  /* Si une fiche est ouverte pendant un rafraîchissement du catalogue, on garde la mise en évidence */
+  const viewer = $("productViewer");
+  if (viewer && viewer.classList.contains("is-open")) {
+    grid.querySelectorAll(".card").forEach(c => c.classList.toggle("is-selected", Number(c.dataset.id) === Number(viewer.dataset.productId)));
+  }
 }
 
 /* ================================================================
    PANIER
 ================================================================ */
 function addToCart(id) {
-  const p = products.find(x => x.id === id);
+  const p = products.find(x => Number(x.id) === Number(id));
   if (!p) return;
-  const item = cart.find(x => x.id === id);
+  const item = cart.find(x => Number(x.id) === Number(id));
   if (item) item.qty = (item.qty || 1) + 1;
-  else cart.push({ id, qty: 1 });
+  else cart.push({ id: Number(id), qty: 1 });
   saveCart();
   renderCart();
   notify(p.name + " ajouté au panier");
@@ -1114,6 +1185,7 @@ function renderCart() {
 }
 
 function openCart() {
+  closeProductViewer();
   $("cartDrawer").classList.add("open");
   $("backdrop").classList.add("open");
 }
@@ -1248,6 +1320,7 @@ async function saveProductImage(image) {
    ADMIN
 ================================================================ */
 function openAdmin() {
+  closeProductViewer();
   $("adminModal").classList.add("open");
   document.body.style.overflow = "hidden";
   if ($("adminDash").hidden) {
@@ -1273,6 +1346,7 @@ async function adminLogin(e) {
     $("adminLogin").hidden=true; $("adminDash").hidden=false;
     await loadRemoteProducts(true);
     await loadRemoteOrders(false);
+    subscribeToOrders();
     if(adminOrdersPoll) clearInterval(adminOrdersPoll);
     adminOrdersPoll=setInterval(()=>loadRemoteOrders(true),15000);
     renderAdminProducts(); renderAdminStats();
@@ -1293,6 +1367,7 @@ async function adminLogout() {
   currentAdmin=null;
   $("adminLogin").hidden=false; $("adminDash").hidden=true;
   $("adminSecretCode").value="";
+  loadRemoteProducts(false);
   notify("Déconnecté");
 }
 
@@ -1317,8 +1392,8 @@ async function loadAdminSuppliers() {
     const active=profiles.filter(s=>s.status==="active");
     $("supplierSelect").innerHTML=active.map(s=>'<option value="'+esc(s.user_id)+'">'+esc(s.business_name)+'</option>').join("");
     $("supplierProductSelect").innerHTML='<option value="">Aucun produit lié</option>'+proposals.filter(p=>p.status==="approved").map(p=>'<option value="'+esc(p.id)+'">'+esc(p.name)+' — '+esc(p.supplier_profiles?.business_name||"Fournisseur")+'</option>').join("");
-    $("supplierOrderSelect").innerHTML=orders.map(o=>'<option value="'+esc(o.id)+'">'+esc(o.reference||o.id)+' — '+esc(o.customerName||"Client")+'</option>').join("");
-    $("adminSupplierAssignments").innerHTML=assignments.length?assignments.map(a=>'<div class="admin-product"><div><h4>'+esc(a.orders?.reference||a.order_id)+'</h4><p>'+esc(a.supplier_profiles?.business_name||a.supplier_id)+' · '+esc(a.status)+' · '+a.quantity+' × '+fmtPrice(a.supplier_unit_price)+'</p><p>'+esc(a.orders?.customer_name||"")+' · '+esc(a.orders?.delivery_city||"")+'</p></div></div>').join(""):'<div class="empty-state">Aucune commande attribuée.</div>';
+    $("supplierOrderSelect").innerHTML=orders.filter(o=>o.id).map(o=>'<option value="'+esc(o.id)+'">'+esc(o.ref||o.id)+' — '+esc((o.customer&&o.customer.name)||"Client")+'</option>').join("");
+    $("adminSupplierAssignments").innerHTML=assignments.length?assignments.map(a=>'<div class="admin-product"><div><h4>'+esc(a.orders?.reference||a.order_id)+'</h4><p>'+esc(a.supplier_profiles?.business_name||a.supplier_id)+' · '+esc(a.status)+' · '+esc(a.quantity)+' × '+fmtPrice(a.supplier_unit_price)+'</p><p>'+esc(a.orders?.customer_name||"")+' · '+esc(a.orders?.delivery_city||"")+'</p></div></div>').join(""):'<div class="empty-state">Aucune commande attribuée.</div>';
   } catch(error) {
     profilesEl.innerHTML='<div class="empty-state">Erreur de chargement : '+esc(error.message||"service indisponible")+'</div>';
     productsEl.innerHTML='';
@@ -1377,7 +1452,7 @@ function renderAdminOrders() {
         '<strong>' + esc(o.ref) + '</strong>' +
         '<span style="color:#888">' + new Date(o.date).toLocaleString("fr-FR") + '</span>' +
       '</div>' +
-      '<div style="color:#aaa">' + o.items.map(i => esc(i.name) + " × " + i.qty).join(", ") + '</div>' +
+      '<div style="color:#aaa">' + (o.items||[]).map(i => esc(i.name) + " × " + esc(i.qty)).join(", ") + '</div>' +
       '<div style="margin-top:8px;color:#d4b58b">Client : ' + esc(o.customer?.name || "Non renseigné") + ' · ' + esc(o.customer?.phone || "") + '</div>' +
       '<div style="color:#999;margin-top:4px">Adresse : ' + esc(o.customer?.address || "Non renseignée") + ' · Paiement souhaité : ' + esc(o.customer?.payment || "À confirmer") + '</div>' +
       '<div style="margin-top:8px;font-weight:600">' + fmtPrice(o.total) + '</div>' +
@@ -1479,8 +1554,9 @@ function resetAll() {
   notify("Tout a été réinitialisé");
 }
 
-
-
+/* ================================================================
+   CONSEILLER DE VENTE
+================================================================ */
 let assistantSettings = { avatar:"robot", skin_tone:"medium", voice:"auto", speak_products:true, display_name:"Sora", greeting:"Bonjour, je peux vous présenter nos pièces." };
 function assistantAvatarSvg(type, skinTone) {
   const skinColors = {light:"#f0c9a5",medium:"#c98f68",tan:"#a96f4d",dark:"#75462f",deep:"#45291f"};
@@ -1534,7 +1610,7 @@ function presentProduct(p){
   if(!p)return;
   const w=$("chatWindow");
   if(!w.classList.contains("open")){w.classList.add("open");$("chatLaunch").setAttribute("aria-expanded","true");}
-  const description=(p.description||"Une pièce choisie pour apporter une touche soignée à votre quotidien.").replace(/\\s+/g," ").trim();
+  const description=(p.description||"Une pièce choisie pour apporter une touche soignée à votre quotidien.").replace(/\s+/g," ").trim();
   const shortDescription=description.split(" ").slice(0,10).join(" ");
   const pitch=(p.name||"Ce produit")+". "+shortDescription+(description.split(" ").length>10?"…":"")+". Prix : "+fmtPrice(p.price)+".";
   chatBubble("bot",pitch);
@@ -1547,9 +1623,6 @@ function presentProduct(p){
   el.append(add,more);
   $("chatMessages").scrollTop=$("chatMessages").scrollHeight;
 }
-
-let piperTtsModulePromise = null;
-let piperAudio = null;
 
 function speakAssistant(text){
   const spokenText = String(text || "").trim();
@@ -1570,7 +1643,7 @@ function speakAssistant(text){
     if (frenchVoice) utterance.voice = frenchVoice;
   };
   chooseVoice();
-  utterance.onerror = () => notify("La lecture vocale a été interrompue. Appuie sur « Écouter la présentation » pour réessayer.");
+  utterance.onerror = (ev) => { if (ev && (ev.error === "canceled" || ev.error === "interrupted")) return; notify("La lecture vocale a été interrompue. Appuie sur « Écouter la présentation » pour réessayer."); };
   window.speechSynthesis.onvoiceschanged = chooseVoice;
   window.speechSynthesis.speak(utterance);
 }
@@ -1676,13 +1749,11 @@ function init() {
   /* Checkout */
   $("btnCheckout").addEventListener("click", checkout);
 
-  /* Reset */
+  /* Synchronisation manuelle */
   $("btnSync").addEventListener("click", async () => { await loadRemoteProducts(true); await loadRemoteOrders(false); notify("Synchronisation terminée."); });
 
   /* Ouverture auto si #admin */
   if (location.hash === "#admin") openAdmin();
-
-
 }
 
 if (document.readyState === "loading") {
