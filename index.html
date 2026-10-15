@@ -1522,27 +1522,35 @@ function presentProduct(p){
 }
 
 async function speakAssistant(text){
-  const spokenText=String(text||"").trim();
-  if(!spokenText) return;
-  if("speechSynthesis" in window) window.speechSynthesis.cancel();
-  try {
-    const publicKey=window.ATELIER_PUBLIC_CONFIG?.supabasePublishableKey;
-    const response=await fetch("https://mdafofdfznufdwscvroq.supabase.co/functions/v1/atelier-voice",{
-      method:"POST",
-      headers:{"Content-Type":"application/json",...(publicKey?{"apikey":publicKey}:{})},
-      body:JSON.stringify({text:spokenText})
-    });
-    if(!response.ok) throw new Error("ElevenLabs indisponible ("+response.status+").");
-    const audioBlob=await response.blob();
-    if(!audioBlob.size) throw new Error("La réponse audio est vide.");
-    const audioUrl=URL.createObjectURL(audioBlob);
-    const audio=new Audio(audioUrl);
-    audio.onended=()=>URL.revokeObjectURL(audioUrl);
-    audio.onerror=()=>{URL.revokeObjectURL(audioUrl);notify("Impossible de lire l’audio ElevenLabs.");};
-    await audio.play();
-  } catch(error) {
-    console.error("Atelier N° — ElevenLabs:",error);
-    notify("La voix ElevenLabs n’a pas pu démarrer. Vérifie la fonction atelier-voice et sa clé secrète dans Supabase.");
+  const spokenText = String(text || "").trim();
+  if (!spokenText) return;
+
+  if (!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) {
+    notify("La synthèse vocale n’est pas prise en charge par ce navigateur.");
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(spokenText);
+  utterance.lang = "fr-FR";
+  utterance.rate = 1;
+  utterance.pitch = 1;
+
+  const chooseVoice = () => {
+    const voices = window.speechSynthesis.getVoices();
+    const frenchVoice = voices.find(voice => voice.lang && voice.lang.toLowerCase().startsWith("fr"));
+    if (frenchVoice) utterance.voice = frenchVoice;
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length) {
+    const frenchVoice = voices.find(voice => voice.lang && voice.lang.toLowerCase().startsWith("fr"));
+    if (frenchVoice) utterance.voice = frenchVoice;
+    window.speechSynthesis.speak(utterance);
+  } else {
+    window.speechSynthesis.addEventListener("voiceschanged", chooseVoice, { once: true });
+    window.speechSynthesis.speak(utterance);
   }
 }
 function toggleChat(){const w=$("chatWindow");const open=!w.classList.contains("open");w.classList.toggle("open",open);$("chatLaunch").setAttribute("aria-expanded",String(open));if(open)$("chatInput").focus();}
