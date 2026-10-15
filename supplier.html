@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101010">
+<title>Espace fournisseur — Atelier N°</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./public-config.js"></script>
+<style>
+:root{color-scheme:dark;--bg:#101010;--panel:#191919;--line:#343434;--gold:#d4b58b;--text:#f5f1e9;--muted:#aaa}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}header{padding:22px max(20px,calc((100% - 1100px)/2));border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px}a{color:var(--gold)}.brand{font-size:22px;font-weight:750;letter-spacing:-.6px}.brand span{color:var(--gold)}main{max-width:1100px;margin:34px auto;padding:0 18px}.intro{margin-bottom:26px}.intro h1{font-size:clamp(28px,4vw,42px);line-height:1.1;letter-spacing:-1.2px;margin:0 0 10px}.muted,small{color:var(--muted)}.layout{display:grid;grid-template-columns: minmax(260px,.8fr) minmax(0,1.4fr);gap:18px}.panel{border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--panel);margin-bottom:18px}.panel h2{font-size:18px;margin:0 0 14px}.field{display:grid;gap:6px;margin:12px 0}label{font-size:13px;color:#d8d2c8}input,textarea,select{width:100%;border:1px solid #444;border-radius:9px;padding:11px 12px;background:#101010;color:var(--text);font:inherit}textarea{min-height:80px;resize:vertical}button{border:1px solid var(--gold);background:var(--gold);color:#141414;border-radius:9px;padding:11px 14px;font-weight:700;cursor:pointer}button.secondary{background:transparent;color:var(--text);border-color:#555}button:disabled{opacity:.45;cursor:not-allowed}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.notice{padding:12px;border:1px solid #454545;border-radius:10px;margin:12px 0;white-space:pre-wrap}.notice.error{border-color:#8d5148;color:#ffc0b6}.notice.ok{border-color:#4d765e;color:#b8e6c5}.hidden{display:none!important}.item{border-top:1px solid var(--line);padding:14px 0}.item:first-of-type{border-top:0}.item h3{margin:0 0 5px;font-size:16px}.tag{display:inline-block;border:1px solid #555;border-radius:20px;padding:2px 9px;font-size:12px;color:#e5caa5}.item p{margin:5px 0;color:var(--muted);font-size:13px;overflow-wrap:anywhere}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}.stat{border:1px solid var(--line);padding:12px;border-radius:12px}.stat strong{display:block;font-size:21px}.stat span{color:var(--muted);font-size:12px}@media(max-width:760px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}header{padding:18px}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="brand">Atelier <span>N°</span> <small style="font-size:12px;font-weight:500;letter-spacing:0">/ Fournisseurs</small></div><a href="./index.html">Retour à la boutique</a></header>
+<main>
+<section class="intro"><h1>Votre espace fournisseur</h1><p class="muted">Proposez vos produits, actualisez leur disponibilité et traitez uniquement les commandes qui vous sont attribuées.</p></section>
+<div id="message" class="notice hidden" role="status"></div>
+<section id="authPanel" class="panel" style="max-width:560px">
+<h2>Connexion ou demande d'accès</h2>
+<p class="muted">Créez un compte professionnel. L'administrateur doit valider votre profil avant que vous puissiez proposer des produits.</p>
+<div class="field"><label for="email">Adresse e-mail professionnelle</label><input id="email" type="email" autocomplete="email" required></div>
+<div class="field"><label for="password">Mot de passe (12 caractères minimum)</label><input id="password" type="password" autocomplete="current-password" minlength="12" required></div>
+<div id="signupFields">
+<div class="field"><label for="businessName">Nom de l'entreprise</label><input id="businessName" maxlength="120" autocomplete="organization"></div>
+<div class="field"><label for="contactName">Nom du contact</label><input id="contactName" maxlength="120" autocomplete="name"></div>
+<div class="field"><label for="phone">Téléphone</label><input id="phone" maxlength="40" autocomplete="tel"></div>
+</div>
+<div class="actions"><button id="loginBtn" type="button">Se connecter</button><button id="signupBtn" type="button" class="secondary">Demander un accès</button></div>
+<p class="muted"><small>Ne partagez jamais votre mot de passe. Utilisez une adresse e-mail que vous contrôlez.</small></p>
+</section>
+<section id="appPanel" class="hidden">
+<div class="stats">
+<div class="stat"><strong id="profileStatus">—</strong><span>Statut du compte</span></div>
+<div class="stat"><strong id="productCount">0</strong><span>Produits proposés</span></div>
+<div class="stat"><strong id="orderCount">0</strong><span>Commandes attribuées</span></div>
+</div>
+<div class="layout">
+<div>
+<section class="panel">
+<h2>Mon profil professionnel</h2>
+<div class="field"><label for="profileBusiness">Entreprise</label><input id="profileBusiness" maxlength="120"></div>
+<div class="field"><label for="profileContact">Contact</label><input id="profileContact" maxlength="120"></div>
+<div class="field"><label for="profilePhone">Téléphone</label><input id="profilePhone" maxlength="40"></div>
+<div class="actions"><button id="saveProfileBtn" type="button">Enregistrer le profil</button><button id="logoutBtn" class="secondary" type="button">Déconnexion</button></div>
+</section>
+<section class="panel">
+<h2>Proposer un produit</h2>
+<p class="muted">Le produit reste en attente jusqu'à validation par Atelier N°.</p>
+<form id="productForm">
+<div class="field"><label for="pName">Nom du produit</label><input id="pName" maxlength="140" required></div>
+<div class="field"><label for="pCategory">Catégorie</label><select id="pCategory" required><option value="Vêtements">Vêtements</option><option value="Chaussures">Chaussures</option><option value="Parfums">Parfums</option><option value="Accessoires">Accessoires</option></select></div>
+<div class="field"><label for="pPrice">Votre prix fournisseur (FCFA)</label><input id="pPrice" type="number" min="1" step="1" required></div>
+<div class="field"><label for="pQuantity">Quantité actuellement disponible</label><input id="pQuantity" type="number" min="0" step="1" value="0" required></div>
+<div class="field"><label for="pImage">URL de la photo (publique et autorisée)</label><input id="pImage" type="url" maxlength="2000" placeholder="https://…"></div>
+<div class="field"><label for="pDescription">Description et conditions</label><textarea id="pDescription" maxlength="1000" placeholder="Tailles, modèle, authenticité, délai de préparation…"></textarea></div>
+<button id="submitProductBtn" type="submit">Envoyer pour validation</button>
+</form>
+</section>
+</div>
+<div>
+<section class="panel"><h2>Mes produits</h2><div id="productsList"><p class="muted">Chargement…</p></div></section>
+<section class="panel"><h2>Commandes qui me sont attribuées</h2><p class="muted">Les informations client ne sont visibles que pour les commandes attribuées à votre compte actif.</p><div id="ordersList"><p class="muted">Chargement…</p></div></section>
+</div>
+</div>
+</section>
+</main>
+<script>
+(() => {
+  const cfg = window.ATELIER_PUBLIC_CONFIG || {};
+  const sb = window.supabase && cfg.supabaseUrl && cfg.supabasePublishableKey
+    ? window.supabase.createClient(cfg.supabaseUrl, cfg.supabasePublishableKey) : null;
+  const $ = id => document.getElementById(id);
+  let user = null, profile = null;
+  function message(text, type="") { const el=$("message"); el.textContent=text; el.className="notice"+(type?" "+type:""); }
+  function clearMessage(){ $("message").className="notice hidden"; $("message").textContent=""; }
+  function safe(v){ return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+  function statusLabel(s){ return ({pending:"En attente d'approbation",active:"Compte actif",suspended:"Compte suspendu",approved:"Validé",rejected:"Refusé",paused:"En pause",awaiting_supplier:"À confirmer",confirmed:"Confirmée",unavailable:"Indisponible",preparing:"En préparation",shipped:"Expédiée",delivered:"Livrée",cancelled:"Annulée"}[s]||s||"—"); }
+  async function requireSb(){ if(!sb) throw new Error("Configuration Supabase manquante."); }
+  async function signup(){
+    clearMessage(); await requireSb();
+    const email=$("email").value.trim(), password=$("password").value;
+    const business_name=$("businessName").value.trim(), contact_name=$("contactName").value.trim(), phone=$("phone").value.trim();
+    if(!email||password.length<12||!business_name||!contact_name||!phone) throw new Error("Renseignez tous les champs et utilisez un mot de passe de 12 caractères minimum.");
+    const {data,error}=await sb.auth.signUp({email,password,options:{data:{account_type:"supplier"}}});
+    if(error) throw error;
+    if(data.session && data.user){
+      const {error:pe}=await sb.from("supplier_profiles").insert({user_id:data.user.id,business_name,contact_name,phone,status:"pending"});
+      if(pe) throw pe;
+      await refresh();
+    } else {
+      message("Demande de compte enregistrée si l'adresse est valide. Confirmez l'e-mail si Supabase le demande, puis connectez-vous. Si la confirmation e-mail est activée, votre profil professionnel devra ensuite être créé après connexion ou par l'administrateur.","ok");
+    }
+  }
+  async function login(){
+    clearMessage(); await requireSb();
+    const {data,error}=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});
+    if(error) throw error;
+    user=data.user; await ensureProfile(); await refresh();
+  }
+  async function ensureProfile(){
+    if(!user) return;
+    const {data,error}=await sb.from("supplier_profiles").select("*").eq("user_id",user.id).maybeSingle();
+    if(error) throw error;
+    profile=data;
+    if(!profile){
+      const meta=user.user_metadata||{};
+      const business_name=String(meta.business_name||"").trim();
+      if(!business_name){ message("Votre compte est connecté, mais votre profil fournisseur n'est pas encore créé. Contactez l'administrateur pour finaliser l'inscription.","error"); return; }
+      const {error:insertError}=await sb.from("supplier_profiles").insert({user_id:user.id,business_name,contact_name:String(meta.contact_name||""),phone:String(meta.phone||""),status:"pending"});
+      if(insertError) throw insertError;
+      const {data:next,error:nextError}=await sb.from("supplier_profiles").select("*").eq("user_id",user.id).single();
+      if(nextError) throw nextError; profile=next;
+    }
+  }
+  async function refresh(){
+    clearMessage();
+    const {data:{user:current},error}=await sb.auth.getUser(); if(error) throw error;
+    user=current;
+    if(!user){ $("authPanel").classList.remove("hidden"); $("appPanel").classList.add("hidden"); return; }
+    await ensureProfile();
+    $("authPanel").classList.add("hidden"); $("appPanel").classList.remove("hidden");
+    if(!profile){ $("profileStatus").textContent="Profil manquant"; return; }
+    $("profileStatus").textContent=statusLabel(profile.status);
+    $("profileBusiness").value=profile.business_name||""; $("profileContact").value=profile.contact_name||""; $("profilePhone").value=profile.phone||"";
+    const active=profile.status==="active";
+    $("productForm").querySelectorAll("input,select,textarea,button").forEach(el=>el.disabled=!active);
+    $("saveProfileBtn").disabled=false;
+    await Promise.all([loadProducts(),loadOrders()]);
+    if(profile.status==="pending") message("Votre compte attend l'approbation de l'administrateur. Vous pourrez proposer des produits après validation.","ok");
+    if(profile.status==="suspended") message("Votre compte est suspendu. Contactez l'administrateur.","error");
+  }
+  async function loadProducts(){
+    const {data,error}=await sb.from("supplier_products").select("id,name,category,supplier_price,available_quantity,status,admin_note,created_at").eq("supplier_id",user.id).order("created_at",{ascending:false});
+    if(error) throw error;
+    $("productCount").textContent=data.length;
+    $("productsList").innerHTML=data.length?data.map(p=>'<article class="item"><h3>'+safe(p.name)+'</h3><span class="tag">'+safe(statusLabel(p.status))+'</span><p>'+safe(p.category)+' · Prix fournisseur : '+Number(p.supplier_price).toLocaleString("fr-FR")+' FCFA · Stock : '+p.available_quantity+'</p>'+(p.admin_note?'<p>Note admin : '+safe(p.admin_note)+'</p>':'')+'</article>').join(""):'<p class="muted">Aucun produit proposé pour le moment.</p>';
+  }
+  async function loadOrders(){
+    const {data,error}=await sb.from("order_supplier_assignments").select("id,order_id,supplier_product_id,quantity,supplier_unit_price,status,supplier_note,created_at,orders:orders(reference,customer_name,customer_phone,delivery_city,delivery_address,customer_note)").eq("supplier_id",user.id).order("created_at",{ascending:false});
+    if(error) throw error;
+    $("orderCount").textContent=data.length;
+    $("ordersList").innerHTML=data.length?data.map(o=>{const d=o.orders||{};return '<article class="item"><h3>Commande '+safe(d.reference||o.order_id)+'</h3><span class="tag">'+safe(statusLabel(o.status))+'</span><p>Article : '+safe(o.supplier_product_id||"Produit attribué")+' · Quantité : '+o.quantity+' · Total fournisseur : '+(Number(o.supplier_unit_price)*Number(o.quantity)).toLocaleString("fr-FR")+' FCFA</p><p>Client : '+safe(d.customer_name||"—")+' · '+safe(d.customer_phone||"—")+'</p><p>Livraison : '+safe(d.delivery_city||"—")+' — '+safe(d.delivery_address||"—")+'</p>'+(d.customer_note?'<p>Note client : '+safe(d.customer_note)+'</p>':'')+'<div class="field"><label for="note-'+o.id+'">Note de traitement</label><input id="note-'+o.id+'" maxlength="500" value="'+safe(o.supplier_note||"")+'"></div><div class="grid2"><div class="field"><label for="status-'+o.id+'">État de la commande</label><select id="status-'+o.id+'">'+["awaiting_supplier","confirmed","unavailable","preparing","shipped","delivered","cancelled"].map(s=>'<option value="'+s+'" '+(s===o.status?'selected':'')+'>'+safe(statusLabel(s))+'</option>').join("")+'</select></div><div class="field" style="align-self:end"><button type="button" data-save-order="'+o.id+'">Mettre à jour</button></div></div></article>'}).join(""):'<p class="muted">Aucune commande ne vous a encore été attribuée.</p>';
+    $("ordersList").querySelectorAll("[data-save-order]").forEach(btn=>btn.addEventListener("click",()=>saveOrder(btn.dataset.saveOrder)));
+  }
+  async function saveOrder(id){
+    const status=$("status-"+id).value, supplier_note=$("note-"+id).value.trim();
+    const {error}=await sb.from("order_supplier_assignments").update({status,supplier_note,updated_at:new Date().toISOString()}).eq("id",id).eq("supplier_id",user.id);
+    if(error) throw error; message("Mise à jour de la commande enregistrée.","ok"); await loadOrders();
+  }
+  $("productForm").addEventListener("submit",async e=>{
+    e.preventDefault();
+    try{
+      if(!profile||profile.status!=="active") throw new Error("Votre compte doit être approuvé avant de proposer un produit.");
+      const product={supplier_id:user.id,name:$("pName").value.trim(),category:$("pCategory").value,supplier_price:Number($("pPrice").value),available_quantity:Number($("pQuantity").value),image_url:$("pImage").value.trim(),description:$("pDescription").value.trim(),status:"pending"};
+      const {error}=await sb.from("supplier_products").insert(product); if(error) throw error;
+      e.target.reset(); $("pQuantity").value="0"; await loadProducts(); message("Produit envoyé à l'administrateur pour validation. Il n'est pas encore publié sur la boutique.","ok");
+    }catch(err){message(err.message||"Impossible d'envoyer le produit.","error")}
+  });
+  $("saveProfileBtn").addEventListener("click",async()=>{
+    try{const {error}=await sb.from("supplier_profiles").update({business_name:$("profileBusiness").value.trim(),contact_name:$("profileContact").value.trim(),phone:$("profilePhone").value.trim(),updated_at:new Date().toISOString()}).eq("user_id",user.id);if(error)throw error;await ensureProfile();message("Profil enregistré.","ok")}
+    catch(err){message(err.message||"Erreur de profil.","error")}
+  });
+  $("loginBtn").addEventListener("click",()=>login().catch(e=>message(e.message||"Connexion impossible.","error")));
+  $("signupBtn").addEventListener("click",()=>signup().catch(e=>message(e.message||"Inscription impossible.","error")));
+  $("logoutBtn").addEventListener("click",async()=>{await sb.auth.signOut();user=null;profile=null;await refresh();message("Vous êtes déconnecté.")});
+  if(!sb){message("Configuration Supabase manquante. Vérifiez public-config.js.","error");$("loginBtn").disabled=true;$("signupBtn").disabled=true}
+  else sb.auth.getSession().then(({data})=>{if(data.session)refresh().catch(e=>message(e.message||"Erreur de chargement.","error"))});
+})();
+</script>
+</body>
+</html>
