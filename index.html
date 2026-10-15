@@ -413,7 +413,11 @@ img { display: block; max-width: 100%; }
 .product-viewer-panel { position:relative;width:min(900px,100%);max-height:90vh;overflow:auto;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:30px;align-items:center;padding:clamp(18px,4vw,38px);background:linear-gradient(145deg,#191919,#0d0d0d);border:1px solid #35302a;border-radius:18px;box-shadow:0 30px 100px #000a; }
 .product-viewer-close { position:absolute;right:14px;top:14px;width:38px;height:38px;border-radius:50%;border:1px solid #555;background:#111;color:#fff;font-size:24px;z-index:3; }
 .product-stage { min-height:340px;display:flex;align-items:center;justify-content:center;perspective:1000px;overflow:hidden;border-radius:12px;background:radial-gradient(ellipse at center,#38332b 0%,#171614 50%,#101010 100%); }
-.product-stage img { width:88%;height:clamp(270px,48vh,480px);object-fit:contain;filter:drop-shadow(0 28px 18px #0008);transform-style:preserve-3d;animation:productFloat 4.5s ease-in-out infinite,productTurn 8s ease-in-out infinite; }
+.product-stage img,.product-stage model-viewer { width:100%;height:clamp(270px,48vh,480px);object-fit:contain;filter:drop-shadow(0 28px 18px #0008);background:transparent;--poster-color:transparent; }
+ .product-stage img { width:88%;animation:productFloat 4.5s ease-in-out infinite,productTurn 8s ease-in-out infinite; }
+ .product-stage model-viewer { display:none; }
+ .product-stage.has-model model-viewer { display:block; }
+ .product-stage.has-model img { display:none; }
 .product-viewer-info { padding:16px 8px 16px 0; }
 .product-viewer-kicker { color:#d4b58b;font-size:10px;text-transform:uppercase;letter-spacing:2.5px;margin-bottom:12px; }
 .product-viewer-info h2 { font:400 clamp(26px,4vw,42px)/1.12 Georgia,serif;margin-bottom:14px; }
@@ -550,6 +554,11 @@ img { display: block; max-width: 100%; }
             <img id="fieldImagePreview" alt="Aperçu de la photo" hidden style="max-width:160px;max-height:180px;object-fit:cover;border-radius:8px;margin-top:10px">
           </div>
           <div class="field">
+            <label for="fieldModel3D">Modèle 3D du produit (.glb ou .gltf, facultatif)</label>
+            <input type="url" id="fieldModel3D" maxlength="2000" placeholder="https://…/produit.glb">
+            <small style="color:#888">Ajoutez l’URL d’un modèle 3D réel pour permettre la rotation interactive. Sans modèle, la photo reste affichée.</small>
+          </div>
+          <div class="field">
             <label for="fieldDescription">Description</label>
             <textarea id="fieldDescription" maxlength="500"></textarea>
           </div>
@@ -627,6 +636,7 @@ img { display: block; max-width: 100%; }
 </div>
 <div class="toast" id="toast"></div>
 
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0"></script>
 <script src="./public-config.js"></script>
 <script>
@@ -725,7 +735,7 @@ function ensureProductViewer() {
   if ($("productViewer")) return;
   const viewer=document.createElement("div");
   viewer.id="productViewer"; viewer.className="product-viewer";
-  viewer.innerHTML='<div class="product-viewer-panel" role="dialog" aria-modal="true" aria-labelledby="viewerTitle"><button type="button" class="product-viewer-close" aria-label="Fermer">×</button><div class="product-stage"><img id="viewerImage" alt=""></div><div class="product-viewer-info"><div class="product-viewer-kicker">Atelier N° · Présentation produit</div><h2 id="viewerTitle"></h2><p id="viewerDescription"></p><div class="product-viewer-price" id="viewerPrice"></div><div class="product-viewer-actions"><button type="button" class="btn-primary" id="viewerAdd">Ajouter au panier</button><button type="button" class="btn" id="viewerCloseSecondary">Continuer</button></div></div></div>';
+  viewer.innerHTML='<div class="product-viewer-panel" role="dialog" aria-modal="true" aria-labelledby="viewerTitle"><button type="button" class="product-viewer-close" aria-label="Fermer">×</button><div class="product-stage" id="viewerStage"><img id="viewerImage" alt=""><model-viewer id="viewerModel" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="18deg" shadow-intensity="1" exposure="1" environment-image="neutral" interaction-prompt="auto" ar></model-viewer></div><div class="product-viewer-info"><div class="product-viewer-kicker">Atelier N° · Présentation produit</div><h2 id="viewerTitle"></h2><p id="viewerDescription"></p><div class="product-viewer-price" id="viewerPrice"></div><div class="product-viewer-actions"><button type="button" class="btn-primary" id="viewerAdd">Ajouter au panier</button><button type="button" class="btn" id="viewerCloseSecondary">Continuer</button></div></div></div>';
   document.body.appendChild(viewer);
   const close=()=>{viewer.classList.remove("is-open");document.body.style.overflow="";};
   viewer.querySelector(".product-viewer-close").addEventListener("click",close);
@@ -738,6 +748,8 @@ function openProductViewer(id) {
   const p=products.find(x=>Number(x.id)===Number(id)); if(!p)return;
   ensureProductViewer();
   $("viewerImage").src=p.image||""; $("viewerImage").alt=p.name||"Produit";
+  const model=$("viewerModel"),stage=$("viewerStage");
+  if(p.model3d){model.src=p.model3d;stage.classList.add("has-model");}else{model.removeAttribute("src");stage.classList.remove("has-model");}
   $("viewerTitle").textContent=p.name||"";
   $("viewerDescription").textContent=p.description||p.category||"Découvrez ce produit Atelier N°.";
   $("viewerPrice").textContent=fmtPrice(p.price);
@@ -978,7 +990,7 @@ async function loadRemoteProducts(showError=false) {
       if(result.error) throw result.error;
       data=result.data;
     }
-    products=(data||[]).map(p=>({id:Number(p.id),name:p.name,category:p.category,price:Number(p.price)||0,description:p.description||"",image:p.image||"",tag:p.tag||"",published:p.published}));
+    products=(data||[]).map(p=>({id:Number(p.id),name:p.name,category:p.category,price:Number(p.price)||0,description:p.description||"",image:p.image||"",model3d:p.model3d||p.model_3d||"",tag:p.tag||"",published:p.published}));
     renderShop(); renderAdminProducts(); renderAdminStats();
   } catch(error) { console.error("Chargement catalogue Supabase:",error); if(showError) notify(error.message || "Impossible de synchroniser le catalogue."); }
 }
@@ -1126,6 +1138,7 @@ function startNew() {
   $("fieldImagePreview").removeAttribute("src");
   $("fieldImagePreview").dataset.dataUrl = "";
   $("fieldDescription").value = "";
+  $("fieldModel3D").value = "";
   $("productForm").hidden = false;
   $("fieldName").focus();
 }
@@ -1146,6 +1159,7 @@ function startEdit(id) {
   $("fieldImagePreview").hidden = !p.image;
   $("fieldImagePreview").dataset.dataUrl = (p.image || "").startsWith("data:") ? p.image : "";
   $("fieldDescription").value = p.description || "";
+  $("fieldModel3D").value = p.model3d || "";
   $("productForm").hidden = false;
   $("productForm").scrollIntoView({ behavior: "smooth", block: "center" });
 }
@@ -1162,13 +1176,15 @@ async function saveProduct(e) {
   const price=Number($("fieldPrice").value)||0, tag=$("fieldTag").value.trim();
   let image=$("fieldImagePreview").dataset.dataUrl || $("fieldImage").value.trim();
   const description=$("fieldDescription").value.trim();
+  const model3d=$("fieldModel3D").value.trim();
+  if(model3d && !/\.(glb|gltf)(?:[?#].*)?$/i.test(model3d)) return notify("L’URL du modèle doit se terminer par .glb ou .gltf.");
   if(!name || !category || price<=0) return notify("Remplissez nom, catégorie et prix.");
   const button=$("productForm").querySelector('button[type="submit"]');
   if(button){button.disabled=true;button.textContent="Enregistrement…";}
   const wasEditing=Boolean(editingId);
   try {
     image=await saveProductImage(image);
-    const record={name,category,price,tag,image,description,published:true,updated_at:new Date().toISOString()};
+    const record={name,category,price,tag,image,description,model3d,published:true,updated_at:new Date().toISOString()};
     await adminApi("products:save",{product:{...record,id:wasEditing?editingId:undefined}});
     await loadRemoteProducts(false); cancelForm();
     notify(wasEditing ? "Produit modifié et synchronisé." : "Produit ajouté et synchronisé.");
