@@ -1526,18 +1526,32 @@ function speakAssistant(text){
   window.speechSynthesis.cancel();
   const utterance=new SpeechSynthesisUtterance(String(text||""));
   utterance.lang="fr-FR";
-  const voices=window.speechSynthesis.getVoices();
   const mode=assistantSettings.voice==="auto"?(assistantSettings.avatar==="man"?"male":assistantSettings.avatar==="woman"?"female":"robot"):assistantSettings.voice;
-  const french=voices.filter(v=>/^fr([-_]|$)/i.test(v.lang));
-  let chosen=null;
-  if(mode==="male") chosen=french.find(v=>/male|homme|thomas|henri|paul|daniel|male/i.test(v.name));
-  else if(mode==="female") chosen=french.find(v=>/female|femme|amelie|marie|audrey|julie|celine|lea/i.test(v.name));
-  else if(mode==="robot") chosen=french.find(v=>/compact|synthetic|robot|google/i.test(v.name));
-  if(!chosen) chosen=french[0]||voices[0];
-  if(chosen) utterance.voice=chosen;
-  utterance.rate=mode==="robot"?0.94:0.98;
-  utterance.pitch=mode==="male"?0.88:mode==="female"?1.08:0.92;
-  window.speechSynthesis.speak(utterance);
+  const chooseVoice=()=>{
+    const voices=window.speechSynthesis.getVoices();
+    const french=voices.filter(v=>/^fr([-_]|$)/i.test(v.lang));
+    let chosen=null;
+    if(mode==="male") chosen=french.find(v=>/thomas|henri|paul|daniel|male|homme/i.test(v.name));
+    else if(mode==="female") chosen=french.find(v=>/amelie|audrey|julie|celine|léa|lea|female|femme/i.test(v.name));
+    else chosen=french.find(v=>/google français|google francais|premium|enhanced|natural/i.test(v.name));
+    if(!chosen) chosen=french.find(v=>v.localService)||french[0]||voices[0];
+    if(chosen) utterance.voice=chosen;
+    // Rythme publicitaire plus posé, avec une intonation chaleureuse.
+    utterance.rate=mode==="robot"?0.91:0.88;
+    utterance.pitch=mode==="male"?0.94:mode==="female"?1.12:0.98;
+    utterance.volume=1;
+    window.speechSynthesis.speak(utterance);
+  };
+  const voices=window.speechSynthesis.getVoices();
+  if(voices.length) chooseVoice();
+  else {
+    window.speechSynthesis.addEventListener("voiceschanged",function onVoices(){
+      window.speechSynthesis.removeEventListener("voiceschanged",onVoices);
+      chooseVoice();
+    },{once:true});
+    // Fallback si le navigateur ne déclenche pas voiceschanged rapidement.
+    setTimeout(()=>{if(window.speechSynthesis.speaking===false)chooseVoice();},250);
+  }
 }
 function toggleChat(){const w=$("chatWindow");const open=!w.classList.contains("open");w.classList.toggle("open",open);$("chatLaunch").setAttribute("aria-expanded",String(open));if(open)$("chatInput").focus();}
 function chatBubble(role,text){const n=document.createElement("div");n.className="chat-message "+role;n.textContent=text;$("chatMessages").appendChild(n);$("chatMessages").scrollTop=$("chatMessages").scrollHeight;}
