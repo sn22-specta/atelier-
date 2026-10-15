@@ -1007,7 +1007,7 @@ function renderShop() {
       '</div>';
     card.addEventListener("click", (event) => {
       if (event.target.closest("[data-add]")) return;
-      presentProduct(p);
+      openProductViewer(p.id);
     });
     grid.appendChild(card);
   });
