@@ -1465,12 +1465,15 @@ function assistantAvatarSvg(type, skinTone) {
   return '<svg viewBox="0 0 80 80" role="img" aria-label="Robot conseiller"><defs><linearGradient id="robotMetal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff1d8"/><stop offset=".55" stop-color="#c7a477"/><stop offset="1" stop-color="#785638"/></linearGradient></defs><circle cx="40" cy="40" r="39" fill="#b69a77"/><path d="M40 8v9" stroke="#f9e7cc" stroke-width="3" stroke-linecap="round"/><circle cx="40" cy="7" r="4" fill="#fff1d8"/><rect x="15" y="19" width="50" height="40" rx="13" fill="url(#robotMetal)" stroke="#f7e4c8" stroke-width="2"/><rect x="22" y="27" width="36" height="19" rx="8" fill="#20201e"/><circle cx="32" cy="36" r="3.5" fill="#f7dcb4"/><circle cx="48" cy="36" r="3.5" fill="#f7dcb4"/><path d="M32 51Q40 56 48 51" stroke="#3b2b1b" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M15 34H9v15h8M65 34h6v15h-8" fill="none" stroke="#f7e4c8" stroke-width="3"/><path d="M27 59v7h26v-7" fill="#d7b68a"/><path d="M31 66v6m18-6v6" stroke="#f7e4c8" stroke-width="3" stroke-linecap="round"/></svg>';
 }
 function paintAssistantAvatar(){
-  const svg=assistantAvatarSvg(assistantSettings.avatar,assistantSettings.skin_tone);
+  const avatar=$("assistantAvatarChoice")?.value||assistantSettings.avatar;
+  const skinTone=$("assistantSkinTone")?.value||assistantSettings.skin_tone;
+  const displayName=$("assistantDisplayName")?.value.trim()||assistantSettings.display_name||"Sora";
+  const svg=assistantAvatarSvg(avatar,skinTone);
   ["assistantAvatarButton","assistantAvatarHead"].forEach(id=>{const el=$(id);if(el)el.innerHTML=svg;});
-  if($("assistantHeaderName"))$("assistantHeaderName").textContent=assistantSettings.display_name||"Sora";
-  if($("chatLaunch"))$("chatLaunch").setAttribute("aria-label","Ouvrir le conseiller "+(assistantSettings.display_name||"Sora"));
+  if($("assistantHeaderName"))$("assistantHeaderName").textContent=displayName;
+  if($("chatLaunch"))$("chatLaunch").setAttribute("aria-label","Ouvrir le conseiller "+displayName);
   const preview=$("assistantPreview");
-  if(preview)preview.innerHTML='<span class="assistant-avatar" style="width:42px;height:42px;flex:0 0 42px">'+svg+'</span><span>Aperçu : '+esc(assistantSettings.avatar==="man"?"Homme":assistantSettings.avatar==="woman"?"Femme":"Robot")+' · Teinte : '+esc(({light:"claire",medium:"medium",tan:"mate",dark:"foncée",deep:"très foncée"})[assistantSettings.skin_tone]||"medium")+' · '+esc(assistantSettings.display_name||"Sora")+'</span>';
+  if(preview)preview.innerHTML='<span class="assistant-avatar" style="width:42px;height:42px;flex:0 0 42px">'+svg+'</span><span>Aperçu : '+esc(avatar==="man"?"Homme":avatar==="woman"?"Femme":"Robot")+' · Teinte : '+esc(({light:"claire",medium:"medium",tan:"mate",dark:"foncée",deep:"très foncée"})[skinTone]||"medium")+' · '+esc(displayName)+'</span>';
 }
 async function loadAssistantSettings(){
   if(!supabaseClient)return;
