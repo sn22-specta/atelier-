@@ -1473,6 +1473,9 @@ async function loadAssistantSettings(){
     const {data,error}=await supabaseClient.from("store_assistant_settings").select("avatar,display_name,greeting").eq("id",1).maybeSingle();
     if(error)throw error;
     if(data)assistantSettings={avatar:data.avatar||"robot",display_name:data.display_name||"Sora",greeting:data.greeting||"Bonjour, je peux vous présenter nos pièces."};
+    if($("assistantAvatarChoice"))$("assistantAvatarChoice").value=assistantSettings.avatar;
+    if($("assistantDisplayName"))$("assistantDisplayName").value=assistantSettings.display_name;
+    if($("assistantGreeting"))$("assistantGreeting").value=assistantSettings.greeting;
     paintAssistantAvatar();
     if($("chatMessages")&&$("chatMessages").children.length===1){$("chatMessages").replaceChildren();chatBubble("bot",assistantSettings.greeting);}
   }catch(error){console.warn("Paramètres du conseiller non chargés",error);}
