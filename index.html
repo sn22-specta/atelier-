@@ -602,9 +602,13 @@ button:disabled { opacity: .58; cursor: wait; transform: none !important; }
 
 
 /* Fiche produit interactive */
-.product-viewer { display:none; }
-.product-viewer.is-open { display:flex; }
-#shopGrid .card { cursor:pointer; }
+.product-viewer { display:none; opacity:0; }
+.product-viewer.is-open { display:flex; opacity:1; }
+.product-viewer-panel { will-change:transform, opacity; animation:viewerPanelIn .28s cubic-bezier(.2,.75,.25,1) both; }
+@keyframes viewerPanelIn { from { opacity:0; transform:translateY(12px) scale(.985); } to { opacity:1; transform:translateY(0) scale(1); } }
+#shopGrid .card { cursor:pointer; -webkit-tap-highlight-color:transparent; }
+#shopGrid .card-img img { content-visibility:auto; }
+@media(prefers-reduced-motion:reduce) { .product-viewer-panel { animation:none; } }
 
 /* Conseiller de vente visuel configurable par l’administration */
 .chat-launch { width:66px;height:66px;right:22px;bottom:22px;border-radius:50%;padding:4px;overflow:visible; }
@@ -953,7 +957,7 @@ function ensureProductViewer() {
   viewer.id="productViewer"; viewer.className="product-viewer";
   viewer.innerHTML='<div class="product-viewer-panel" role="dialog" aria-modal="true" aria-labelledby="viewerTitle"><button type="button" class="product-viewer-close" aria-label="Fermer">×</button><div class="product-stage" id="viewerStage"><img id="viewerImage" alt=""><model-viewer id="viewerModel" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="18deg" shadow-intensity="1" exposure="1" environment-image="neutral" interaction-prompt="auto" ar></model-viewer></div><div class="product-viewer-info"><div class="product-viewer-kicker">Atelier N° · Présentation produit</div><h2 id="viewerTitle"></h2><p id="viewerDescription"></p><div class="product-viewer-price" id="viewerPrice"></div><div class="product-viewer-actions"><button type="button" class="btn" id="viewerSpeak">Écouter la présentation</button><button type="button" class="btn-primary" id="viewerAdd">Ajouter au panier</button><button type="button" class="btn" id="viewerCloseSecondary">Continuer</button></div></div></div>';
   document.body.appendChild(viewer);
-  const close=()=>{viewer.classList.remove("is-open");document.body.style.overflow="";};
+  const close=()=>{viewer.classList.remove("is-open");viewer.setAttribute("aria-hidden","true");document.body.style.overflow="";if("speechSynthesis" in window)window.speechSynthesis.cancel();};
   viewer.querySelector(".product-viewer-close").addEventListener("click",close);
   $("viewerCloseSecondary").addEventListener("click",close);
   $("viewerSpeak").addEventListener("click",()=>{const p=products.find(x=>Number(x.id)===Number(viewer.dataset.productId));if(p){const d=(p.description||"Découvrez ce produit Atelier N°.").replace(/\s+/g," ").trim();speakAssistant((p.name||"Ce produit")+". "+d+". Prix : "+fmtPrice(p.price)+".");}});
@@ -972,6 +976,7 @@ function openProductViewer(id) {
   $("viewerPrice").textContent=fmtPrice(p.price);
   $("productViewer").dataset.productId=String(p.id);
   $("productViewer").classList.add("is-open");
+  $("productViewer").setAttribute("aria-hidden","false");
   document.body.style.overflow="hidden";
   if (assistantSettings && assistantSettings.speak_products) {
     const d=(p.description||"Découvrez ce produit Atelier N°.").replace(/\s+/g," ").trim();
@@ -1001,7 +1006,7 @@ function renderShop() {
     card.className = "card";
     card.innerHTML =
       '<div class="card-img">' +
-        '<img src="' + esc(p.image || "") + '" alt="' + esc(p.name) + '" onerror="this.style.display=\'none\'">' +
+        '<img src="' + esc(p.image || "") + '" alt="' + esc(p.name) + '" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">' +
       '</div>' +
       '<div class="card-body">' +
         '<h3>' + esc(p.name) + '</h3>' +
@@ -1011,9 +1016,20 @@ function renderShop() {
           '<button class="btn-add" data-add="' + p.id + '">+ Panier</button>' +
         '</div>' +
       '</div>';
-    card.addEventListener("click", (event) => {
-      if (event.target.closest("[data-add]")) return;
+    card.setAttribute("role","button");
+    card.setAttribute("tabindex","0");
+    card.setAttribute("aria-label","Voir le produit "+(p.name||""));
+    const showProduct = (event) => {
+      if (event && event.target && event.target.closest("[data-add]")) return;
       openProductViewer(p.id);
+    };
+    card.addEventListener("click", showProduct);
+    card.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        if (event.target.closest("[data-add]")) return;
+        event.preventDefault();
+        openProductViewer(p.id);
+      }
     });
     grid.appendChild(card);
   });
