@@ -602,6 +602,16 @@ button:disabled { opacity: .58; cursor: wait; transform: none !important; }
 /* Désactivation de la fiche produit flottante */
 .product-viewer { display:none !important; }
 #shopGrid .card { cursor:default !important; }
+
+/* Conseiller de vente visuel configurable par l’administration */
+.chat-launch { width:66px;height:66px;right:22px;bottom:22px;border-radius:50%;padding:4px;overflow:visible; }
+.assistant-avatar { width:100%;height:100%;display:grid;place-items:center;border-radius:50%;overflow:hidden;background:linear-gradient(145deg,#e7d3b4,#8b6845);border:1px solid #f1d7b1;box-shadow:0 6px 24px #0008; }
+.assistant-avatar svg { width:100%;height:100%;display:block; }
+.assistant-avatar-small { width:36px;height:36px;flex:0 0 36px; }
+.chat-head { gap:10px; }
+#assistantPreview { display:flex;align-items:center;gap:10px; }
+@media(max-width:600px){.chat-launch{right:14px;bottom:14px;width:60px;height:60px}.chat-window{right:10px;bottom:84px}}
+
 </style>
 </head>
 <body>
@@ -770,6 +780,15 @@ button:disabled { opacity: .58; cursor: wait; transform: none !important; }
 
       <!-- TAB CONFIG -->
       <div class="tab-panel" data-panel="config">
+        <div class="assistant-admin-settings" style="margin:0 0 22px;padding:18px;border:1px solid #3a3329;background:#111;border-radius:10px">
+          <h3 style="font-family:Georgia,serif;font-weight:400;margin-bottom:8px">Conseiller de vente</h3>
+          <p style="color:#999;font-size:13px;line-height:1.6;margin-bottom:14px">Choisissez le personnage affiché en bas de la boutique. Quand un client sélectionne un produit, il le présente et l’invite à l’ajouter au panier.</p>
+          <div class="field"><label for="assistantAvatarChoice">Personnage</label><select id="assistantAvatarChoice"><option value="robot">Robot</option><option value="man">Homme</option><option value="woman">Femme</option></select></div>
+          <div class="field"><label for="assistantDisplayName">Nom du conseiller</label><input id="assistantDisplayName" maxlength="40" value="Sora" placeholder="Ex. Sora"></div>
+          <div class="field"><label for="assistantGreeting">Message d’accueil</label><textarea id="assistantGreeting" maxlength="240" rows="2" placeholder="Message affiché aux visiteurs"></textarea></div>
+          <button type="button" class="btn-primary" id="saveAssistantSettings">Enregistrer le conseiller</button>
+          <div id="assistantPreview" style="margin-top:12px;color:#d4b58b;font-size:12px">Aperçu : Robot · Sora</div>
+        </div>
         <div style="background:rgba(212,181,139,0.08);border:1px dashed rgba(212,181,139,0.4);padding:16px;border-radius:10px;font-size:13px;line-height:1.7;color:#d2c3ae">
           <strong>Synchronisation active :</strong> catalogue, photos et commandes sont partagés via Supabase. Les nouvelles commandes arrivent dans l'onglet Commandes en temps réel.
         </div>
@@ -818,9 +837,9 @@ button:disabled { opacity: .58; cursor: wait; transform: none !important; }
 </div>
 <section class="cinematic-banner"><div class="eyebrow">Atelier N°</div><h2>Le détail fait toute la différence.</h2><p>Découvrez une collection pensée pour durer.</p></section>
 <a class="whatsapp-float" href="https://wa.me/221771234567?text=Bonjour%20Atelier%20N%C2%B0%2C%20je%20souhaite%20des%20informations." target="_blank" rel="noopener noreferrer" aria-label="Contacter Atelier N° sur WhatsApp" title="Contacter sur WhatsApp"><svg aria-hidden="true" viewBox="0 0 32 32" width="29" height="29" fill="none"><path d="M16 3.3A12.1 12.1 0 0 0 5.6 21.6L4 28l6.6-1.7A12.1 12.1 0 1 0 16 3.3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M11 9.5c-.4-.8-.8-.8-1.2-.8h-.9c-.4 0-1 .2-1.5.7-.5.5-1.9 1.8-1.9 4.3s1.9 5 2.2 5.3c.3.3 3.7 5.9 9.1 7.1 4.5 1 5.4-.7 6.4-1.5 1-.9 1.3-1.8 1.2-2.1-.1-.4-.4-.5-.9-.8l-3-1.4c-.4-.2-.8-.3-1.1.3-.3.5-1.2 1.5-1.5 1.8-.3.3-.6.4-1.1.1-.5-.2-2.1-.8-4-2.5-1.5-1.3-2.5-3-2.8-3.5-.3-.5 0-.8.2-1 .2-.2.5-.6.8-.9.3-.3.4-.5.5-.8.2-.3.1-.6 0-.9L11 9.5Z" fill="currentColor" transform="translate(4 1) scale(.8)"/></svg></a>
-<button class="chat-launch" id="chatLaunch" aria-label="Ouvrir l’assistant Atelier N°" aria-expanded="false"><span class="orb"></span></button>
+<button class="chat-launch" id="chatLaunch" aria-label="Ouvrir le conseiller de vente Atelier N°" aria-expanded="false"><span class="assistant-avatar" id="assistantAvatarButton" aria-hidden="true"></span></button>
 <div class="chat-window" id="chatWindow" role="dialog" aria-label="Assistant Atelier N°">
-  <div class="chat-head"><span class="orb"></span><div class="chat-id"><b>Sora · Atelier N°</b><small><i class="chat-status-dot"></i><span id="chatStatus">Assistant local</span></small></div><button class="modal-close" id="chatClose" type="button" style="position:static">✕</button></div>
+  <div class="chat-head"><span class="assistant-avatar assistant-avatar-small" id="assistantAvatarHead" aria-hidden="true"></span><div class="chat-id"><b><span id="assistantHeaderName">Sora</span> · Atelier N°</b><small><i class="chat-status-dot"></i><span id="chatStatus">Assistant local</span></small></div><button class="modal-close" id="chatClose" type="button" style="position:static">✕</button></div>
   <div class="chat-messages" id="chatMessages" aria-live="polite"></div><div class="chat-suggestions" id="chatSuggestions"></div>
   <form class="chat-form" id="chatForm"><textarea id="chatInput" rows="1" placeholder="Écrivez votre message…" maxlength="1000" required></textarea><button class="btn-primary" type="submit" aria-label="Envoyer">↑</button></form>
 </div>
@@ -980,6 +999,10 @@ function renderShop() {
           '<button class="btn-add" data-add="' + p.id + '">+ Panier</button>' +
         '</div>' +
       '</div>';
+    card.addEventListener("click", (event) => {
+      if (event.target.closest("[data-add]")) return;
+      presentProduct(p);
+    });
     grid.appendChild(card);
   });
 
@@ -1429,6 +1452,57 @@ function resetAll() {
 }
 
 
+
+let assistantSettings = { avatar:"robot", display_name:"Sora", greeting:"Bonjour, je peux vous présenter nos pièces." };
+function assistantAvatarSvg(type) {
+  if (type === "man") return '<svg viewBox="0 0 80 80" role="img" aria-label="Portrait illustré d’un conseiller"><defs><linearGradient id="skinM" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d9a77b"/><stop offset="1" stop-color="#8b5639"/></linearGradient></defs><circle cx="40" cy="40" r="39" fill="#c9ad8c"/><path d="M13 80V65Q16 52 31 51H49Q64 52 67 65V80" fill="#202b36"/><path d="M31 47h18v13l-9 8-9-8z" fill="url(#skinM)"/><path d="M23 29Q21 11 40 10Q61 10 58 32L55 45Q49 57 40 57Q29 55 25 43z" fill="url(#skinM)"/><path d="M22 31Q15 14 34 8Q54 3 60 19L56 31 49 20Q37 26 23 24z" fill="#2b201b"/><path d="M28 35h7m10 0h7" stroke="#3a241b" stroke-width="3" stroke-linecap="round"/><path d="M34 46Q40 50 46 46" stroke="#6c342a" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M30 60l10 9 10-9" fill="#f0e4d4"/></svg>';
+  if (type === "woman") return '<svg viewBox="0 0 80 80" role="img" aria-label="Portrait illustré d’une conseillère"><defs><linearGradient id="skinW" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e5b995"/><stop offset="1" stop-color="#a86c4c"/></linearGradient></defs><circle cx="40" cy="40" r="39" fill="#d7c0a1"/><path d="M13 80V65Q16 52 31 51H49Q64 52 67 65V80" fill="#26313b"/><path d="M21 31Q18 7 40 8Q64 7 60 34L57 57 48 64H31L23 55z" fill="#30201d"/><path d="M31 47h18v14l-9 8-9-8z" fill="url(#skinW)"/><path d="M25 28Q24 17 40 15Q56 17 55 31L53 43Q49 55 40 56Q30 54 27 42z" fill="url(#skinW)"/><path d="M27 34h7m12 0h7" stroke="#39251e" stroke-width="3" stroke-linecap="round"/><path d="M34 45Q40 49 46 45" stroke="#9c4c4b" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M30 60l10 9 10-9" fill="#f0e4d4"/></svg>';
+  return '<svg viewBox="0 0 80 80" role="img" aria-label="Robot conseiller"><defs><linearGradient id="robotMetal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff1d8"/><stop offset=".55" stop-color="#c7a477"/><stop offset="1" stop-color="#785638"/></linearGradient></defs><circle cx="40" cy="40" r="39" fill="#b69a77"/><path d="M40 8v9" stroke="#f9e7cc" stroke-width="3" stroke-linecap="round"/><circle cx="40" cy="7" r="4" fill="#fff1d8"/><rect x="15" y="19" width="50" height="40" rx="13" fill="url(#robotMetal)" stroke="#f7e4c8" stroke-width="2"/><rect x="22" y="27" width="36" height="19" rx="8" fill="#20201e"/><circle cx="32" cy="36" r="3.5" fill="#f7dcb4"/><circle cx="48" cy="36" r="3.5" fill="#f7dcb4"/><path d="M32 51Q40 56 48 51" stroke="#3b2b1b" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M15 34H9v15h8M65 34h6v15h-8" fill="none" stroke="#f7e4c8" stroke-width="3"/><path d="M27 59v7h26v-7" fill="#d7b68a"/><path d="M31 66v6m18-6v6" stroke="#f7e4c8" stroke-width="3" stroke-linecap="round"/></svg>';
+}
+function paintAssistantAvatar(){
+  const svg=assistantAvatarSvg(assistantSettings.avatar);
+  ["assistantAvatarButton","assistantAvatarHead"].forEach(id=>{const el=$(id);if(el)el.innerHTML=svg;});
+  if($("assistantHeaderName"))$("assistantHeaderName").textContent=assistantSettings.display_name||"Sora";
+  if($("chatLaunch"))$("chatLaunch").setAttribute("aria-label","Ouvrir le conseiller "+(assistantSettings.display_name||"Sora"));
+  const preview=$("assistantPreview");
+  if(preview)preview.innerHTML='<span class="assistant-avatar" style="width:42px;height:42px;flex:0 0 42px">'+svg+'</span><span>Aperçu : '+esc(assistantSettings.avatar==="man"?"Homme":assistantSettings.avatar==="woman"?"Femme":"Robot")+' · '+esc(assistantSettings.display_name||"Sora")+'</span>';
+}
+async function loadAssistantSettings(){
+  if(!supabaseClient)return;
+  try{
+    const {data,error}=await supabaseClient.from("store_assistant_settings").select("avatar,display_name,greeting").eq("id",1).maybeSingle();
+    if(error)throw error;
+    if(data)assistantSettings={avatar:data.avatar||"robot",display_name:data.display_name||"Sora",greeting:data.greeting||"Bonjour, je peux vous présenter nos pièces."};
+    paintAssistantAvatar();
+    if($("chatMessages")&&$("chatMessages").children.length===1){$("chatMessages").replaceChildren();chatBubble("bot",assistantSettings.greeting);}
+  }catch(error){console.warn("Paramètres du conseiller non chargés",error);}
+}
+async function saveAssistantSettings(){
+  try{
+    const avatar=$("assistantAvatarChoice").value;
+    const display_name=$("assistantDisplayName").value.trim()||"Sora";
+    const greeting=$("assistantGreeting").value.trim()||"Bonjour, je peux vous présenter nos pièces.";
+    const result=await adminApi("assistant-settings:save",{avatar,display_name,greeting});
+    assistantSettings=result.data||{avatar,display_name,greeting};
+    paintAssistantAvatar();
+    notify("Conseiller enregistré pour tous les visiteurs.");
+  }catch(error){notify(error.message||"Impossible d’enregistrer le conseiller.");}
+}
+function presentProduct(p){
+  if(!p)return;
+  const w=$("chatWindow");
+  if(!w.classList.contains("open")){w.classList.add("open");$("chatLaunch").setAttribute("aria-expanded","true");}
+  const pitch=(p.name||"Ce produit")+" est une belle option pour votre sélection. "+(p.description||"Une pièce choisie pour apporter une touche soignée à votre quotidien.")+" Son prix est de "+fmtPrice(p.price)+". Si cette pièce correspond à votre besoin, vous pouvez l’ajouter au panier dès maintenant.";
+  chatBubble("bot",pitch);
+  const el=$("chatSuggestions");el.replaceChildren();
+  const add=document.createElement("button");add.type="button";add.textContent="Ajouter au panier";
+  add.addEventListener("click",()=>{addToCart(Number(p.id));chatBubble("bot","C’est ajouté à votre panier. Vous pouvez continuer à découvrir la collection ou passer commande.");setChatSuggestions(["Voir la collection","Ouvrir le panier","Comment commander ?"]);});
+  const more=document.createElement("button");more.type="button";more.textContent="Voir d’autres produits";
+  more.addEventListener("click",()=>{document.querySelector("#shopGrid")?.scrollIntoView({behavior:"smooth",block:"start"});chatBubble("bot","Parcourez la collection et sélectionnez un autre article pour que je vous le présente.");setChatSuggestions(["Ouvrir le panier","Comment commander ?"]);});
+  el.append(add,more);
+  $("chatMessages").scrollTop=$("chatMessages").scrollHeight;
+}
+
 function toggleChat(){const w=$("chatWindow");const open=!w.classList.contains("open");w.classList.toggle("open",open);$("chatLaunch").setAttribute("aria-expanded",String(open));if(open)$("chatInput").focus();}
 function chatBubble(role,text){const n=document.createElement("div");n.className="chat-message "+role;n.textContent=text;$("chatMessages").appendChild(n);$("chatMessages").scrollTop=$("chatMessages").scrollHeight;}
 function setChatSuggestions(items){const el=$("chatSuggestions");el.replaceChildren();items.forEach(text=>{const b=document.createElement("button");b.type="button";b.textContent=text;b.addEventListener("click",()=>sendChatText(text));el.appendChild(b);});}
@@ -1456,7 +1530,9 @@ function init() {
   if(supabaseClient) { loadRemoteProducts(false); subscribeToProducts(); }
   renderShop();
   renderCart();
-  chatBubble("bot","Bonjour et bienvenue chez Atelier N°. Je suis Sora, votre assistante locale. Je peux vous présenter les produits et vous aider à commander.");
+  paintAssistantAvatar();
+  chatBubble("bot",assistantSettings.greeting+" Je peux vous présenter les produits et vous aider à commander.");
+  loadAssistantSettings();
   setChatSuggestions(["Voir la collection","Quel est votre prix ?","Comment commander ?"]);
 
   /* Boutons principaux */
@@ -1515,6 +1591,9 @@ function init() {
   $("checkoutClose").addEventListener("click",closeCheckout);
   $("checkoutCancel").addEventListener("click",closeCheckout);
   $("checkoutModal").addEventListener("click",e=>{if(e.target===$("checkoutModal"))closeCheckout();});
+  $("assistantAvatarChoice").addEventListener("change",paintAssistantAvatar);
+  $("assistantDisplayName").addEventListener("input",paintAssistantAvatar);
+  $("saveAssistantSettings").addEventListener("click",saveAssistantSettings);
   $("chatLaunch").addEventListener("click",toggleChat);
   $("chatClose").addEventListener("click",toggleChat);
   $("chatForm").addEventListener("submit",sendChat);
