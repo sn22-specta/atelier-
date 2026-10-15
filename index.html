@@ -382,6 +382,30 @@ img { display: block; max-width: 100%; }
 @media (min-width: 601px) and (max-width: 900px) {
   #shopGrid.grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
 }
+
+/* Bandeau photo cinématique à défilement continu */
+.lookbook-strip { padding: 34px 0 42px; overflow: hidden; border-bottom: 1px solid #1a1a1a; }
+.lookbook-heading { display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 20px 18px;max-width:1240px;margin:auto; }
+.lookbook-heading span { color:#d4b58b;text-transform:uppercase;letter-spacing:2.8px;font-size:10px; }
+.lookbook-heading p { color:#777;font-size:11px; }
+.lookbook-window { overflow:hidden; width:100%; }
+.lookbook-track { display:flex;gap:14px;width:max-content;animation:lookbookFlow 48s linear infinite; }
+.lookbook-window:hover .lookbook-track { animation-play-state:paused; }
+.lookbook-window:focus-within .lookbook-track { animation-play-state:paused; }
+.lookbook-card { position:relative; flex:0 0 clamp(210px,28vw,340px); height:clamp(230px,34vw,390px); overflow:hidden; border-radius:9px; background:#161616; }
+.lookbook-card img { width:100%;height:100%;object-fit:cover;filter:saturate(.78);transition:transform .8s ease,filter .8s ease; }
+.lookbook-card:hover img { transform:scale(1.045);filter:saturate(1); }
+.lookbook-card::after { content:"";position:absolute;inset:35% 0 0;background:linear-gradient(transparent,#0009);pointer-events:none; }
+.lookbook-card figcaption { position:absolute;left:16px;bottom:15px;z-index:1;color:#f5f1e9;font:400 17px Georgia,serif;letter-spacing:.2px; }
+@keyframes lookbookFlow { from { transform:translateX(0); } to { transform:translateX(calc(-50% - 7px)); } }
+@media(max-width:600px) {
+ .lookbook-strip { padding:26px 0 30px; }
+ .lookbook-heading { padding:0 16px 14px;align-items:flex-end; }
+ .lookbook-heading p { max-width:120px;text-align:right;line-height:1.4; }
+ .lookbook-track { gap:10px;animation-duration:38s; }
+ .lookbook-card { flex-basis:68vw;height:270px;border-radius:7px; }
+}
+@media(prefers-reduced-motion:reduce) { .lookbook-track { animation:none; } }
 </style>
 </head>
 <body>
@@ -397,6 +421,25 @@ img { display: block; max-width: 100%; }
   <section class="hero">
     <h1>L'art de<br><em>choisir.</em></h1>
     <p>Une sélection d'objets choisis pour leur caractère, leur matière et leur design intemporel.</p>
+  </section>
+
+  <section class="lookbook-strip" aria-label="Inspiration Atelier N°">
+    <div class="lookbook-heading">
+      <span>La sélection Atelier N°</span>
+      <p>Une inspiration, en mouvement.</p>
+    </div>
+    <div class="lookbook-window">
+      <div class="lookbook-track">
+        <figure class="lookbook-card"><img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=900&q=85" alt="Silhouette mode contemporaine" loading="lazy"><figcaption>La silhouette</figcaption></figure>
+        <figure class="lookbook-card"><img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=85" alt="Style urbain minimaliste" loading="lazy"><figcaption>Le style urbain</figcaption></figure>
+        <figure class="lookbook-card"><img src="https://images.unsplash.com/photo-1523398002811-999ca8dec234?auto=format&fit=crop&w=900&q=85" alt="Sélection de vêtements" loading="lazy"><figcaptionLes essentiels</figcaption></figure>
+        <figure class="lookbook-card"><img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=900&q=85" alt="Détails de mode et matières" loading="lazy"><figcaption>Les détails</figcaption></figure>
+        <figure class="lookbook-card"><img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=900&q=85" alt="" loading="lazy" aria-hidden="true"><figcaption>La silhouette</figcaption></figure>
+        <figure class="lookbook-card"><img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=85" alt="" loading="lazy" aria-hidden="true"><figcaption>Le style urbain</figcaption></figure>
+        <figure class="lookbook-card"><img src="https://images.unsplash.com/photo-1523398002811-999ca8dec234?auto=format&fit=crop&w=900&q=85" alt="" loading="lazy" aria-hidden="true"><figcaption>Les essentiels</figcaption></figure>
+        <figure class="lookbook-card"><img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=900&q=85" alt="" loading="lazy" aria-hidden="true"><figcaption>Les détails</figcaption></figure>
+      </div>
+    </div>
   </section>
 
   <section class="section">
