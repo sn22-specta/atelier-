@@ -406,6 +406,37 @@ img { display: block; max-width: 100%; }
  .lookbook-card { flex-basis:68vw;height:270px;border-radius:7px; }
 }
 @media(prefers-reduced-motion:reduce) { .lookbook-track { animation:none; } }
+
+/* Fiche produit immersive avec effet 3D flottant */
+.product-viewer { position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.82);backdrop-filter:blur(14px); }
+.product-viewer.is-open { display:flex;animation:viewerFade .25s ease both; }
+.product-viewer-panel { position:relative;width:min(900px,100%);max-height:90vh;overflow:auto;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:30px;align-items:center;padding:clamp(18px,4vw,38px);background:linear-gradient(145deg,#191919,#0d0d0d);border:1px solid #35302a;border-radius:18px;box-shadow:0 30px 100px #000a; }
+.product-viewer-close { position:absolute;right:14px;top:14px;width:38px;height:38px;border-radius:50%;border:1px solid #555;background:#111;color:#fff;font-size:24px;z-index:3; }
+.product-stage { min-height:340px;display:flex;align-items:center;justify-content:center;perspective:1000px;overflow:hidden;border-radius:12px;background:radial-gradient(ellipse at center,#38332b 0%,#171614 50%,#101010 100%); }
+.product-stage img { width:88%;height:clamp(270px,48vh,480px);object-fit:contain;filter:drop-shadow(0 28px 18px #0008);transform-style:preserve-3d;animation:productFloat 4.5s ease-in-out infinite,productTurn 8s ease-in-out infinite; }
+.product-viewer-info { padding:16px 8px 16px 0; }
+.product-viewer-kicker { color:#d4b58b;font-size:10px;text-transform:uppercase;letter-spacing:2.5px;margin-bottom:12px; }
+.product-viewer-info h2 { font:400 clamp(26px,4vw,42px)/1.12 Georgia,serif;margin-bottom:14px; }
+.product-viewer-info p { color:#b6b1a8;font-size:14px;line-height:1.8;margin-bottom:18px; }
+.product-viewer-price { font-size:20px;color:#d4b58b;margin-bottom:24px; }
+.product-viewer-actions { display:flex;gap:10px;flex-wrap:wrap; }
+#shopGrid .card { cursor:pointer; }
+#shopGrid .card-img img { transition:transform .5s ease; }
+#shopGrid .card:hover .card-img img { transform:scale(1.035); }
+@keyframes productFloat { 0%,100%{transform:translateY(0) rotateX(0deg) rotateY(-7deg)} 50%{transform:translateY(-13px) rotateX(2deg) rotateY(7deg)} }
+@keyframes productTurn { 0%,100%{filter:drop-shadow(0 28px 18px #0008)} 50%{filter:drop-shadow(0 38px 22px #0009)} }
+@keyframes viewerFade { from{opacity:0}to{opacity:1} }
+@media(max-width:650px) {
+ .product-viewer { padding:10px;align-items:center; }
+ .product-viewer-panel { grid-template-columns:1fr;gap:12px;padding:14px;border-radius:14px;max-height:94vh; }
+ .product-stage { min-height:250px;max-height:36vh; }
+ .product-stage img { height:clamp(210px,34vh,300px); }
+ .product-viewer-info { padding:6px 4px 8px; }
+ .product-viewer-info h2 { font-size:28px;margin-bottom:8px; }
+ .product-viewer-info p { font-size:13px;line-height:1.6;margin-bottom:10px; }
+ .product-viewer-price { margin-bottom:14px; }
+}
+@media(prefers-reduced-motion:reduce) { .product-stage img { animation:none; } }
 </style>
 </head>
 <body>
@@ -688,6 +719,33 @@ function saveProducts() { writeLS(LS_PRODUCTS, products); }
 function saveCart()     { writeLS(LS_CART, cart); }
 function saveOrders()   { writeLS(LS_ORDERS, orders); }
 
+
+/* Visionneuse produit flottante */
+function ensureProductViewer() {
+  if ($("productViewer")) return;
+  const viewer=document.createElement("div");
+  viewer.id="productViewer"; viewer.className="product-viewer";
+  viewer.innerHTML='<div class="product-viewer-panel" role="dialog" aria-modal="true" aria-labelledby="viewerTitle"><button type="button" class="product-viewer-close" aria-label="Fermer">×</button><div class="product-stage"><img id="viewerImage" alt=""></div><div class="product-viewer-info"><div class="product-viewer-kicker">Atelier N° · Présentation produit</div><h2 id="viewerTitle"></h2><p id="viewerDescription"></p><div class="product-viewer-price" id="viewerPrice"></div><div class="product-viewer-actions"><button type="button" class="btn-primary" id="viewerAdd">Ajouter au panier</button><button type="button" class="btn" id="viewerCloseSecondary">Continuer</button></div></div></div>';
+  document.body.appendChild(viewer);
+  const close=()=>{viewer.classList.remove("is-open");document.body.style.overflow="";};
+  viewer.querySelector(".product-viewer-close").addEventListener("click",close);
+  $("viewerCloseSecondary").addEventListener("click",close);
+  viewer.addEventListener("click",e=>{if(e.target===viewer)close();});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")close();});
+  $("viewerAdd").addEventListener("click",()=>{const id=Number(viewer.dataset.productId);if(id)addToCart(id);close();});
+}
+function openProductViewer(id) {
+  const p=products.find(x=>Number(x.id)===Number(id)); if(!p)return;
+  ensureProductViewer();
+  $("viewerImage").src=p.image||""; $("viewerImage").alt=p.name||"Produit";
+  $("viewerTitle").textContent=p.name||"";
+  $("viewerDescription").textContent=p.description||p.category||"Découvrez ce produit Atelier N°.";
+  $("viewerPrice").textContent=fmtPrice(p.price);
+  $("productViewer").dataset.productId=String(p.id);
+  $("productViewer").classList.add("is-open");
+  document.body.style.overflow="hidden";
+}
+
 /* ================================================================
    SHOP PUBLIC
 ================================================================ */
@@ -720,6 +778,10 @@ function renderShop() {
           '<button class="btn-add" data-add="' + p.id + '">+ Panier</button>' +
         '</div>' +
       '</div>';
+    card.addEventListener("click", (event) => {
+      if (event.target.closest("[data-add]")) return;
+      openProductViewer(p.id);
+    });
     grid.appendChild(card);
   });
 
