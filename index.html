@@ -659,6 +659,13 @@ body.viewer-open #shopGrid .card.is-selected {
 @media (prefers-reduced-motion: reduce) {
   .product-viewer-panel, .product-stage img { animation: none; }
 }
+
+/* =========================================================
+   CORRECTIF : empilement panier / modales au-dessus des boutons flottants
+========================================================= */
+.backdrop { z-index: 1700; }
+.cart-drawer { z-index: 1800; }
+.modal { z-index: 2500; }
 </style>
 </head>
 <body>
@@ -833,11 +840,12 @@ body.viewer-open #shopGrid .card.is-selected {
           <p style="color:#999;font-size:13px;line-height:1.6;margin-bottom:14px">Choisissez le personnage affiché en bas de la boutique. Quand un client sélectionne un produit, il le présente et l’invite à l’ajouter au panier.</p>
           <div class="field"><label for="assistantAvatarChoice">Personnage</label><select id="assistantAvatarChoice"><option value="robot">Robot</option><option value="man">Homme</option><option value="woman">Femme</option></select></div>
           <div class="field"><label for="assistantSkinTone">Couleur de peau</label><select id="assistantSkinTone"><option value="light">Claire</option><option value="medium" selected>Medium</option><option value="tan">Mate</option><option value="dark">Foncée</option><option value="deep">Très foncée</option></select></div>
-          <div class="field"><label for="assistantVoice">Voix publicitaire</label><select id="assistantVoice"><option value="auto" selected>Automatique selon le personnage</option><option value="male">Voix masculine</option><option value="female">Voix féminine</option><option value="robot">Voix synthétique</option></select></div>
+          <div class="field"><label for="assistantVoice">Voix publicitaire</label><select id="assistantVoice"><option value="auto" selected>Automatique selon le personnage</option><option value="male">Voix masculine (dynamique)</option><option value="female">Voix féminine (enjouée)</option><option value="robot">Voix synthétique (futuriste)</option></select></div>
           <div class="field"><label><input id="assistantSpeakProducts" type="checkbox" checked style="width:auto;margin-right:8px"> Lire les présentations de produits à voix haute</label></div>
           <div class="field"><label for="assistantDisplayName">Nom du conseiller</label><input id="assistantDisplayName" maxlength="40" value="Sora" placeholder="Ex. Sora"></div>
           <div class="field"><label for="assistantGreeting">Message d’accueil</label><textarea id="assistantGreeting" maxlength="240" rows="2" placeholder="Message affiché aux visiteurs"></textarea></div>
           <button type="button" class="btn-primary" id="saveAssistantSettings">Enregistrer le conseiller</button>
+          <button type="button" class="btn" id="testAssistantVoice" style="margin-left:8px">Tester la voix</button>
           <div id="assistantPreview" style="margin-top:12px;color:#d4b58b;font-size:12px">Aperçu : Robot · Sora</div>
         </div>
         <div style="background:rgba(212,181,139,0.08);border:1px dashed rgba(212,181,139,0.4);padding:16px;border-radius:10px;font-size:13px;line-height:1.7;color:#d2c3ae">
@@ -1002,6 +1010,7 @@ function closeProductViewer() {
   document.body.style.overflow = "";
   document.body.classList.remove("viewer-open");
   document.querySelectorAll("#shopGrid .card.is-selected").forEach(c => c.classList.remove("is-selected"));
+  ttsToken++;
   if ("speechSynthesis" in window) window.speechSynthesis.cancel();
 }
 
@@ -1015,7 +1024,7 @@ function ensureProductViewer() {
   $("viewerCloseSecondary").addEventListener("click",closeProductViewer);
   $("viewerSpeak").addEventListener("click",()=>{
     const p=products.find(x=>Number(x.id)===Number(viewer.dataset.productId));
-    if(p){const d=(p.description||"Découvrez ce produit Atelier N°.").replace(/\s+/g," ").trim();speakAssistant((p.name||"Ce produit")+". "+d+". Prix : "+fmtPrice(p.price)+".");}
+    if(p) speakAssistant(marketingPitch(p));
   });
   viewer.addEventListener("click",e=>{if(e.target===viewer)closeProductViewer();});
   document.addEventListener("keydown",e=>{if(e.key==="Escape"&&viewer.classList.contains("is-open"))closeProductViewer();});
@@ -1042,10 +1051,7 @@ function openProductViewer(id) {
   const chat=$("chatWindow"); if(chat) chat.classList.remove("open");
   const launch=$("chatLaunch"); if(launch) launch.setAttribute("aria-expanded","false");
 
-  if (assistantSettings && assistantSettings.speak_products) {
-    const d=(p.description||"Découvrez ce produit Atelier N°.").replace(/\s+/g," ").trim();
-    speakAssistant((p.name||"Ce produit")+". "+d+". Prix : "+fmtPrice(p.price)+".");
-  }
+  if (assistantSettings && assistantSettings.speak_products) speakAssistant(marketingPitch(p));
 }
 
 /* ================================================================
@@ -1145,6 +1151,11 @@ function renderCart() {
   const totalEl = $("cartTotal");
   if (!container) return;
 
+  /* Retire du panier les produits qui n'existent plus au catalogue */
+  const before = cart.length;
+  cart = cart.filter(i => products.some(p => p.id === i.id));
+  if (cart.length !== before) saveCart();
+
   container.innerHTML = "";
   let count = 0, total = 0;
 
@@ -1196,7 +1207,7 @@ function closeCart() {
 
 function checkout() {
   if (!cart.length) return notify("Votre panier est vide.");
-  $("checkoutTotal").textContent = fmtPrice(cart.reduce((sum,item)=>{ const p=products.find(x=>x.id===item.id); return sum+(p?Number(p.price)*Number(item.qty):0); },0));
+  $("checkoutTotal").textContent = fmtPrice(cart.reduce((sum,item)=>{ const p=products.find(x=>x.id===item.id); return sum+(p?Number(p.price)*(Number(item.qty)||1):0); },0));
   $("checkoutModal").classList.add("open");
 }
 function closeCheckout() { $("checkoutModal").classList.remove("open"); }
@@ -1205,7 +1216,8 @@ async function submitCheckout(e) {
   if (!cart.length) return notify("Votre panier est vide.");
   if (!supabaseClient) return notify("La connexion aux commandes est indisponible. Réessayez plus tard.");
   const customer = { name:$("customerName").value.trim(), phone:$("customerPhone").value.trim(), address:$("customerAddress").value.trim(), payment:$("customerPayment").value };
-  const items = cart.map(i=>{const p=products.find(x=>x.id===i.id);return p?{name:p.name,qty:i.qty,price:Number(p.price)}:null;}).filter(Boolean);
+  const items = cart.map(i=>{const p=products.find(x=>x.id===i.id);return p?{name:p.name,qty:Number(i.qty)||1,price:Number(p.price)}:null;}).filter(Boolean);
+  if (!items.length) return notify("Votre panier ne contient plus de produit disponible.");
   const total = items.reduce((sum,i)=>sum+(i.price*i.qty),0);
   const ref = "CMD-" + Date.now().toString(36).toUpperCase();
   const payload = {
@@ -1295,12 +1307,15 @@ async function loadRemoteProducts(showError=false) {
       const result=await adminApi("products:list");
       data=result.data;
     } else {
-      const result=await supabaseClient.from("products").select("id,name,category,price,description,image,tag,published,created_at,updated_at").eq("published",true).order("id",{ascending:true});
+      const base="id,name,category,price,description,image,tag,published,created_at,updated_at";
+      /* On tente d'abord avec le modèle 3D ; si la colonne n'existe pas, on retombe sur la requête de base */
+      let result=await supabaseClient.from("products").select(base+",model3d").eq("published",true).order("id",{ascending:true});
+      if(result.error) result=await supabaseClient.from("products").select(base).eq("published",true).order("id",{ascending:true});
       if(result.error) throw result.error;
       data=result.data;
     }
     products=(data||[]).map(p=>({id:Number(p.id),name:p.name,category:p.category,price:Number(p.price)||0,description:p.description||"",image:p.image||"",model3d:p.model3d||p.model_3d||"",tag:p.tag||"",published:p.published}));
-    renderShop(); renderAdminProducts(); renderAdminStats();
+    renderShop(); renderCart(); renderAdminProducts(); renderAdminStats();
   } catch(error) { console.error("Chargement catalogue Supabase:",error); if(showError) notify(error.message || "Impossible de synchroniser le catalogue."); }
 }
 function subscribeToProducts() {
@@ -1614,7 +1629,7 @@ function presentProduct(p){
   const shortDescription=description.split(" ").slice(0,10).join(" ");
   const pitch=(p.name||"Ce produit")+". "+shortDescription+(description.split(" ").length>10?"…":"")+". Prix : "+fmtPrice(p.price)+".";
   chatBubble("bot",pitch);
-  if(assistantSettings.speak_products) speakAssistant(pitch);
+  if(assistantSettings.speak_products) speakAssistant(marketingPitch(p));
   const el=$("chatSuggestions");el.replaceChildren();
   const add=document.createElement("button");add.type="button";add.textContent="Ajouter au panier";
   add.addEventListener("click",()=>{addToCart(Number(p.id));chatBubble("bot","C’est ajouté à votre panier. Vous pouvez continuer à découvrir la collection ou passer commande.");setChatSuggestions(["Voir la collection","Ouvrir le panier","Comment commander ?"]);});
@@ -1624,29 +1639,109 @@ function presentProduct(p){
   $("chatMessages").scrollTop=$("chatMessages").scrollHeight;
 }
 
+/* ================================================================
+   VOIX MARKETING
+   Synthèse vocale native du navigateur, découpée phrase par phrase
+   avec un rythme et une hauteur "publicité radio".
+================================================================ */
+let ttsToken = 0;
+let cachedVoices = [];
+function loadVoices(){ if ("speechSynthesis" in window) cachedVoices = window.speechSynthesis.getVoices() || []; }
+if ("speechSynthesis" in window) {
+  loadVoices();
+  window.speechSynthesis.addEventListener("voiceschanged", loadVoices);
+}
+
+const VOICE_HINTS = {
+  female: /denise|eloise|éloise|vivienne|brigitte|amelie|amélie|audrey|aurelie|julie|hortense|marie|léa|lea|google fran|\bfemale\b|femme/i,
+  male: /henri|remy|rémy|thomas|paul|antoine|claude|daniel|jean|\bmale\b|homme/i
+};
+const PREMIUM_VOICE = /natural|neural|online|premium|enhanced|améliorée|google/i;
+
+/* Débit et hauteur : dynamique, chaleureux, ton publicitaire */
+const VOICE_PROFILES = {
+  female: { rate: 1.05, pitch: 1.12 },
+  male:   { rate: 1.06, pitch: 0.90 },
+  robot:  { rate: 1.00, pitch: 0.65 }
+};
+
+function resolveVoiceKind(){
+  const v = (assistantSettings && assistantSettings.voice) || "auto";
+  if (v === "male" || v === "female" || v === "robot") return v;
+  const a = assistantSettings && assistantSettings.avatar;
+  return a === "man" ? "male" : a === "woman" ? "female" : "robot";
+}
+
+function pickVoice(kind){
+  const fr = cachedVoices.filter(v => /^fr([-_]|$)/i.test(v.lang || ""));
+  if (!fr.length) return null;
+  const score = v => (/^fr[-_]FR/i.test(v.lang) ? 3 : 0) + (PREMIUM_VOICE.test(v.name) ? 4 : 0) + (v.localService ? 0 : 1);
+  let pool = fr;
+  if (kind === "female") pool = fr.filter(v => VOICE_HINTS.female.test(v.name));
+  if (kind === "male")   pool = fr.filter(v => !VOICE_HINTS.female.test(v.name) && VOICE_HINTS.male.test(v.name));
+  return (pool.length ? pool : fr).slice().sort((a, b) => score(b) - score(a))[0];
+}
+
+function spokenPrice(n){
+  return new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(Number(n) || 0)
+    .replace(/[\u202f\u00a0]/g, " ") + " francs CFA";
+}
+
+function randomPick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+
+/* Texte publicitaire généré pour un produit */
+function marketingPitch(p){
+  const name = p.name || "ce produit";
+  const desc = (p.description || "").replace(/\s+/g, " ").trim().replace(/[.!?…]+$/, "");
+  const opener = randomPick([
+    "Découvrez " + name + " !",
+    "Craquez pour " + name + " !",
+    "Voici " + name + ", l'une de nos pièces stars !"
+  ]);
+  const closer = randomPick([
+    "Ajoutez-le à votre panier dès maintenant !",
+    "Ne laissez pas passer celui-ci : commandez-le dès aujourd'hui !",
+    "Offrez-vous ce coup de cœur Atelier N° !"
+  ]);
+  return [opener, desc ? desc + "." : "", "Disponible à seulement " + spokenPrice(p.price) + " !", closer]
+    .filter(Boolean).join(" ");
+}
+
 function speakAssistant(text){
-  const spokenText = String(text || "").trim();
-  if (!spokenText) return;
+  const spoken = String(text || "").replace(/\s+/g, " ").trim();
+  if (!spoken) return;
   if (!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) {
     notify("La lecture vocale n’est pas disponible dans ce navigateur. Essaie Safari ou Chrome à jour.");
     return;
   }
-  // Synthèse vocale native : aucun service externe ni clé API.
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(spokenText);
-  utterance.lang = "fr-FR";
-  utterance.rate = 0.92;
-  utterance.pitch = 1;
-  const chooseVoice = () => {
-    const voices = window.speechSynthesis.getVoices();
-    const frenchVoice = voices.find(v => /^fr([-_]|$)/i.test(v.lang || ""));
-    if (frenchVoice) utterance.voice = frenchVoice;
-  };
-  chooseVoice();
-  utterance.onerror = (ev) => { if (ev && (ev.error === "canceled" || ev.error === "interrupted")) return; notify("La lecture vocale a été interrompue. Appuie sur « Écouter la présentation » pour réessayer."); };
-  window.speechSynthesis.onvoiceschanged = chooseVoice;
-  window.speechSynthesis.speak(utterance);
+  const synth = window.speechSynthesis;
+  const token = ++ttsToken;
+  synth.cancel();
+  const kind = resolveVoiceKind();
+  const prof = VOICE_PROFILES[kind];
+  /* Phrase par phrase : intonation plus vivante, et évite la coupure à ~15 s de Chrome */
+  const parts = (spoken.match(/[^.!?…]+[.!?…]*/g) || [spoken]).map(s => s.trim()).filter(Boolean);
+  setTimeout(() => {
+    if (token !== ttsToken) return;
+    if (!cachedVoices.length) loadVoices();
+    const voice = pickVoice(kind);
+    parts.forEach((part, i) => {
+      const u = new SpeechSynthesisUtterance(part);
+      u.lang = voice ? voice.lang : "fr-FR";
+      if (voice) u.voice = voice;
+      const excited = /!\s*$/.test(part);
+      u.rate = prof.rate + (excited ? 0.04 : 0);
+      u.pitch = Math.min(2, prof.pitch + (excited ? 0.08 : 0));
+      u.volume = 1;
+      u.onerror = ev => {
+        if (ev && (ev.error === "canceled" || ev.error === "interrupted")) return;
+        if (i === 0) notify("La lecture vocale a été interrompue. Appuie sur « Écouter la présentation » pour réessayer.");
+      };
+      synth.speak(u);
+    });
+  }, 60);
 }
+
 function toggleChat(){const w=$("chatWindow");const open=!w.classList.contains("open");w.classList.toggle("open",open);$("chatLaunch").setAttribute("aria-expanded",String(open));if(open)$("chatInput").focus();}
 function chatBubble(role,text){const n=document.createElement("div");n.className="chat-message "+role;n.textContent=text;$("chatMessages").appendChild(n);$("chatMessages").scrollTop=$("chatMessages").scrollHeight;}
 function setChatSuggestions(items){const el=$("chatSuggestions");el.replaceChildren();items.forEach(text=>{const b=document.createElement("button");b.type="button";b.textContent=text;b.addEventListener("click",()=>sendChatText(text));el.appendChild(b);});}
@@ -1681,7 +1776,7 @@ function init() {
 
   /* Boutons principaux */
   $("presentationSpeak").addEventListener("click", () => {
-    speakAssistant("Bienvenue chez Atelier N°. Découvrez une sélection pensée pour celles et ceux qui apprécient le style, les belles matières et les détails qui font la différence. Parcourez notre collection, trouvez la pièce qui vous ressemble et ajoutez vos coups de cœur au panier en quelques instants. Atelier N°. Le plaisir de choisir, tout simplement.");
+    speakAssistant("Bienvenue chez Atelier N° ! Le style, les belles matières, les détails qui font toute la différence : tout est là ! Parcourez notre collection, trouvez la pièce qui vous ressemble, et ajoutez vos coups de cœur au panier en quelques secondes ! Atelier N° : le plaisir de choisir, tout simplement !");
   });
   $("btnAdmin").addEventListener("click", openAdmin);
   $("btnCart").addEventListener("click", openCart);
@@ -1742,6 +1837,14 @@ function init() {
   $("assistantSkinTone").addEventListener("change",paintAssistantAvatar);
   $("assistantDisplayName").addEventListener("input",paintAssistantAvatar);
   $("saveAssistantSettings").addEventListener("click",saveAssistantSettings);
+  /* Test de la voix choisie avec les réglages actuellement sélectionnés (sans enregistrer) */
+  $("testAssistantVoice").addEventListener("click",()=>{
+    const previous={avatar:assistantSettings.avatar,voice:assistantSettings.voice};
+    assistantSettings.avatar=$("assistantAvatarChoice").value;
+    assistantSettings.voice=$("assistantVoice").value;
+    speakAssistant(marketingPitch({name:"cette pièce signature",description:"Une élégance pensée pour durer",price:52000}));
+    setTimeout(()=>{assistantSettings.avatar=previous.avatar;assistantSettings.voice=previous.voice;},100);
+  });
   $("chatLaunch").addEventListener("click",toggleChat);
   $("chatClose").addEventListener("click",toggleChat);
   $("chatForm").addEventListener("submit",sendChat);
