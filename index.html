@@ -1640,9 +1640,10 @@ function presentProduct(p){
 }
 
 /* ================================================================
-   VOIX MARKETING
+   VOIX MARKETING — moteur publicitaire
    Synthèse vocale native du navigateur, découpée phrase par phrase
-   avec un rythme et une hauteur "publicité radio".
+   avec une courbe d'intonation de type spot radio : accroche vive,
+   ralentissement sur le prix, envolée finale sur l'appel à l'action.
 ================================================================ */
 let ttsToken = 0;
 let cachedVoices = [];
@@ -1656,13 +1657,13 @@ const VOICE_HINTS = {
   female: /denise|eloise|éloise|vivienne|brigitte|amelie|amélie|audrey|aurelie|julie|hortense|marie|léa|lea|google fran|\bfemale\b|femme/i,
   male: /henri|remy|rémy|thomas|paul|antoine|claude|daniel|jean|\bmale\b|homme/i
 };
-const PREMIUM_VOICE = /natural|neural|online|premium|enhanced|améliorée|google/i;
+const PREMIUM_VOICE = /natural|neural|online|premium|enhanced|améliorée|wavenet|studio|google/i;
 
-/* Débit et hauteur : dynamique, chaleureux, ton publicitaire */
+/* Débit et hauteur : ton publicitaire énergique */
 const VOICE_PROFILES = {
-  female: { rate: 1.05, pitch: 1.12 },
-  male:   { rate: 1.06, pitch: 0.90 },
-  robot:  { rate: 1.00, pitch: 0.65 }
+  female: { rate: 1.20, pitch: 1.15 },
+  male:   { rate: 1.18, pitch: 0.92 },
+  robot:  { rate: 1.08, pitch: 0.72 }
 };
 
 function resolveVoiceKind(){
@@ -1675,7 +1676,11 @@ function resolveVoiceKind(){
 function pickVoice(kind){
   const fr = cachedVoices.filter(v => /^fr([-_]|$)/i.test(v.lang || ""));
   if (!fr.length) return null;
-  const score = v => (/^fr[-_]FR/i.test(v.lang) ? 3 : 0) + (PREMIUM_VOICE.test(v.name) ? 4 : 0) + (v.localService ? 0 : 1);
+  const score = v =>
+    (/^fr[-_]FR/i.test(v.lang) ? 5 : /^fr[-_]CA/i.test(v.lang) ? 1 : 0) +
+    (PREMIUM_VOICE.test(v.name) ? 8 : 0) +
+    (/google/i.test(v.name) ? 3 : 0) +
+    (v.localService ? 0 : 1);
   let pool = fr;
   if (kind === "female") pool = fr.filter(v => VOICE_HINTS.female.test(v.name));
   if (kind === "male")   pool = fr.filter(v => !VOICE_HINTS.female.test(v.name) && VOICE_HINTS.male.test(v.name));
@@ -1696,15 +1701,23 @@ function marketingPitch(p){
   const opener = randomPick([
     "Découvrez " + name + " !",
     "Craquez pour " + name + " !",
-    "Voici " + name + ", l'une de nos pièces stars !"
+    "Voici " + name + " !",
+    "Laissez-vous séduire par " + name + " !"
+  ]);
+  const hook = randomPick([
+    "Une pièce qui ne passe pas inaperçue !",
+    "Le détail qui change tout !",
+    "Une élégance qui se voit, une qualité qui se sent !"
   ]);
   const closer = randomPick([
+    "À ce prix, c'est une affaire à ne pas manquer !",
     "Ajoutez-le à votre panier dès maintenant !",
-    "Ne laissez pas passer celui-ci : commandez-le dès aujourd'hui !",
-    "Offrez-vous ce coup de cœur Atelier N° !"
+    "Commandez aujourd'hui, vous ne le regretterez pas !"
   ]);
-  return [opener, desc ? desc + "." : "", "Disponible à seulement " + spokenPrice(p.price) + " !", closer]
-    .filter(Boolean).join(" ");
+  return [opener,
+          desc ? desc + "." : hook,
+          "Disponible à seulement " + spokenPrice(p.price) + " !",
+          closer].filter(Boolean).join(" ");
 }
 
 function speakAssistant(text){
@@ -1719,20 +1732,44 @@ function speakAssistant(text){
   synth.cancel();
   const kind = resolveVoiceKind();
   const prof = VOICE_PROFILES[kind];
-  /* Phrase par phrase : intonation plus vivante, et évite la coupure à ~15 s de Chrome */
   const parts = (spoken.match(/[^.!?…]+[.!?…]*/g) || [spoken]).map(s => s.trim()).filter(Boolean);
+
   setTimeout(() => {
     if (token !== ttsToken) return;
     if (!cachedVoices.length) loadVoices();
     const voice = pickVoice(kind);
+
     parts.forEach((part, i) => {
       const u = new SpeechSynthesisUtterance(part);
       u.lang = voice ? voice.lang : "fr-FR";
       if (voice) u.voice = voice;
-      const excited = /!\s*$/.test(part);
-      u.rate = prof.rate + (excited ? 0.04 : 0);
-      u.pitch = Math.min(2, prof.pitch + (excited ? 0.08 : 0));
-      u.volume = 1;
+
+      const isFirst  = i === 0;
+      const isLast   = i === parts.length - 1;
+      const isPrice  = /francs?\s*CFA|FCFA/i.test(part);
+      const isCTA    = /panier|commander|commandez|craquez|offrez|dès maintenant|découvrez|ne laissez pas|ajoutez|offrez-vous|profitez|saisissez|dépêchez|aujourd'hui|tout simplement/i.test(part);
+      const isExcl   = /!\s*$/.test(part);
+      const isQuest  = /\?\s*$/.test(part);
+
+      let rate   = prof.rate;
+      let pitch  = prof.pitch;
+      let volume = 0.98;
+
+      /* Accroche : on ouvre fort */
+      if (isFirst)         { rate += 0.08; pitch += 0.07; volume = 1; }
+      /* Prix : on ralentit pour l'emphase */
+      if (isPrice)         { rate -= 0.12; pitch += 0.03; volume = 1; }
+      /* CTA / clôture : on accélère et on monte */
+      if (isLast || isCTA) { rate += 0.10; pitch += 0.06; volume = 1; }
+      /* Exclamation : pic d'énergie */
+      if (isExcl)          { rate += 0.02; pitch += 0.04; }
+      /* Question : intonation montante */
+      if (isQuest)         { pitch += 0.08; }
+
+      u.rate   = Math.max(0.6, Math.min(2, rate));
+      u.pitch  = Math.max(0.5, Math.min(2, pitch));
+      u.volume = Math.max(0,   Math.min(1, volume));
+
       u.onerror = ev => {
         if (ev && (ev.error === "canceled" || ev.error === "interrupted")) return;
         if (i === 0) notify("La lecture vocale a été interrompue. Appuie sur « Écouter la présentation » pour réessayer.");
